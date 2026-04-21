@@ -1,0 +1,344 @@
+/* css/style.css */
+body {
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+button {
+    transition: transform 0.2s active, background-color 0.3s ease;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* ==================================
+   Cinematic Unified Card
+===================================== */
+.unified-card {
+    transition: box-shadow 0.5s ease;
+}
+
+.cinematic-image-wrapper {
+    max-height: 0;
+    transition: max-height 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    overflow: hidden;
+}
+
+.cinematic-image-wrapper.cinematic-expanded {
+    max-height: 800px;
+}
+
+.cinematic-image-inner {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.cinematic-image-wrapper.cinematic-expanded .cinematic-image-inner {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+/* ==================================
+   Micro-interactions (Resume Mode)
+===================================== */
+.resume-card {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.resume-card:hover {
+    transform: translateX(5px) translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    border-left-color: #3b82f6 !important;
+}
+
+body.text-slate-900 .resume-card:hover {
+    background-color: #f8fafc;
+}
+
+body.text-white .resume-card:hover {
+    background-color: #1e293b;
+}
+
+.resume-card:hover .glow-point {
+    background-color: #3b82f6 !important;
+    transform: scale(1.3);
+    transition: all 0.3s ease;
+}
+
+.glow-point {
+    transition: all 0.3s ease;
+}
+
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.scroll-reveal.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==================================
+   Print Mode (A4 PDF Export แบบประหยัดกระดาษ)
+===================================== */
+@media print {
+    @page {
+        size: auto;
+        margin: 0mm;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    nav,
+    #edit-modal,
+    .no-print,
+    #dynamic-bg {
+        display: none !important;
+    }
+
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+    }
+
+    #app,
+    .container {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        /* 🌟 ลด Padding ลง เพื่อดึงข้อมูล Contact และ Skills ให้อยู่หน้าแรกได้พอดี */
+        padding: 10mm 15mm !important;
+        box-sizing: border-box !important;
+        box-shadow: none !important;
+    }
+
+    /* 🌟 ลด Margin ที่ไม่จำเป็นออก เพื่อประหยัดพื้นที่ */
+    .mt-10,
+    .mt-20,
+    .mt-6 {
+        margin-top: 15px !important;
+    }
+
+    .gap-12 {
+        gap: 15px !important;
+    }
+
+    .mb-12,
+    .mb-24,
+    .mb-32 {
+        margin-bottom: 15px !important;
+    }
+
+    .py-12,
+    .py-24,
+    .py-20 {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* 🌟 ป้องกันไม่ให้ Header ตกไปอยู่คนละหน้ากับเนื้อหา (Orphan) */
+    h3 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        margin-bottom: 10px !important;
+    }
+
+    .fade-in,
+    .scroll-reveal,
+    .cinematic-image-wrapper,
+    .cinematic-image-inner {
+        display: block !important;
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+        overflow: visible !important;
+        max-height: none !important;
+    }
+
+    .scrollytelling-wrapper {
+        height: auto !important;
+        margin-bottom: 0 !important;
+    }
+
+    .sticky {
+        position: static !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .scrolly-spacer {
+        display: none !important;
+    }
+
+    .scrollytelling-track {
+        transform: none !important;
+        flex-wrap: wrap !important;
+        gap: 15px !important;
+        margin-top: 15px !important;
+    }
+
+    .scrollytelling-track img {
+        height: 250px !important;
+        width: 48% !important;
+        max-width: 48% !important;
+        object-fit: cover;
+    }
+
+    .print-layout-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .print-order-1 {
+        order: 1 !important;
+    }
+
+    .print-order-2 {
+        order: 2 !important;
+    }
+
+    .print-order-3 {
+        order: 3 !important;
+    }
+
+    .print-order-4 {
+        order: 4 !important;
+    }
+
+    /* 🌟 ปล่อยให้ระบบขึ้นหน้าใหม่แบบ Auto แต่งาน 1 ชิ้น ห้ามขาดครึ่งหน้า */
+    .print-exp-item {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-bottom: 20px !important;
+        padding-top: 5mm !important;
+    }
+}
+
+/* ==================================
+   Dynamic Background Animations
+===================================== */
+@keyframes tech-scan {
+    0% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(100vh);
+    }
+}
+
+@keyframes float-orb {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+}
+
+@keyframes gov-shimmer {
+    0% {
+        transform: translateX(-150%) skewX(-15deg);
+    }
+
+    100% {
+        transform: translateX(250%) skewX(-15deg);
+    }
+}
+
+@keyframes creative-blob {
+    0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        transform: rotate(0deg);
+    }
+
+    50% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+
+    100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bg-pan {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes eco-leaf {
+    0% {
+        transform: translate(0, -10%) rotate(0deg);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.6;
+    }
+
+    80% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translate(100px, 110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes bold-pulse {
+
+    0%,
+    100% {
+        transform: scale(1) skewY(-10deg);
+        opacity: 0.1;
+    }
+
+    50% {
+        transform: scale(1.05) skewY(-10deg);
+        opacity: 0.3;
+    }
+}
+
+@keyframes luxury-dust {
+    0% {
+        transform: translateY(10vh) scale(1);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(-50vh) scale(0.2);
+        opacity: 0;
+    }
+}
