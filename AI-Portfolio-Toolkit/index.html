@@ -449,25 +449,67 @@
             render(data);
         }
 
+        // 🌟 ระบบย่อรูปภาพ (Image Compression) สำหรับรูปโปรไฟล์
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    currentAvatarBase64 = e.target.result;
-                    document.getElementById('avatar-preview').src = currentAvatarBase64;
-                    document.getElementById('avatar-preview').classList.remove('hidden');
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const MAX_WIDTH = 400; // ย่อรูปโปรไฟล์ให้กว้างสุดแค่ 400px
+
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // แปลงเป็น JPEG และลดคุณภาพเหลือ 70% เพื่อประหยัดพื้นที่ 
+                        currentAvatarBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('avatar-preview').src = currentAvatarBase64;
+                        document.getElementById('avatar-preview').classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
+        // 🌟 ระบบย่อรูปภาพ (Image Compression) สำหรับรูปผลงาน (Experience)
         function handleExpImageUpload(event) {
             Array.from(event.target.files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    currentExpImagesBase64.push(e.target.result);
-                    renderExpImagePreview();
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const MAX_WIDTH = 800; // ย่อรูปผลงานให้กว้างสุด 800px (ชัดพอสำหรับเว็บและ PPTX)
+
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // แปลงเป็น JPEG และลดคุณภาพเหลือ 70%
+                        currentExpImagesBase64.push(canvas.toDataURL('image/jpeg', 0.7));
+                        renderExpImagePreview();
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             });
