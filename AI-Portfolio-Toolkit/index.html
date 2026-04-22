@@ -45,6 +45,28 @@
             outline-offset: 2px;
             transform: scale(1.1);
         }
+
+        #watermark {
+            display: none;
+        }
+
+        .is-downloaded #watermark {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            opacity: 0.4;
+            z-index: 100;
+            pointer-events: none;
+            color: gray;
+        }
+
+        .is-downloaded nav button:last-child,
+        .is-downloaded #btn-appearance,
+        .is-downloaded button[onclick="handleExportWeb()"] {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -54,6 +76,8 @@
         class="fixed inset-0 z-[-1] bg-cover bg-center bg-no-repeat transition-all duration-700 opacity-0 bg-blend-overlay bg-[#0f172a]/90">
     </div>
     <div id="theme-decorations" class="fixed inset-0 z-[0] pointer-events-none overflow-hidden"></div>
+
+    <div id="watermark">Web Portfolio by Kasidech "Ge7ex" Settavanit</div>
 
     <nav class="fixed top-6 right-6 z-50 flex items-center gap-3">
         <button onclick="toggleLang()" id="btn-lang"
@@ -268,11 +292,9 @@
                                 <option value="Nov">Nov</option>
                                 <option value="Dec">Dec</option>
                             </select>
-
                             <input type="number" id="new-exp-start-year" placeholder="Start Year" min="1900"
                                 onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                                 class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
-
                             <select id="new-exp-end-month"
                                 class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
                                 <option value="">End Month</option>
@@ -289,11 +311,9 @@
                                 <option value="Nov">Nov</option>
                                 <option value="Dec">Dec</option>
                             </select>
-
                             <input type="number" id="new-exp-end-year" placeholder="End Year" min="1900"
                                 onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                                 class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
-
                             <div class="col-span-2 md:col-span-4 flex items-center gap-2 mt-1">
                                 <input type="checkbox" id="new-exp-current" onchange="toggleEndDate()"
                                     class="w-4 h-4 accent-emerald-500">
@@ -348,14 +368,12 @@
                         <div class="flex gap-3">
                             <button onclick="cancelEditExp()" id="btn-cancel-exp"
                                 class="hidden px-6 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-all font-semibold">Cancel</button>
-
                             <button onclick="addExperience(true)" id="btn-add-more-exp"
                                 class="px-6 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded-xl font-bold transition-all flex items-center gap-2"
-                                title="บันทึกโปรเจกต์นี้ และเคลียร์ช่องเพื่อเพิ่มโปรเจกต์ถัดไป (โดยคงชื่อบริษัทและวันที่ไว้)">
+                                title="บันทึกโปรเจกต์นี้ และเคลียร์ช่องเพื่อเพิ่มโปรเจกต์ถัดไป">
                                 <i data-lucide="copy-plus" class="w-5 h-5"></i> <span class="hidden md:inline">Save &
                                     Add Another</span>
                             </button>
-
                             <button onclick="addExperience(false)" id="btn-add-exp"
                                 class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
                                 <i data-lucide="check" class="w-5 h-5"></i> Save & Close
@@ -372,20 +390,16 @@
 
             <div class="p-6 border-t border-slate-800 bg-slate-900/80 flex flex-wrap justify-end gap-3 rounded-b-3xl">
                 <button onclick="handleExportWeb()"
-                    class="flex-1 min-w-[120px] py-3 rounded-xl font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-all flex items-center justify-center gap-2 border border-slate-700">
-                    <i data-lucide="globe" class="w-4 h-4 text-cyan-400"></i> <span class="text-sm">WEB</span>
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-600/20 transition-all flex items-center justify-center gap-2 border border-cyan-500">
+                    <i data-lucide="download" class="w-4 h-4"></i> <span class="text-sm">Download WEB</span>
                 </button>
                 <button onclick="handleExportPPTX()"
-                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-orange-600 hover:bg-orange-500 shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2 border border-orange-500">
-                    <i data-lucide="file-presentation" class="w-4 h-4"></i> <span class="text-sm">PPTX</span>
-                </button>
-                <button onclick="handlePrint()"
-                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 border border-emerald-500">
-                    <i data-lucide="printer" class="w-4 h-4"></i> <span class="text-sm">PDF</span>
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-orange-600 hover:bg-orange-500 shadow-lg shadow-orange-600/20 transition-all flex items-center justify-center gap-2 border border-orange-500">
+                    <i data-lucide="file-presentation" class="w-4 h-4"></i> <span class="text-sm">Download PPTX</span>
                 </button>
                 <button onclick="updatePreview()"
                     class="w-full md:w-auto px-10 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
-                    <i data-lucide="save" class="w-5 h-5"></i> Update Profile
+                    <i data-lucide="save" class="w-5 h-5"></i> Save Profile
                 </button>
             </div>
         </div>
@@ -432,6 +446,7 @@
         }
 
         function toggleModal() {
+            if (document.body.classList.contains('is-downloaded')) return;
             const modal = document.getElementById('edit-modal');
             modal.classList.toggle('hidden');
             modal.classList.toggle('flex');
@@ -453,14 +468,11 @@
                     const img = new Image();
                     img.onload = function () {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+                        let width = img.width; let height = img.height;
                         const MAX_WIDTH = 400;
-
                         if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-
                         currentAvatarBase64 = canvas.toDataURL('image/jpeg', 0.8);
                         document.getElementById('avatar-preview').src = currentAvatarBase64;
                         document.getElementById('avatar-preview').classList.remove('hidden');
@@ -478,14 +490,11 @@
                     const img = new Image();
                     img.onload = function () {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
+                        let width = img.width; let height = img.height;
                         const MAX_WIDTH = 800;
-
                         if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-
                         currentExpImagesBase64.push(canvas.toDataURL('image/jpeg', 0.8));
                         renderExpImagePreview();
                     };
@@ -496,24 +505,12 @@
             event.target.value = '';
         }
 
-        function removeExpImage(index) {
-            currentExpImagesBase64.splice(index, 1);
-            renderExpImagePreview();
-        }
-
+        function removeExpImage(index) { currentExpImagesBase64.splice(index, 1); renderExpImagePreview(); }
         function renderExpImagePreview() {
             const preview = document.getElementById('exp-img-preview');
-            if (currentExpImagesBase64.length === 0) {
-                preview.classList.add('hidden');
-                return;
-            }
+            if (currentExpImagesBase64.length === 0) { preview.classList.add('hidden'); return; }
             preview.classList.remove('hidden');
-            preview.innerHTML = currentExpImagesBase64.map((b64, idx) => `
-                <div class="relative inline-block shrink-0 mt-2 mr-2">
-                    <img src="${b64}" class="h-16 w-16 object-cover rounded-md border border-slate-600">
-                    <button onclick="removeExpImage(${idx})" class="absolute -top-2 -right-2 bg-slate-900 border border-slate-600 hover:text-red-500 rounded-full w-5 h-5 flex items-center justify-center text-slate-300"><i data-lucide="x" class="w-3 h-3"></i></button>
-                </div>
-            `).join('');
+            preview.innerHTML = currentExpImagesBase64.map((b64, idx) => `<div class="relative inline-block shrink-0 mt-2 mr-2"><img src="${b64}" class="h-16 w-16 object-cover rounded-md border border-slate-600"><button onclick="removeExpImage(${idx})" class="absolute -top-2 -right-2 bg-slate-900 border border-slate-600 hover:text-red-500 rounded-full w-5 h-5 flex items-center justify-center text-slate-300"><i data-lucide="x" class="w-3 h-3"></i></button></div>`).join('');
             lucide.createIcons();
         }
 
@@ -529,251 +526,113 @@
             const em = document.getElementById('new-exp-end-month').value;
             const ey = document.getElementById('new-exp-end-year').value;
             const isCurrent = document.getElementById('new-exp-current').checked;
-
             const company_th = document.getElementById('new-exp-company-th').value;
             const title_th = document.getElementById('new-exp-title-th').value;
             const desc_th = document.getElementById('new-exp-desc-th').value;
             const hl_th = document.getElementById('new-exp-highlights-th').value.split('\n').filter(h => h.trim() !== '');
-
             const company_en = document.getElementById('new-exp-company-en').value;
             const title_en = document.getElementById('new-exp-title-en').value;
             const desc_en = document.getElementById('new-exp-desc-en').value;
             const hl_en = document.getElementById('new-exp-highlights-en').value.split('\n').filter(h => h.trim() !== '');
 
             if (!sy || (!title_th && !title_en)) return alert("Please fill at least Start Year and Title");
-
             const data = StorageHandler.load();
             if (!data.exp) data.exp = [];
-
-            const expItem = {
-                startMonth: sm, startYear: sy, endMonth: em, endYear: ey, isCurrent, year: sy,
-                company_th, title_th, desc_th, highlights_th: hl_th,
-                company_en, title_en, desc_en, highlights_en: hl_en,
-                images: [...currentExpImagesBase64]
-            };
-
-            if (editingExpIndex === -1) {
-                data.exp.push(expItem);
-            } else {
-                data.exp[editingExpIndex] = expItem;
-            }
-
+            const expItem = { startMonth: sm, startYear: sy, endMonth: em, endYear: ey, isCurrent, year: sy, company_th, title_th, desc_th, highlights_th: hl_th, company_en, title_en, desc_en, highlights_en: hl_en, images: [...currentExpImagesBase64] };
+            if (editingExpIndex === -1) { data.exp.push(expItem); } else { data.exp[editingExpIndex] = expItem; }
             StorageHandler.save(data);
 
             if (keepContext) {
-                ['title-th', 'desc-th', 'highlights-th', 'title-en', 'desc-en', 'highlights-en'].forEach(id => {
-                    if (document.getElementById(`new-exp-${id}`)) document.getElementById(`new-exp-${id}`).value = '';
-                });
-                currentExpImagesBase64 = [];
-                renderExpImagePreview();
-                editingExpIndex = -1;
-                refreshExpPreview();
-
+                ['title-th', 'desc-th', 'highlights-th', 'title-en', 'desc-en', 'highlights-en'].forEach(id => { if (document.getElementById(`new-exp-${id}`)) document.getElementById(`new-exp-${id}`).value = ''; });
+                currentExpImagesBase64 = []; renderExpImagePreview();
+                editingExpIndex = -1; refreshExpPreview();
                 const btn = document.getElementById('btn-add-more-exp');
                 const originalHtml = btn.innerHTML;
                 btn.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-green-400"></i> <span class="hidden md:inline text-green-400">Saved!</span>`;
-                lucide.createIcons();
-                setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1000);
-
-            } else {
-                cancelEditExp();
-                refreshExpPreview();
-            }
+                lucide.createIcons(); setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1000);
+            } else { cancelEditExp(); refreshExpPreview(); }
         }
 
         function editExp(index) {
             const data = StorageHandler.load();
-            const item = data.exp[index];
-            editingExpIndex = index;
-
+            const item = data.exp[index]; editingExpIndex = index;
             document.getElementById('new-exp-start-month').value = item.startMonth || '';
             document.getElementById('new-exp-start-year').value = item.startYear || item.year || '';
             document.getElementById('new-exp-end-month').value = item.endMonth || '';
             document.getElementById('new-exp-end-year').value = item.endYear || '';
             document.getElementById('new-exp-current').checked = item.isCurrent || false;
             toggleEndDate();
-
             document.getElementById('new-exp-company-th').value = item.company_th || item.company || '';
             document.getElementById('new-exp-title-th').value = item.title_th || item.title || '';
             document.getElementById('new-exp-desc-th').value = item.desc_th || item.desc || '';
             document.getElementById('new-exp-highlights-th').value = item.highlights_th ? item.highlights_th.join('\n') : (item.highlights ? item.highlights.join('\n') : '');
-
             document.getElementById('new-exp-company-en').value = item.company_en || '';
             document.getElementById('new-exp-title-en').value = item.title_en || '';
             document.getElementById('new-exp-desc-en').value = item.desc_en || '';
             document.getElementById('new-exp-highlights-en').value = item.highlights_en ? item.highlights_en.join('\n') : '';
-
             currentExpImagesBase64 = item.images ? [...item.images] : [];
             renderExpImagePreview();
-
             document.getElementById('btn-add-exp').innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Update Experience';
             document.getElementById('btn-add-exp').classList.replace('text-emerald-400', 'text-amber-400');
             document.getElementById('btn-add-exp').classList.replace('bg-emerald-600/20', 'bg-amber-600/20');
             document.getElementById('btn-cancel-exp').classList.remove('hidden');
-
             document.getElementById('btn-add-more-exp').classList.add('hidden');
             lucide.createIcons();
         }
 
         function cancelEditExp() {
             editingExpIndex = -1;
-            ['start-month', 'start-year', 'end-month', 'end-year', 'company-th', 'title-th', 'desc-th', 'highlights-th', 'company-en', 'title-en', 'desc-en', 'highlights-en'].forEach(id => {
-                if (document.getElementById(`new-exp-${id}`)) document.getElementById(`new-exp-${id}`).value = '';
-            });
+            ['start-month', 'start-year', 'end-month', 'end-year', 'company-th', 'title-th', 'desc-th', 'highlights-th', 'company-en', 'title-en', 'desc-en', 'highlights-en'].forEach(id => { if (document.getElementById(`new-exp-${id}`)) document.getElementById(`new-exp-${id}`).value = ''; });
             document.getElementById('new-exp-current').checked = false; toggleEndDate();
             currentExpImagesBase64 = []; renderExpImagePreview();
-
             document.getElementById('btn-add-exp').innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Save & Close';
             document.getElementById('btn-add-exp').classList.replace('text-amber-400', 'text-emerald-400');
             document.getElementById('btn-add-exp').classList.replace('bg-amber-600/20', 'bg-emerald-600/20');
             document.getElementById('btn-cancel-exp').classList.add('hidden');
-
             document.getElementById('btn-add-more-exp').classList.remove('hidden');
             lucide.createIcons();
         }
 
-        function removeExp(index) {
-            const data = StorageHandler.load();
-            data.exp.splice(index, 1);
-            StorageHandler.save(data);
-            refreshExpPreview();
-        }
+        function removeExp(index) { const data = StorageHandler.load(); data.exp.splice(index, 1); StorageHandler.save(data); refreshExpPreview(); }
 
         function refreshExpPreview() {
             const data = StorageHandler.load();
             const container = document.getElementById('exp-list-preview');
             if (!data.exp || data.exp.length === 0) return container.innerHTML = '<p class="text-sm text-slate-500 italic">No experience added yet.</p>';
-
             const lang = data.lang || 'th';
-
-            // 🌟 เช็คค่า พ.ศ. / ค.ศ. สำหรับโชว์ในลิสต์พรีวิว
-            const formatYear = (yStr, targetLang) => {
-                if (!yStr) return '';
-                const y = parseInt(yStr);
-                if (isNaN(y)) return yStr;
-                if (targetLang === 'th' && y < 2500) return (y + 543).toString();
-                if (targetLang === 'en' && y >= 2500) return (y - 543).toString();
-                return y.toString();
-            };
-
+            const formatYear = (yStr, targetLang) => { if (!yStr) return ''; const y = parseInt(yStr); if (isNaN(y)) return yStr; if (targetLang === 'th' && y < 2500) return (y + 543).toString(); if (targetLang === 'en' && y >= 2500) return (y - 543).toString(); return y.toString(); };
             container.innerHTML = data.exp.map((item, index) => {
                 const showTitle = lang === 'th' ? (item.title_th || item.title) : (item.title_en || item.title_th || item.title);
                 const showCompany = lang === 'th' ? (item.company_th || item.company) : (item.company_en || item.company_th || item.company);
-
-                const sy = formatYear(item.startYear || item.year, lang);
-                const ey = formatYear(item.endYear, lang);
-                const showEnd = item.isCurrent ? (lang === 'th' ? ' - ปัจจุบัน' : ' - Present') : (ey ? ' - ' + ey : '');
-
-                return `
-                <div class="flex justify-between items-center bg-[#0f172a] p-4 rounded-xl border border-slate-700 shadow-inner">
-                    <div>
-                        <span class="text-emerald-400 font-bold text-sm bg-emerald-400/10 px-2 py-1 rounded inline-block mb-1">${sy}${showEnd}</span>
-                        <h4 class="text-white font-medium text-lg">${showTitle}</h4>
-                        ${showCompany ? `<p class="text-sm text-slate-400">@ ${showCompany}</p>` : ''}
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editExp(${index})" class="text-amber-400 hover:bg-amber-400/20 p-2.5 rounded-xl transition-colors bg-amber-400/5"><i data-lucide="edit" class="w-4 h-4"></i></button>
-                        <button onclick="removeExp(${index})" class="text-red-400 hover:bg-red-400/20 p-2.5 rounded-xl transition-colors bg-red-400/5"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                </div>
-            `}).join('');
+                const sy = formatYear(item.startYear || item.year, lang); const ey = formatYear(item.endYear, lang); const showEnd = item.isCurrent ? (lang === 'th' ? ' - ปัจจุบัน' : ' - Present') : (ey ? ' - ' + ey : '');
+                return `<div class="flex justify-between items-center bg-[#0f172a] p-4 rounded-xl border border-slate-700 shadow-inner"><div><span class="text-emerald-400 font-bold text-sm bg-emerald-400/10 px-2 py-1 rounded inline-block mb-1">${sy}${showEnd}</span><h4 class="text-white font-medium text-lg">${showTitle}</h4>${showCompany ? `<p class="text-sm text-slate-400">@ ${showCompany}</p>` : ''}</div><div class="flex gap-2"><button onclick="editExp(${index})" class="text-amber-400 hover:bg-amber-400/20 p-2.5 rounded-xl transition-colors bg-amber-400/5"><i data-lucide="edit" class="w-4 h-4"></i></button><button onclick="removeExp(${index})" class="text-red-400 hover:bg-red-400/20 p-2.5 rounded-xl transition-colors bg-red-400/5"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`
+            }).join('');
             lucide.createIcons();
         }
 
         function updatePreview() {
-            if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) {
-                try {
-                    const sy = document.getElementById('new-exp-start-year').value;
-                    if (sy) addExperience(false);
-                } catch (e) { }
-            }
-
+            if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
-            const data = {
-                layout: currentData.layout || 'portfolio',
-                colorMode: currentData.colorMode || 'dark',
-                lang: currentData.lang || 'th',
-                portfolioStyle: currentData.portfolioStyle || 'tech',
-                name_th: document.getElementById('in-name-th').value,
-                name_en: document.getElementById('in-name-en').value,
-                role_th: document.getElementById('in-role-th').value,
-                role_en: document.getElementById('in-role-en').value,
-                bio_th: document.getElementById('in-bio-th').value,
-                bio_en: document.getElementById('in-bio-en').value,
-                skills_th: document.getElementById('in-skills-th').value,
-                skills_en: document.getElementById('in-skills-en').value,
-                email: document.getElementById('in-email').value,
-                phone: document.getElementById('in-phone').value,
-                linkedin: document.getElementById('in-linkedin').value,
-                avatar: currentAvatarBase64,
-                exp: currentData.exp || []
-            };
-
-            StorageHandler.save(data);
-            render(data);
-            toggleModal();
+            const data = { layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            StorageHandler.save(data); render(data); toggleModal();
         }
 
         function render(data) {
-            const app = document.getElementById('app');
-            const layout = data.layout || 'portfolio';
-            const colorMode = data.colorMode || 'dark';
-            const pStyle = data.portfolioStyle || 'tech';
-            const lang = data.lang || 'th';
+            const app = document.getElementById('app'); const layout = data.layout || 'portfolio'; const colorMode = data.colorMode || 'dark'; const pStyle = data.portfolioStyle || 'tech'; const lang = data.lang || 'th';
 
-            if (layout === 'portfolio') {
-                document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md";
-                document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
-            } else {
-                document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md";
-                document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
-            }
+            if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) { document.body.classList.add('is-downloaded'); }
 
-            if (colorMode === 'dark') {
-                document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-700 text-white flex items-center justify-center gap-2 shadow-md";
-                document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2";
-            } else {
-                document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-900 flex items-center justify-center gap-2 shadow-md";
-                document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2";
-            }
-
-            document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active'));
-            if (document.getElementById(`swatch-${pStyle}`)) document.getElementById(`swatch-${pStyle}`).classList.add('active');
-
-            const localizedData = {
-                name: data[`name_${lang}`] || data.name_th || '',
-                role: data[`role_${lang}`] || data.role_th || '',
-                bio: data[`bio_${lang}`] || data.bio_th || '',
-                skills: data[`skills_${lang}`] || data.skills_th || '',
-                exp: (data.exp || []).map(e => ({
-                    ...e,
-                    company: e[`company_${lang}`] || e.company_th || e.company || '',
-                    title: e[`title_${lang}`] || e.title_th || e.title || '',
-                    desc: e[`desc_${lang}`] || e.desc_th || e.desc || '',
-                    highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || []
-                }))
-            };
-
-            const themeBGs = {
-                tech: { dark: 'bg-[#020617]', light: 'bg-slate-50' },
-                educ: { dark: 'bg-[#022c22]', light: 'bg-emerald-50' },
-                gov: { dark: 'bg-[#0f172a]', light: 'bg-slate-100' },
-                creative: { dark: 'bg-[#2e1065]', light: 'bg-fuchsia-50' },
-                minimal: { dark: 'bg-black', light: 'bg-white' },
-                eco: { dark: 'bg-[#042f2e]', light: 'bg-teal-50' },
-                bold: { dark: 'bg-[#450a0a]', light: 'bg-rose-50' },
-                luxury: { dark: 'bg-[#1e1b4b]', light: 'bg-indigo-50' }
-            };
+            if (layout === 'portfolio') { document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md"; document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white"; } else { document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md"; document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white"; }
+            if (colorMode === 'dark') { document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-700 text-white flex items-center justify-center gap-2 shadow-md"; document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"; } else { document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-900 flex items-center justify-center gap-2 shadow-md"; document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"; }
+            document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active')); if (document.getElementById(`swatch-${pStyle}`)) document.getElementById(`swatch-${pStyle}`).classList.add('active');
+            const localizedData = { name: data[`name_${lang}`] || data.name_th || '', role: data[`role_${lang}`] || data.role_th || '', bio: data[`bio_${lang}`] || data.bio_th || '', skills: data[`skills_${lang}`] || data.skills_th || '', exp: (data.exp || []).map(e => ({ ...e, company: e[`company_${lang}`] || e.company_th || e.company || '', title: e[`title_${lang}`] || e.title_th || e.title || '', desc: e[`desc_${lang}`] || e.desc_th || e.desc || '', highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || [] })) };
+            const themeBGs = { tech: { dark: 'bg-[#020617]', light: 'bg-slate-50' }, educ: { dark: 'bg-[#022c22]', light: 'bg-emerald-50' }, gov: { dark: 'bg-[#0f172a]', light: 'bg-slate-100' }, creative: { dark: 'bg-[#2e1065]', light: 'bg-fuchsia-50' }, minimal: { dark: 'bg-black', light: 'bg-white' }, eco: { dark: 'bg-[#042f2e]', light: 'bg-teal-50' }, bold: { dark: 'bg-[#450a0a]', light: 'bg-rose-50' }, luxury: { dark: 'bg-[#1e1b4b]', light: 'bg-indigo-50' } };
             const currentBg = themeBGs[pStyle] ? themeBGs[pStyle][colorMode] : themeBGs['tech'][colorMode];
-
-            let bodyClass = `min-h-screen transition-colors duration-700 antialiased relative overflow-x-hidden ${currentBg} `;
-            bodyClass += colorMode === 'light' ? "text-slate-900" : "text-white";
-            document.body.className = bodyClass;
+            document.body.className = `min-h-screen transition-colors duration-700 antialiased relative overflow-x-hidden ${currentBg} ${colorMode === 'light' ? "text-slate-900" : "text-white"} ${document.body.classList.contains('is-downloaded') ? 'is-downloaded' : ''}`;
 
             const decorationContainer = document.getElementById('theme-decorations');
             if (decorationContainer) {
-                let decorationsHTML = '';
-                if (layout === 'portfolio') {
+                let decorationsHTML = ''; if (layout === 'portfolio') {
                     switch (pStyle) {
                         case 'tech': decorationsHTML = `<div class="absolute inset-0 bg-[#3b82f6] opacity-[0.03] dark:opacity-[0.05]" style="background-image: linear-gradient(rgba(59, 130, 246, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.2) 1px, transparent 1px); background-size: 40px 40px; will-change: transform;"></div><div class="absolute left-[5%] top-0 w-[2px] h-[200px] bg-blue-500 shadow-[0_0_15px_#3b82f6] animate-[tech-scan_3s_linear_infinite] will-change-transform"></div><div class="absolute right-[10%] top-0 w-[1px] h-[300px] bg-cyan-400 opacity-70 shadow-[0_0_10px_#22d3ee] animate-[tech-scan_4.5s_linear_infinite_reverse] will-change-transform"></div>`; break;
                         case 'educ': decorationsHTML = `<div class="absolute top-[20%] left-[10%] w-[40vh] h-[40vh] bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15)_0%,transparent_70%)] animate-[float-orb_8s_ease-in-out_infinite] will-change-transform"></div><div class="absolute top-[60%] right-[10%] w-[50vh] h-[50vh] bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.15)_0%,transparent_70%)] animate-[float-orb_12s_ease-in-out_infinite_reverse] will-change-transform"></div>`; break;
@@ -784,224 +643,132 @@
                         case 'bold': decorationsHTML = `<div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-rose-500/5 to-transparent animate-[bold-pulse_4s_infinite] will-change-transform"></div><div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-t from-red-500/5 to-transparent animate-[bold-pulse_6s_infinite_1s] will-change-transform"></div>`; break;
                         case 'luxury': decorationsHTML = `<div class="absolute w-full h-full pointer-events-none"><div class="absolute top-[80%] left-[10%] w-2 h-2 bg-amber-200 rounded-full shadow-[0_0_15px_#fde68a] animate-[luxury-dust_8s_infinite] will-change-transform"></div><div class="absolute top-[90%] left-[30%] w-3 h-3 bg-amber-300 rounded-full shadow-[0_0_20px_#fcd34d] animate-[luxury-dust_12s_infinite_2s] will-change-transform"></div><div class="absolute top-[70%] left-[80%] w-1.5 h-1.5 bg-amber-100 rounded-full shadow-[0_0_10px_#fef3c7] animate-[luxury-dust_6s_infinite_1s] will-change-transform"></div><div class="absolute top-[85%] left-[60%] w-2.5 h-2.5 bg-yellow-200 rounded-full shadow-[0_0_15px_#fef08a] animate-[luxury-dust_10s_infinite_4s] will-change-transform"></div></div>`; break;
                     }
-                }
-                decorationContainer.innerHTML = decorationsHTML;
+                } decorationContainer.innerHTML = decorationsHTML;
             }
 
-            if (layout === 'resume') {
-                app.className = `container mx-auto py-12 px-10 max-w-4xl shadow-2xl border my-10 min-h-[1000px] rounded-sm fade-in ${colorMode === 'dark' ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200'}`;
-            } else {
-                app.className = "container mx-auto py-24 px-6 fade-in w-full max-w-full";
-            }
-
-            app.innerHTML = `
-                <div class="print-layout-wrapper ${layout === 'resume' ? 'flex flex-col mt-6' : 'flex flex-col gap-12 mt-10 w-full'}">
-                    <div id="header-section" class="print-order-1 ${layout === 'portfolio' ? 'scroll-reveal w-full max-w-5xl mx-auto' : 'fade-in'}">
-                        ${HeaderComponent.render(localizedData.name, localizedData.role, layout, data.avatar, colorMode, pStyle, lang)}
-                    </div>
-                    <div class="print-order-2 w-full ${layout === 'portfolio' ? 'max-w-5xl mx-auto' : ''}">
-                        ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
-                    </div>
-                    <div class="print-order-3 ${layout === 'resume' ? 'w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-slate-200' : 'w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 mt-20'}">
-                        ${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}
-                        ${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}
-                    </div>
-                    <div class="print-order-4 w-full">
-                        ${ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang)}
-                    </div>
-                </div>
-            `;
-
+            if (layout === 'resume') { app.className = `container mx-auto py-12 px-10 max-w-4xl shadow-2xl border my-10 min-h-[1000px] rounded-sm fade-in ${colorMode === 'dark' ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200'}`; } else { app.className = "container mx-auto py-24 px-6 fade-in w-full max-w-full"; }
+            app.innerHTML = `<div class="print-layout-wrapper ${layout === 'resume' ? 'flex flex-col mt-6' : 'flex flex-col gap-12 mt-10 w-full'}"><div id="header-section" class="print-order-1 ${layout === 'portfolio' ? 'scroll-reveal w-full max-w-5xl mx-auto' : 'fade-in'}">${HeaderComponent.render(localizedData.name, localizedData.role, layout, data.avatar, colorMode, pStyle, lang)}</div><div class="print-order-2 w-full ${layout === 'portfolio' ? 'max-w-5xl mx-auto' : ''}">${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}</div><div class="print-order-3 ${layout === 'resume' ? 'w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-slate-200' : 'w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 mt-20'}">${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}</div><div class="print-order-4 w-full">${ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang)}</div></div>`;
             if (document.getElementById('btn-lang')) document.getElementById('btn-lang').innerText = lang === 'th' ? 'TH' : 'EN';
+            setTimeout(() => { lucide.createIcons(); if (layout === 'portfolio') initScrollEffects(); }, 50);
+        }
 
-            setTimeout(() => {
+        async function handleExportWeb() {
+            const btn = document.querySelector('button[onclick="handleExportWeb()"]');
+            const originalHtml = btn.innerHTML;
+            try {
+                if (window.location.protocol === 'file:') { alert("⚠️ ฟีเจอร์ 'ดาวน์โหลด WEB' ต้องใช้งานผ่านอินเทอร์เน็ต (เช่น บน Vercel) เท่านั้นครับ"); return; }
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-white"></i> <span class="text-sm">Downloading...</span>`;
                 lucide.createIcons();
-                if (layout === 'portfolio') initScrollEffects();
-            }, 50);
+                const data = StorageHandler.load(); const dataString = JSON.stringify(data);
+                const response = await fetch(window.location.href); let html = await response.text();
+                let baseUrl = window.location.origin + window.location.pathname;
+                if (!baseUrl.endsWith('/')) { baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1); }
+                html = html.replace(/src="js\//g, `src="${baseUrl}js/`);
+                html = html.replace(/href="css\//g, `href="${baseUrl}css/`);
+                const scriptInject = `\n<script>\nwindow.INJECTED_PORTFOLIO_DATA = ${dataString};\n<\/script>\n`;
+                html = html.replace('</head>', `${scriptInject}</head>`);
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                const safeName = (data.name_en || data.name_th || 'My').replace(/\s+/g, '_');
+                a.download = `${safeName}_Web_Portfolio.html`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            } catch (err) { alert("เกิดข้อผิดพลาดในการดาวน์โหลดเว็บ"); }
+            finally { setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1500); }
         }
 
         function initScrollEffects() {
-            const revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('show'); });
-            }, { threshold: 0.1 });
+            const revealObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('show'); }); }, { threshold: 0.1 });
             document.querySelectorAll('.scroll-reveal').forEach(el => revealObserver.observe(el));
-
             const scrollyWrappers = document.querySelectorAll('.scrollytelling-wrapper');
             if (scrollyWrappers.length > 0) {
                 if (window._scrollHandler) window.removeEventListener('scroll', window._scrollHandler);
                 scrollyWrappers.forEach(w => { const t = w.querySelector('.scrollytelling-track'); if (t) t.removeAttribute('data-max-translate'); });
-
                 let isTicking = false;
-
                 window._scrollHandler = () => {
                     if (window.innerWidth < 1024) return;
-
                     if (!isTicking) {
                         window.requestAnimationFrame(() => {
                             scrollyWrappers.forEach(wrapper => {
-                                const track = wrapper.querySelector('.scrollytelling-track');
-                                const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
-                                const stickyBox = wrapper.querySelector('.sticky');
-
-                                if (!track || !stickyBox) return;
-
-                                const rect = wrapper.getBoundingClientRect();
-                                if (rect.top > window.innerHeight || rect.bottom < 0) return;
-
-                                const stickyTop = window.innerHeight * 0.1;
-                                const stickyHeight = stickyBox.offsetHeight;
-                                const totalScrollDistance = rect.height - stickyHeight;
-
-                                let progress = 0;
-                                if (totalScrollDistance > 0) {
-                                    progress = (stickyTop - rect.top) / totalScrollDistance;
-                                }
+                                const track = wrapper.querySelector('.scrollytelling-track'); const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper'); const stickyBox = wrapper.querySelector('.sticky'); if (!track || !stickyBox) return;
+                                const rect = wrapper.getBoundingClientRect(); const stickyTop = window.innerHeight * 0.1; const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
+                                let progress = 0; if (totalScrollDistance > 0) { progress = (stickyTop - rect.top) / totalScrollDistance; }
                                 progress = Math.max(0, Math.min(1, progress));
-
                                 let maxTranslate = track.getAttribute('data-max-translate');
                                 if (!maxTranslate) {
-                                    const isCol = imageWrapper.classList.contains('cinematic-collapsed');
-                                    if (isCol) {
-                                        imageWrapper.classList.remove('cinematic-collapsed');
-                                        imageWrapper.classList.add('cinematic-expanded');
-                                    }
-                                    maxTranslate = track.scrollWidth - track.parentElement.clientWidth;
-                                    track.setAttribute('data-max-translate', maxTranslate);
-                                    if (isCol) {
-                                        imageWrapper.classList.add('cinematic-collapsed');
-                                        imageWrapper.classList.remove('cinematic-expanded');
-                                    }
+                                    const isCol = imageWrapper.classList.contains('cinematic-collapsed'); if (isCol) { imageWrapper.classList.remove('cinematic-collapsed'); imageWrapper.classList.add('cinematic-expanded'); }
+                                    maxTranslate = track.scrollWidth - track.parentElement.clientWidth; track.setAttribute('data-max-translate', maxTranslate);
+                                    if (isCol) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
                                 }
-
                                 maxTranslate = parseFloat(maxTranslate) || 0;
-
-                                if (imageWrapper) {
-                                    if (progress <= 0.01 || progress >= 0.98) {
-                                        imageWrapper.classList.add('cinematic-collapsed');
-                                        imageWrapper.classList.remove('cinematic-expanded');
-                                    } else {
-                                        imageWrapper.classList.add('cinematic-expanded');
-                                        imageWrapper.classList.remove('cinematic-collapsed');
-                                    }
-                                }
-
-                                if (maxTranslate > 0) {
-                                    let scrollProgress = 0;
-                                    const startMove = 0.05;
-                                    const endMove = 0.85;
-
-                                    if (progress > startMove && progress < endMove) {
-                                        scrollProgress = (progress - startMove) / (endMove - startMove);
-                                    } else if (progress >= endMove) {
-                                        scrollProgress = 1;
-                                    }
-
-                                    const currentTranslate = scrollProgress * maxTranslate;
-                                    track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`;
-                                } else {
-                                    track.style.transform = `translate3d(0px, 0, 0)`;
-                                }
-                            });
-                            isTicking = false;
-                        });
-                        isTicking = true;
+                                if (imageWrapper) { if (progress <= 0.01 || progress >= 0.98) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
+                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = 0.05; const endMove = 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; }
+                            }); isTicking = false;
+                        }); isTicking = true;
                     }
                 };
                 window.addEventListener('scroll', window._scrollHandler, { passive: true });
             }
         }
 
-        function handlePrint() {
-            toggleModal();
-            setTimeout(() => window.print(), 350);
-        }
-
-        function handleExportPPTX() {
-            const data = StorageHandler.load();
-            Exporter.generatePPT(data);
-        }
-
-        async function handleExportWeb() {
-            const btn = document.querySelector('button[onclick="handleExportWeb()"]');
+        // 🌟 4. ฟังก์ชันส่งออก PPTX ซ่อน UI หน้าจอก่อนแคปภาพ Background
+        async function handleExportPPTX() {
+            const btn = document.querySelector('button[onclick="handleExportPPTX()"]');
             const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-white"></i> <span class="text-sm">Rendering...</span>`;
+            lucide.createIcons();
 
             try {
-                // 🌟 ดักจับถ้ารันผ่านไฟล์ในเครื่อง (file:///) ให้แจ้งเตือนแทนการปล่อย Error
-                if (window.location.protocol === 'file:') {
-                    alert("⚠️ ฟีเจอร์ 'ดาวน์โหลด WEB' ต้องใช้งานผ่านอินเทอร์เน็ต (เช่น บน Vercel) เท่านั้นครับ\n\nเนื่องจากระบบจำเป็นต้องสร้างลิงก์เชื่อมโยงไฟล์ CSS/JS จากเซิร์ฟเวอร์ เพื่อให้ไฟล์ HTML ที่โหลดไป สามารถส่งให้คนอื่นเปิดดูได้โดยที่หน้าเว็บไม่พังครับ\n\n💡 รบกวน Push โค้ดชุดนี้ขึ้น Vercel แล้วทดสอบกดดาวน์โหลดจากเว็บจริงของคุณได้เลยครับ!");
-                    return;
-                }
+                // แอบซ่อน UI บนหน้าจอชั่วคราวเพื่อถ่ายเฉพาะ Background
+                const app = document.getElementById('app');
+                const nav = document.querySelector('nav');
+                const wm = document.getElementById('watermark');
+                const modal = document.getElementById('edit-modal'); // เพิ่มการซ่อน Modal ให้ชัวร์
 
-                // แจ้งสถานะปุ่ม
-                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-cyan-400"></i> <span class="text-sm">Downloading...</span>`;
-                lucide.createIcons();
+                if (app) app.style.visibility = 'hidden';
+                if (nav) nav.style.visibility = 'hidden';
+                if (wm) wm.style.visibility = 'hidden';
+                if (modal) modal.style.visibility = 'hidden'; // ซ่อนแน่นอนไม่ติดในภาพ
+
+                // ใช้ html2canvas ถ่ายรูป Background แบบ 16:9
+                const canvas = await html2canvas(document.body, {
+                    scale: 1,
+                    windowWidth: 1920,
+                    windowHeight: 1080,
+                    backgroundColor: null // ให้จับพื้นหลังที่มีอยู่ ไม่เอาสีขาวทับ
+                });
+
+                const bgSnapshot = canvas.toDataURL('image/jpeg', 0.8);
+
+                // คืนค่า UI กลับมาเหมือนเดิม
+                if (app) app.style.visibility = '';
+                if (nav) nav.style.visibility = '';
+                if (wm) wm.style.visibility = '';
+                if (modal) modal.style.visibility = '';
 
                 const data = StorageHandler.load();
-                const dataString = JSON.stringify(data);
+                data.bgSnapshot = bgSnapshot; // เอาสแนปช็อตยัดใส่ Object
 
-                // Fetch โครงสร้าง HTML ต้นฉบับจาก Vercel
-                const response = await fetch(window.location.href);
-                let html = await response.text();
-
-                // สร้าง Base URL ให้ดึง Asset (CSS/JS) จาก Vercel อัตโนมัติเวลาเปิดบนเครื่อง
-                let baseUrl = window.location.origin + window.location.pathname;
-                if (!baseUrl.endsWith('/')) {
-                    baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
-                }
-
-                // แทนที่ Path เดิมด้วย Vercel Absolute Path
-                html = html.replace(/src="js\//g, `src="${baseUrl}js/`);
-                html = html.replace(/href="css\//g, `href="${baseUrl}css/`);
-
-                // แทรก Data ปัจจุบันฝังลงในไฟล์ HTML โดยตรง!
-                const scriptInject = `\n<script>\nwindow.INJECTED_PORTFOLIO_DATA = ${dataString};\n<\/script>\n`;
-                html = html.replace('</head>', `${scriptInject}</head>`);
-
-                // สั่งดาวน์โหลดเป็นไฟล์ HTML 1 ไฟล์ถ้วน
-                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-
-                const safeName = (data.name_en || data.name_th || 'My').replace(/\s+/g, '_');
-                a.download = `${safeName}_Web_Portfolio.html`;
-
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-            } catch (err) {
-                console.error(err);
-                alert("เกิดข้อผิดพลาดในการดาวน์โหลดเว็บ กรุณาลองใหม่อีกครั้ง");
+                Exporter.generatePPT(data);
+            } catch (e) {
+                console.error(e);
+                // ถ้าถ่ายรูปล้มเหลว ก็ยังให้ดึงสี Hex Code ไปสร้าง PPTX ได้อยู่
+                const data = StorageHandler.load();
+                Exporter.generatePPT(data);
             } finally {
-                // คืนค่าปุ่มกลับเป็นเหมือนเดิมเสมอ ไม่ว่าจะ Success หรือ Error
-                setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1500);
+                btn.innerHTML = originalHtml;
+                lucide.createIcons();
             }
         }
-
 
         window.onload = () => {
             const savedData = StorageHandler.load();
-
             if (document.getElementById('in-portfolio-style')) document.getElementById('in-portfolio-style').value = savedData.portfolioStyle || 'tech';
-
-            ['name-th', 'name-en', 'role-th', 'role-en', 'bio-th', 'bio-en', 'skills-th', 'skills-en'].forEach(id => {
-                const valKey = id.replace('-', '_');
-                if (document.getElementById(`in-${id}`)) {
-                    document.getElementById(`in-${id}`).value = savedData[valKey] || '';
-                }
-            });
-
+            ['name-th', 'name-en', 'role-th', 'role-en', 'bio-th', 'bio-en', 'skills-th', 'skills-en'].forEach(id => { const valKey = id.replace('-', '_'); if (document.getElementById(`in-${id}`)) document.getElementById(`in-${id}`).value = savedData[valKey] || ''; });
             document.getElementById('in-email').value = savedData.email || '';
             document.getElementById('in-phone').value = savedData.phone || '';
             document.getElementById('in-linkedin').value = savedData.linkedin || '';
-
-            if (savedData.avatar) {
-                currentAvatarBase64 = savedData.avatar;
-                document.getElementById('avatar-preview').src = currentAvatarBase64;
-                document.getElementById('avatar-preview').classList.remove('hidden');
-            }
+            if (savedData.avatar) { currentAvatarBase64 = savedData.avatar; document.getElementById('avatar-preview').src = currentAvatarBase64; document.getElementById('avatar-preview').classList.remove('hidden'); }
             render(savedData);
         };
     </script>
