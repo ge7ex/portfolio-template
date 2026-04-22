@@ -8,9 +8,12 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
         body {
+            font-family: 'IBM Plex Sans Thai', sans-serif;
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
@@ -28,7 +31,6 @@
             color: #e2e8f0;
         }
 
-        /* สไตล์สำหรับปุ่มวงกลมเลือกธีม */
         .theme-swatch {
             transition: all 0.2s ease;
             cursor: pointer;
@@ -54,7 +56,6 @@
     <div id="theme-decorations" class="fixed inset-0 z-[0] pointer-events-none overflow-hidden"></div>
 
     <nav class="fixed top-6 right-6 z-50 flex items-center gap-3">
-
         <button onclick="toggleLang()" id="btn-lang"
             class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all font-bold uppercase text-sm flex items-center justify-center">
             EN
@@ -134,7 +135,7 @@
 
             <div class="px-8 py-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
                 <h2 class="text-2xl font-bold flex items-center gap-3"><i data-lucide="user-cog"
-                        class="w-7 h-7 text-blue-400"></i> Manage Profile (Bilingual)</h2>
+                        class="w-7 h-7 text-blue-400"></i> Manage Profile</h2>
                 <button onclick="toggleModal()" class="text-slate-400 hover:text-white transition-colors"><i
                         data-lucide="x" class="w-7 h-7"></i></button>
             </div>
@@ -267,8 +268,11 @@
                                 <option value="Nov">Nov</option>
                                 <option value="Dec">Dec</option>
                             </select>
-                            <input type="number" id="new-exp-start-year" placeholder="Start Year"
+
+                            <input type="number" id="new-exp-start-year" placeholder="Start Year" min="1900"
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                                 class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+
                             <select id="new-exp-end-month"
                                 class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
                                 <option value="">End Month</option>
@@ -285,8 +289,11 @@
                                 <option value="Nov">Nov</option>
                                 <option value="Dec">Dec</option>
                             </select>
-                            <input type="number" id="new-exp-end-year" placeholder="End Year"
+
+                            <input type="number" id="new-exp-end-year" placeholder="End Year" min="1900"
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                                 class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+
                             <div class="col-span-2 md:col-span-4 flex items-center gap-2 mt-1">
                                 <input type="checkbox" id="new-exp-current" onchange="toggleEndDate()"
                                     class="w-4 h-4 accent-emerald-500">
@@ -300,9 +307,11 @@
                                 <h3
                                     class="text-blue-400 font-bold border-b border-slate-700 pb-2 text-sm flex items-center gap-2">
                                     🇹🇭 ข้อมูลภาษาไทย</h3>
-                                <input type="text" id="new-exp-company-th" placeholder="ชื่อบริษัท / องค์กร"
+                                <input type="text" id="new-exp-company-th"
+                                    placeholder="ชื่อบริษัท / ลูกค้า (Company/Client)"
                                     class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
-                                <input type="text" id="new-exp-title-th" placeholder="ตำแหน่ง / ชื่อผลงาน"
+                                <input type="text" id="new-exp-title-th"
+                                    placeholder="ตำแหน่ง / ชื่อโปรเจกต์ (Role/Project)"
                                     class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
                                 <input type="text" id="new-exp-desc-th" placeholder="รายละเอียดแบบย่อ"
                                     class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
@@ -314,9 +323,9 @@
                                 <h3
                                     class="text-amber-400 font-bold border-b border-slate-700 pb-2 text-sm flex items-center gap-2">
                                     🇬🇧 English Data</h3>
-                                <input type="text" id="new-exp-company-en" placeholder="Company / Organization"
+                                <input type="text" id="new-exp-company-en" placeholder="Company / Client"
                                     class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
-                                <input type="text" id="new-exp-title-en" placeholder="Title / Role"
+                                <input type="text" id="new-exp-title-en" placeholder="Role / Project Name"
                                     class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
                                 <input type="text" id="new-exp-desc-en" placeholder="Short description"
                                     class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
@@ -339,14 +348,23 @@
                         <div class="flex gap-3">
                             <button onclick="cancelEditExp()" id="btn-cancel-exp"
                                 class="hidden px-6 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-all font-semibold">Cancel</button>
-                            <button onclick="addExperience()" id="btn-add-exp"
-                                class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2"><i
-                                    data-lucide="plus" class="w-5 h-5"></i> Save Experience</button>
+
+                            <button onclick="addExperience(true)" id="btn-add-more-exp"
+                                class="px-6 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded-xl font-bold transition-all flex items-center gap-2"
+                                title="บันทึกโปรเจกต์นี้ และเคลียร์ช่องเพื่อเพิ่มโปรเจกต์ถัดไป (โดยคงชื่อบริษัทและวันที่ไว้)">
+                                <i data-lucide="copy-plus" class="w-5 h-5"></i> <span class="hidden md:inline">Save &
+                                    Add Another</span>
+                            </button>
+
+                            <button onclick="addExperience(false)" id="btn-add-exp"
+                                class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="check" class="w-5 h-5"></i> Save & Close
+                            </button>
                         </div>
                     </div>
 
-                    <label
-                        class="block text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Timeline</label>
+                    <label class="block text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Timeline
+                        (เรียงลำดับใหม่-เก่าอัตโนมัติ)</label>
                     <div id="exp-list-preview" class="space-y-3"></div>
                 </div>
 
@@ -367,11 +385,13 @@
                 </button>
                 <button onclick="updatePreview()"
                     class="w-full md:w-auto px-10 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
-                    <i data-lucide="save" class="w-5 h-5"></i> Save Profile
+                    <i data-lucide="save" class="w-5 h-5"></i> Update Profile
                 </button>
             </div>
         </div>
     </div>
+
+    <input type="hidden" id="in-theme" value="portfolio">
 
     <script src="js/components/Header.js"></script>
     <script src="js/components/Bio.js"></script>
@@ -387,7 +407,6 @@
         let currentExpImagesBase64 = [];
         let editingExpIndex = -1;
 
-        // 🌟 ซ่อน Theme Panel เมื่อคลิกที่อื่น
         document.addEventListener('click', (e) => {
             const panel = document.getElementById('theme-panel');
             const btn = document.getElementById('btn-appearance');
@@ -396,33 +415,10 @@
             }
         });
 
-        function toggleThemePanel() {
-            document.getElementById('theme-panel').classList.toggle('hidden');
-        }
-
-        // 🌟 จัดการ Layout ผ่าน Pill Toggle โดยตรง
-        function setDirectLayout(mode) {
-            const data = StorageHandler.load();
-            data.layout = mode;
-            StorageHandler.save(data);
-            render(data);
-        }
-
-        // 🌟 จัดการ Mode ผ่าน Theme Panel โดยตรง
-        function setDirectColorMode(mode) {
-            const data = StorageHandler.load();
-            data.colorMode = mode;
-            StorageHandler.save(data);
-            render(data);
-        }
-
-        // 🌟 จัดการ Theme (สี) ผ่าน Theme Panel โดยตรง
-        function setDirectTheme(theme) {
-            const data = StorageHandler.load();
-            data.portfolioStyle = theme;
-            StorageHandler.save(data);
-            render(data);
-        }
+        function toggleThemePanel() { document.getElementById('theme-panel').classList.toggle('hidden'); }
+        function setDirectLayout(mode) { const data = StorageHandler.load(); data.layout = mode; StorageHandler.save(data); render(data); }
+        function setDirectColorMode(mode) { const data = StorageHandler.load(); data.colorMode = mode; StorageHandler.save(data); render(data); }
+        function setDirectTheme(theme) { const data = StorageHandler.load(); data.portfolioStyle = theme; StorageHandler.save(data); render(data); }
 
         function switchTab(tabId) {
             ['basic', 'contact', 'experience'].forEach(t => {
@@ -449,7 +445,6 @@
             render(data);
         }
 
-        // 🌟 ระบบย่อรูปภาพ (Image Compression) สำหรับรูปโปรไฟล์
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
@@ -460,20 +455,13 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const MAX_WIDTH = 400; // ย่อรูปโปรไฟล์ให้กว้างสุดแค่ 400px
+                        const MAX_WIDTH = 400;
 
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
 
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        // แปลงเป็น JPEG และลดคุณภาพเหลือ 70% เพื่อประหยัดพื้นที่ 
-                        currentAvatarBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                        currentAvatarBase64 = canvas.toDataURL('image/jpeg', 0.8);
                         document.getElementById('avatar-preview').src = currentAvatarBase64;
                         document.getElementById('avatar-preview').classList.remove('hidden');
                     };
@@ -483,7 +471,6 @@
             }
         }
 
-        // 🌟 ระบบย่อรูปภาพ (Image Compression) สำหรับรูปผลงาน (Experience)
         function handleExpImageUpload(event) {
             Array.from(event.target.files).forEach(file => {
                 const reader = new FileReader();
@@ -493,20 +480,13 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const MAX_WIDTH = 800; // ย่อรูปผลงานให้กว้างสุด 800px (ชัดพอสำหรับเว็บและ PPTX)
+                        const MAX_WIDTH = 800;
 
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
 
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        // แปลงเป็น JPEG และลดคุณภาพเหลือ 70%
-                        currentExpImagesBase64.push(canvas.toDataURL('image/jpeg', 0.7));
+                        currentExpImagesBase64.push(canvas.toDataURL('image/jpeg', 0.8));
                         renderExpImagePreview();
                     };
                     img.src = e.target.result;
@@ -543,7 +523,7 @@
             document.getElementById('new-exp-end-year').disabled = isCurrent;
         }
 
-        function addExperience() {
+        function addExperience(keepContext = false) {
             const sm = document.getElementById('new-exp-start-month').value;
             const sy = document.getElementById('new-exp-start-year').value;
             const em = document.getElementById('new-exp-end-month').value;
@@ -573,13 +553,32 @@
             };
 
             if (editingExpIndex === -1) {
-                data.exp.unshift(expItem);
+                data.exp.push(expItem);
             } else {
                 data.exp[editingExpIndex] = expItem;
             }
+
             StorageHandler.save(data);
-            cancelEditExp();
-            refreshExpPreview();
+
+            if (keepContext) {
+                ['title-th', 'desc-th', 'highlights-th', 'title-en', 'desc-en', 'highlights-en'].forEach(id => {
+                    if (document.getElementById(`new-exp-${id}`)) document.getElementById(`new-exp-${id}`).value = '';
+                });
+                currentExpImagesBase64 = [];
+                renderExpImagePreview();
+                editingExpIndex = -1;
+                refreshExpPreview();
+
+                const btn = document.getElementById('btn-add-more-exp');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-green-400"></i> <span class="hidden md:inline text-green-400">Saved!</span>`;
+                lucide.createIcons();
+                setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1000);
+
+            } else {
+                cancelEditExp();
+                refreshExpPreview();
+            }
         }
 
         function editExp(index) {
@@ -611,6 +610,8 @@
             document.getElementById('btn-add-exp').classList.replace('text-emerald-400', 'text-amber-400');
             document.getElementById('btn-add-exp').classList.replace('bg-emerald-600/20', 'bg-amber-600/20');
             document.getElementById('btn-cancel-exp').classList.remove('hidden');
+
+            document.getElementById('btn-add-more-exp').classList.add('hidden');
             lucide.createIcons();
         }
 
@@ -622,10 +623,12 @@
             document.getElementById('new-exp-current').checked = false; toggleEndDate();
             currentExpImagesBase64 = []; renderExpImagePreview();
 
-            document.getElementById('btn-add-exp').innerHTML = '<i data-lucide="plus" class="w-5 h-5"></i> Save Experience';
+            document.getElementById('btn-add-exp').innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Save & Close';
             document.getElementById('btn-add-exp').classList.replace('text-amber-400', 'text-emerald-400');
             document.getElementById('btn-add-exp').classList.replace('bg-amber-600/20', 'bg-emerald-600/20');
             document.getElementById('btn-cancel-exp').classList.add('hidden');
+
+            document.getElementById('btn-add-more-exp').classList.remove('hidden');
             lucide.createIcons();
         }
 
@@ -643,13 +646,28 @@
 
             const lang = data.lang || 'th';
 
+            // 🌟 เช็คค่า พ.ศ. / ค.ศ. สำหรับโชว์ในลิสต์พรีวิว
+            const formatYear = (yStr, targetLang) => {
+                if (!yStr) return '';
+                const y = parseInt(yStr);
+                if (isNaN(y)) return yStr;
+                if (targetLang === 'th' && y < 2500) return (y + 543).toString();
+                if (targetLang === 'en' && y >= 2500) return (y - 543).toString();
+                return y.toString();
+            };
+
             container.innerHTML = data.exp.map((item, index) => {
                 const showTitle = lang === 'th' ? (item.title_th || item.title) : (item.title_en || item.title_th || item.title);
                 const showCompany = lang === 'th' ? (item.company_th || item.company) : (item.company_en || item.company_th || item.company);
+
+                const sy = formatYear(item.startYear || item.year, lang);
+                const ey = formatYear(item.endYear, lang);
+                const showEnd = item.isCurrent ? (lang === 'th' ? ' - ปัจจุบัน' : ' - Present') : (ey ? ' - ' + ey : '');
+
                 return `
                 <div class="flex justify-between items-center bg-[#0f172a] p-4 rounded-xl border border-slate-700 shadow-inner">
                     <div>
-                        <span class="text-emerald-400 font-bold text-sm bg-emerald-400/10 px-2 py-1 rounded inline-block mb-1">${item.startYear}</span>
+                        <span class="text-emerald-400 font-bold text-sm bg-emerald-400/10 px-2 py-1 rounded inline-block mb-1">${sy}${showEnd}</span>
                         <h4 class="text-white font-medium text-lg">${showTitle}</h4>
                         ${showCompany ? `<p class="text-sm text-slate-400">@ ${showCompany}</p>` : ''}
                     </div>
@@ -663,11 +681,10 @@
         }
 
         function updatePreview() {
-            // Auto-save ถ้าค้างในฟอร์ม
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) {
                 try {
                     const sy = document.getElementById('new-exp-start-year').value;
-                    if (sy) addExperience();
+                    if (sy) addExperience(false);
                 } catch (e) { }
             }
 
@@ -676,7 +693,7 @@
                 layout: currentData.layout || 'portfolio',
                 colorMode: currentData.colorMode || 'dark',
                 lang: currentData.lang || 'th',
-                portfolioStyle: currentData.portfolioStyle || 'tech', // ไม่ได้ดึงจาก Modal แล้ว ดึงจาก State เดิม
+                portfolioStyle: currentData.portfolioStyle || 'tech',
                 name_th: document.getElementById('in-name-th').value,
                 name_en: document.getElementById('in-name-en').value,
                 role_th: document.getElementById('in-role-th').value,
@@ -704,7 +721,6 @@
             const pStyle = data.portfolioStyle || 'tech';
             const lang = data.lang || 'th';
 
-            // 🌟 อัปเดต UI ของปุ่ม Layout Pill
             if (layout === 'portfolio') {
                 document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md";
                 document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
@@ -713,7 +729,6 @@
                 document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
             }
 
-            // 🌟 อัปเดต UI ของปุ่ม Mode
             if (colorMode === 'dark') {
                 document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-700 text-white flex items-center justify-center gap-2 shadow-md";
                 document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2";
@@ -722,7 +737,6 @@
                 document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2";
             }
 
-            // 🌟 อัปเดตกรอบ Active ของวงกลมสี
             document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active'));
             if (document.getElementById(`swatch-${pStyle}`)) document.getElementById(`swatch-${pStyle}`).classList.add('active');
 
@@ -741,14 +755,14 @@
             };
 
             const themeBGs = {
-                tech: { dark: 'bg-gradient-to-br from-slate-900 via-[#0c1322] to-blue-950', light: 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50' },
-                educ: { dark: 'bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900', light: 'bg-gradient-to-br from-emerald-50 via-teal-50/50 to-green-50' },
-                gov: { dark: 'bg-gradient-to-br from-slate-800 via-slate-900 to-[#1e1e1e]', light: 'bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-50/30 via-slate-100 to-slate-200' },
-                creative: { dark: 'bg-gradient-to-br from-violet-950 via-fuchsia-950 to-indigo-950', light: 'bg-gradient-to-tr from-fuchsia-50 via-pink-50 to-purple-50' },
-                minimal: { dark: 'bg-gradient-to-b from-gray-900 to-black', light: 'bg-gradient-to-b from-gray-50 to-white' },
-                eco: { dark: 'bg-gradient-to-br from-teal-950 via-emerald-950 to-slate-900', light: 'bg-gradient-to-tl from-teal-50 via-green-50/40 to-emerald-100/50' },
-                bold: { dark: 'bg-gradient-to-br from-rose-950 via-[#3f091a] to-red-950', light: 'bg-gradient-to-br from-rose-50 via-red-50 to-orange-50' },
-                luxury: { dark: 'bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-900', light: 'bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-50 via-indigo-50 to-purple-50' }
+                tech: { dark: 'bg-[#020617]', light: 'bg-slate-50' },
+                educ: { dark: 'bg-[#022c22]', light: 'bg-emerald-50' },
+                gov: { dark: 'bg-[#0f172a]', light: 'bg-slate-100' },
+                creative: { dark: 'bg-[#2e1065]', light: 'bg-fuchsia-50' },
+                minimal: { dark: 'bg-black', light: 'bg-white' },
+                eco: { dark: 'bg-[#042f2e]', light: 'bg-teal-50' },
+                bold: { dark: 'bg-[#450a0a]', light: 'bg-rose-50' },
+                luxury: { dark: 'bg-[#1e1b4b]', light: 'bg-indigo-50' }
             };
             const currentBg = themeBGs[pStyle] ? themeBGs[pStyle][colorMode] : themeBGs['tech'][colorMode];
 
@@ -817,69 +831,81 @@
                 if (window._scrollHandler) window.removeEventListener('scroll', window._scrollHandler);
                 scrollyWrappers.forEach(w => { const t = w.querySelector('.scrollytelling-track'); if (t) t.removeAttribute('data-max-translate'); });
 
+                let isTicking = false;
+
                 window._scrollHandler = () => {
-                    scrollyWrappers.forEach(wrapper => {
-                        const track = wrapper.querySelector('.scrollytelling-track');
-                        const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
-                        const stickyBox = wrapper.querySelector('.sticky');
+                    if (window.innerWidth < 1024) return;
 
-                        if (!track || !stickyBox) return;
+                    if (!isTicking) {
+                        window.requestAnimationFrame(() => {
+                            scrollyWrappers.forEach(wrapper => {
+                                const track = wrapper.querySelector('.scrollytelling-track');
+                                const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
+                                const stickyBox = wrapper.querySelector('.sticky');
 
-                        const rect = wrapper.getBoundingClientRect();
-                        const stickyTop = window.innerHeight * 0.1;
-                        const stickyHeight = stickyBox.offsetHeight;
-                        const totalScrollDistance = rect.height - stickyHeight;
+                                if (!track || !stickyBox) return;
 
-                        let progress = 0;
-                        if (totalScrollDistance > 0) {
-                            progress = (stickyTop - rect.top) / totalScrollDistance;
-                        }
-                        progress = Math.max(0, Math.min(1, progress));
+                                const rect = wrapper.getBoundingClientRect();
+                                if (rect.top > window.innerHeight || rect.bottom < 0) return;
 
-                        let maxTranslate = track.getAttribute('data-max-translate');
-                        if (!maxTranslate) {
-                            const isCol = imageWrapper.classList.contains('cinematic-collapsed');
-                            if (isCol) {
-                                imageWrapper.classList.remove('cinematic-collapsed');
-                                imageWrapper.classList.add('cinematic-expanded');
-                            }
-                            maxTranslate = track.scrollWidth - track.parentElement.clientWidth;
-                            track.setAttribute('data-max-translate', maxTranslate);
-                            if (isCol) {
-                                imageWrapper.classList.add('cinematic-collapsed');
-                                imageWrapper.classList.remove('cinematic-expanded');
-                            }
-                        }
+                                const stickyTop = window.innerHeight * 0.1;
+                                const stickyHeight = stickyBox.offsetHeight;
+                                const totalScrollDistance = rect.height - stickyHeight;
 
-                        maxTranslate = parseFloat(maxTranslate) || 0;
+                                let progress = 0;
+                                if (totalScrollDistance > 0) {
+                                    progress = (stickyTop - rect.top) / totalScrollDistance;
+                                }
+                                progress = Math.max(0, Math.min(1, progress));
 
-                        if (imageWrapper) {
-                            if (progress <= 0.02 || progress >= 0.98) {
-                                imageWrapper.classList.add('cinematic-collapsed');
-                                imageWrapper.classList.remove('cinematic-expanded');
-                            } else {
-                                imageWrapper.classList.add('cinematic-expanded');
-                                imageWrapper.classList.remove('cinematic-collapsed');
-                            }
-                        }
+                                let maxTranslate = track.getAttribute('data-max-translate');
+                                if (!maxTranslate) {
+                                    const isCol = imageWrapper.classList.contains('cinematic-collapsed');
+                                    if (isCol) {
+                                        imageWrapper.classList.remove('cinematic-collapsed');
+                                        imageWrapper.classList.add('cinematic-expanded');
+                                    }
+                                    maxTranslate = track.scrollWidth - track.parentElement.clientWidth;
+                                    track.setAttribute('data-max-translate', maxTranslate);
+                                    if (isCol) {
+                                        imageWrapper.classList.add('cinematic-collapsed');
+                                        imageWrapper.classList.remove('cinematic-expanded');
+                                    }
+                                }
 
-                        if (maxTranslate > 0) {
-                            let scrollProgress = 0;
-                            const startMove = 0.05;
-                            const endMove = 0.85;
+                                maxTranslate = parseFloat(maxTranslate) || 0;
 
-                            if (progress > startMove && progress < endMove) {
-                                scrollProgress = (progress - startMove) / (endMove - startMove);
-                            } else if (progress >= endMove) {
-                                scrollProgress = 1;
-                            }
+                                if (imageWrapper) {
+                                    if (progress <= 0.01 || progress >= 0.98) {
+                                        imageWrapper.classList.add('cinematic-collapsed');
+                                        imageWrapper.classList.remove('cinematic-expanded');
+                                    } else {
+                                        imageWrapper.classList.add('cinematic-expanded');
+                                        imageWrapper.classList.remove('cinematic-collapsed');
+                                    }
+                                }
 
-                            const currentTranslate = scrollProgress * maxTranslate;
-                            track.style.transform = `translateX(-${currentTranslate}px)`;
-                        } else {
-                            track.style.transform = `translateX(0px)`;
-                        }
-                    });
+                                if (maxTranslate > 0) {
+                                    let scrollProgress = 0;
+                                    const startMove = 0.05;
+                                    const endMove = 0.85;
+
+                                    if (progress > startMove && progress < endMove) {
+                                        scrollProgress = (progress - startMove) / (endMove - startMove);
+                                    } else if (progress >= endMove) {
+                                        scrollProgress = 1;
+                                    }
+
+                                    const currentTranslate = scrollProgress * maxTranslate;
+                                    track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`;
+                                } else {
+                                    track.style.transform = `translate3d(0px, 0, 0)`;
+                                }
+                            });
+                            isTicking = false;
+                        });
+                        isTicking = true;
+                    }
                 };
                 window.addEventListener('scroll', window._scrollHandler, { passive: true });
             }
@@ -895,12 +921,70 @@
             Exporter.generatePPT(data);
         }
 
-        function handleExportWeb() {
-            alert("🌐 การนำไปใช้เป็นเว็บไซต์ (Web Portfolio):\n\nเนื่องจากระบบนี้เป็น HTML/CSS/JS แบบสมบูรณ์ในตัว (ไม่ต้องใช้ Database)\nคุณสามารถนำ 'ไฟล์ทั้งหมดในโฟลเดอร์นี้' ไปอัปโหลดขึ้นโฮสติ้งฟรี เช่น\n\n• GitHub Pages\n• Vercel\n• Netlify\n\nเมื่ออัปโหลดเสร็จ เว็บไซต์จะออนไลน์และใช้งานได้ทันทีเหมือนที่คุณเห็นบนหน้าจอตอนนี้เลยครับ!");
+        async function handleExportWeb() {
+            const btn = document.querySelector('button[onclick="handleExportWeb()"]');
+            const originalHtml = btn.innerHTML;
+
+            try {
+                // 🌟 ดักจับถ้ารันผ่านไฟล์ในเครื่อง (file:///) ให้แจ้งเตือนแทนการปล่อย Error
+                if (window.location.protocol === 'file:') {
+                    alert("⚠️ ฟีเจอร์ 'ดาวน์โหลด WEB' ต้องใช้งานผ่านอินเทอร์เน็ต (เช่น บน Vercel) เท่านั้นครับ\n\nเนื่องจากระบบจำเป็นต้องสร้างลิงก์เชื่อมโยงไฟล์ CSS/JS จากเซิร์ฟเวอร์ เพื่อให้ไฟล์ HTML ที่โหลดไป สามารถส่งให้คนอื่นเปิดดูได้โดยที่หน้าเว็บไม่พังครับ\n\n💡 รบกวน Push โค้ดชุดนี้ขึ้น Vercel แล้วทดสอบกดดาวน์โหลดจากเว็บจริงของคุณได้เลยครับ!");
+                    return;
+                }
+
+                // แจ้งสถานะปุ่ม
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-cyan-400"></i> <span class="text-sm">Downloading...</span>`;
+                lucide.createIcons();
+
+                const data = StorageHandler.load();
+                const dataString = JSON.stringify(data);
+
+                // Fetch โครงสร้าง HTML ต้นฉบับจาก Vercel
+                const response = await fetch(window.location.href);
+                let html = await response.text();
+
+                // สร้าง Base URL ให้ดึง Asset (CSS/JS) จาก Vercel อัตโนมัติเวลาเปิดบนเครื่อง
+                let baseUrl = window.location.origin + window.location.pathname;
+                if (!baseUrl.endsWith('/')) {
+                    baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+                }
+
+                // แทนที่ Path เดิมด้วย Vercel Absolute Path
+                html = html.replace(/src="js\//g, `src="${baseUrl}js/`);
+                html = html.replace(/href="css\//g, `href="${baseUrl}css/`);
+
+                // แทรก Data ปัจจุบันฝังลงในไฟล์ HTML โดยตรง!
+                const scriptInject = `\n<script>\nwindow.INJECTED_PORTFOLIO_DATA = ${dataString};\n<\/script>\n`;
+                html = html.replace('</head>', `${scriptInject}</head>`);
+
+                // สั่งดาวน์โหลดเป็นไฟล์ HTML 1 ไฟล์ถ้วน
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+
+                const safeName = (data.name_en || data.name_th || 'My').replace(/\s+/g, '_');
+                a.download = `${safeName}_Web_Portfolio.html`;
+
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            } catch (err) {
+                console.error(err);
+                alert("เกิดข้อผิดพลาดในการดาวน์โหลดเว็บ กรุณาลองใหม่อีกครั้ง");
+            } finally {
+                // คืนค่าปุ่มกลับเป็นเหมือนเดิมเสมอ ไม่ว่าจะ Success หรือ Error
+                setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1500);
+            }
         }
+
 
         window.onload = () => {
             const savedData = StorageHandler.load();
+
+            if (document.getElementById('in-portfolio-style')) document.getElementById('in-portfolio-style').value = savedData.portfolioStyle || 'tech';
 
             ['name-th', 'name-en', 'role-th', 'role-en', 'bio-th', 'bio-en', 'skills-th', 'skills-en'].forEach(id => {
                 const valKey = id.replace('-', '_');
