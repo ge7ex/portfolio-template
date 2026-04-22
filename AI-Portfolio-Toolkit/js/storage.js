@@ -4,7 +4,10 @@ const StorageHandler = {
         try {
             // 🌟 1. Auto-Sort Algorithm: เรียงลำดับประสบการณ์ (ใหม่ -> เก่า) อัตโนมัติก่อนเซฟ
             if (data.exp && Array.isArray(data.exp)) {
-                const monthMap = { 'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12, '': 0 };
+                const monthMap = {
+                    'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+                    'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12, '': 0
+                };
 
                 data.exp.sort((a, b) => {
                     // ให้ความสำคัญกับปี/เดือนที่จบงาน (ถ้าเป็น ปัจจุบัน ให้ค่าเป็น 9999 สูงสุด)
@@ -28,44 +31,59 @@ const StorageHandler = {
                 });
             }
 
+            // 🌟 2. สำหรับไฟล์ดาวน์โหลด: ให้อัปเดตสถานะกลับเข้าไปใน Data ที่ฝังอยู่ (ทำให้สลับ Layout/Theme ไปมาได้เรื่อยๆ)
+            if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) {
+                window.INJECTED_PORTFOLIO_DATA = data;
+            }
+
             localStorage.setItem('ai-portfolio-pro-cache', JSON.stringify(data));
             console.log("Data saved & sorted successfully!");
+
         } catch (e) {
             console.error("Storage Error:", e);
-            // 🌟 แจ้งเตือนกรณีพื้นที่เต็ม (มักเกิดในมือถือถ้ารูปใหญ่เกินไป)
             alert("บันทึกข้อมูลไม่สำเร็จ: พื้นที่จัดเก็บข้อมูลเต็ม (ไฟล์รูปภาพอาจจะใหญ่หรือเยอะเกินไป กรุณาลบรูปที่ไม่ใช้ออก)");
         }
     },
+
     load: () => {
         let data = null;
 
-        // 🌟 2. Injected Data Check: ตรวจสอบว่ามีข้อมูลฝังอยู่ในไฟล์ HTML หรือไม่ (สำหรับเวอร์ชันดาวน์โหลดลงเครื่อง)
+        // 🌟 เช็คว่าเป็นการเปิดจากไฟล์ที่ดาวน์โหลดไปหรือไม่
         if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) {
             data = window.INJECTED_PORTFOLIO_DATA;
-            console.log("Loaded data from Injected Script");
         } else {
             const d = localStorage.getItem('ai-portfolio-pro-cache');
             data = d ? JSON.parse(d) : null;
-            console.log("Loaded data from LocalStorage");
         }
 
-        // 🌟 3. Migration: แปลงข้อมูลระบบเก่า ให้รองรับ 2 ภาษาอัตโนมัติ (ป้องกันข้อมูลเดิมหาย)
+        // 🌟 3. Migration: แปลงข้อมูลระบบเก่า ให้รองรับ 2 ภาษาอัตโนมัติ
         if (data) {
-            if (data.theme) { data.layout = data.theme; delete data.theme; }
+            if (data.theme) {
+                data.layout = data.theme;
+                delete data.theme;
+            }
 
             if (data.name && !data.name_th) {
-                data.name_th = data.name; data.name_en = data.name;
-                data.role_th = data.role; data.role_en = data.role;
-                data.bio_th = data.bio; data.bio_en = data.bio;
-                data.skills_th = data.skills; data.skills_en = data.skills;
+                data.name_th = data.name;
+                data.name_en = data.name;
+                data.role_th = data.role;
+                data.role_en = data.role;
+                data.bio_th = data.bio;
+                data.bio_en = data.bio;
+                data.skills_th = data.skills;
+                data.skills_en = data.skills;
 
                 if (data.exp) {
                     data.exp = data.exp.map(e => ({
                         ...e,
-                        company_th: e.company || '', company_en: e.company || '',
-                        title_th: e.title || '', title_en: e.title || '',
-                        desc_th: e.desc || '', desc_en: e.desc || '',
-                        highlights_th: e.highlights || [], highlights_en: e.highlights || []
+                        company_th: e.company || '',
+                        company_en: e.company || '',
+                        title_th: e.title || '',
+                        title_en: e.title || '',
+                        desc_th: e.desc || '',
+                        desc_en: e.desc || '',
+                        highlights_th: e.highlights || [],
+                        highlights_en: e.highlights || []
                     }));
                 }
             }
@@ -78,7 +96,7 @@ const StorageHandler = {
             layout: 'portfolio',
             colorMode: 'dark',
             portfolioStyle: 'tech',
-            lang: 'th', // เริ่มต้นที่ภาษาไทย
+            lang: 'th',
             skills_th: 'AI Strategy, Web Architecture, SEO',
             skills_en: 'AI Strategy, Web Architecture, SEO',
             email: '', phone: '', linkedin: '', avatar: '',

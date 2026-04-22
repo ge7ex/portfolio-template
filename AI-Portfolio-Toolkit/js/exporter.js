@@ -2,12 +2,12 @@
 const Exporter = {
     generatePPT: (data) => {
         let pres = new PptxGenJS();
-        pres.layout = 'LAYOUT_WIDE'; // ใช้ Layout 16:9 สำหรับ Portfolio
+        pres.layout = 'LAYOUT_WIDE';
 
         const isLight = data.colorMode === 'light';
         const pStyle = data.portfolioStyle || 'tech';
 
-        // 🌟 1. ธีมสีข้อความ (Text Colors) ตรงตาม 8 ธีมของเว็บ
+        // 🌟 แมประดับสีตาม 8 ธีมของเราให้ตรงกันเป๊ะ
         const themeColors = {
             tech: { accent: "3B82F6", sub: "60A5FA" },
             educ: { accent: "10B981", sub: "34D399" },
@@ -19,7 +19,6 @@ const Exporter = {
             luxury: { accent: "FBBF24", sub: "FCD34D" }
         };
 
-        // 🌟 2. ธีมสีพื้นหลังสำรอง (Exact Hex Colors) ในกรณีที่สแนปช็อตภาพล้มเหลว
         const themeBgColors = {
             tech: { dark: "020617", light: "F8FAFC" },
             educ: { dark: "022C22", light: "ECFDF5" },
@@ -34,7 +33,7 @@ const Exporter = {
         const currentTheme = themeColors[pStyle] || themeColors.tech;
         const exactBgHex = themeBgColors[pStyle] ? themeBgColors[pStyle][data.colorMode] : (isLight ? "FFFFFF" : "020617");
 
-        // 🌟 3. ตั้งค่า Background: ใช้รูปภาพสแนปช็อตเป็นหลัก ถ้าไม่มีให้ใช้สี Hex ตรงตามธีม
+        // 🌟 ถ้าระบบจับภาพหน้าจอได้ ให้ปูเป็นพื้นหลัง ถ้าจับไม่ได้ ให้ใช้สี Hex
         const bgConfig = data.bgSnapshot ? { data: data.bgSnapshot } : { fill: exactBgHex };
 
         const titleColor = currentTheme.accent;
@@ -58,7 +57,7 @@ const Exporter = {
 
         // ============== Slide 1: Cover ==============
         let slide1 = pres.addSlide();
-        slide1.background = bgConfig; // ใส่ Background
+        slide1.background = bgConfig;
 
         if (data.avatar) {
             slide1.addImage({ data: data.avatar, x: 4.15, y: 1.0, w: 2.5, h: 2.5, sizing: { type: 'cover', w: 2.5, h: 2.5 }, rounding: true });
@@ -68,9 +67,8 @@ const Exporter = {
 
         // ============== Slide 2: Bio & Contact ==============
         let slide2 = pres.addSlide();
-        slide2.background = bgConfig; // ใส่ Background
+        slide2.background = bgConfig;
 
-        // 🌟 แก้ไข: ใช้ titleColor แทนโค้ดสีที่ Hardcode ไว้
         slide2.addText(lang === 'th' ? "ประวัติโดยย่อ" : "ABOUT ME", { x: 0.5, y: 0.5, w: '45%', fontSize: 32, color: titleColor, bold: true });
         slide2.addText(bioText || "...", { x: 0.5, y: 1.2, w: '45%', h: 4, fontSize: 16, color: bodyColor, valign: 'top' });
 
@@ -80,9 +78,8 @@ const Exporter = {
 
         // ============== Slide 3: Skills ==============
         let slide3 = pres.addSlide();
-        slide3.background = bgConfig; // ใส่ Background
+        slide3.background = bgConfig;
 
-        // 🌟 แก้ไข: ใช้ titleColor แทนโค้ดสีที่ Hardcode ไว้
         slide3.addText(lang === 'th' ? "ทักษะและความเชี่ยวชาญ" : "CORE SKILLS", { x: 0.5, y: 0.5, fontSize: 32, color: titleColor, bold: true });
         let skillsArr = skillsText.split(',').map(s => s.trim()).filter(s => s);
         if (skillsArr.length > 0) {
@@ -96,9 +93,8 @@ const Exporter = {
 
         // ============== Slide 4+: Experience ==============
         if (data.exp && data.exp.length > 0) {
-            // หน้า Overview
             let slide4 = pres.addSlide();
-            slide4.background = bgConfig; // ใส่ Background
+            slide4.background = bgConfig;
             slide4.addText(lang === 'th' ? "สรุปประสบการณ์ทำงาน" : "EXPERIENCE OVERVIEW", { x: 0.5, y: 0.5, fontSize: 32, color: titleColor, bold: true });
 
             let currentY = 1.2;
@@ -118,16 +114,14 @@ const Exporter = {
                 }
             });
 
-            // หน้า Project Showcase (แต่ละชิ้นงาน)
             data.exp.forEach((e) => {
                 const itemHighlights = e[`highlights_${lang}`] || e.highlights_th || e.highlights || [];
                 let hasImages = e.images && e.images.length > 0;
                 let hasHighlights = itemHighlights.length > 0;
 
-                // สร้างสไลด์เมื่อมีไฮไลท์หรือรูปเท่านั้น
                 if (hasHighlights || hasImages) {
                     let pSlide = pres.addSlide();
-                    pSlide.background = bgConfig; // ใส่ Background
+                    pSlide.background = bgConfig;
 
                     const itemTitle = e[`title_${lang}`] || e.title_th || e.title || "";
                     const itemCompany = e[`company_${lang}`] || e.company_th || e.company || "";
@@ -136,8 +130,6 @@ const Exporter = {
                     const dateDisplay = e.isCurrent ? (lang === 'th' ? `${sy} - ปัจจุบัน` : `${sy} - Present`) : (ey ? `${sy} - ${ey}` : sy);
 
                     pSlide.addText(itemTitle, { x: 0.5, y: 0.5, w: '90%', fontSize: 26, color: titleColor, bold: true });
-
-                    // 🌟 แก้ไข: ใช้ subColor แทนสีที่ Hardcode ไว้
                     pSlide.addText(`${dateDisplay} | ${itemCompany}`, { x: 0.5, y: 1.0, w: '90%', fontSize: 15, color: subColor, italic: true });
 
                     let yPos = 1.6;

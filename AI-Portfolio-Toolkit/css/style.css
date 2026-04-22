@@ -83,11 +83,10 @@ body.text-white .resume-card:hover {
 }
 
 /* ==================================
-   Print Mode (A4 PDF Export แบบคลีนสุดๆ)
+   Print Mode (A4 PDF Export - Smart Layout)
 ===================================== */
 @media print {
     @page {
-        /* 🌟 คืนค่าเป็น auto เพื่อให้ Browser โชว์ปุ่มสลับ แนวนอน/แนวตั้ง ได้ครับ */
         size: auto;
         margin: 12mm;
     }
@@ -99,8 +98,22 @@ body.text-white .resume-card:hover {
         box-shadow: none !important;
     }
 
-    /* 🌟 บังคับให้ข้อความทุกอย่างเป็นสีดำ/เทาเข้ม และพื้นหลังขาว เพื่อ Contrast ที่ดีที่สุดบนกระดาษ */
-    body,
+    nav,
+    #edit-modal,
+    .no-print,
+    #dynamic-bg,
+    #theme-decorations,
+    #watermark,
+    #export-panel {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     h1,
     h2,
     h3,
@@ -109,27 +122,10 @@ body.text-white .resume-card:hover {
     p,
     span,
     li,
-    a {
+    a,
+    div {
         color: #0f172a !important;
-    }
-
-    body,
-    .unified-card,
-    .resume-card,
-    header,
-    section,
-    .scrollytelling-wrapper,
-    .scrollytelling-track {
-        background: #ffffff !important;
         border-color: #cbd5e1 !important;
-    }
-
-    nav,
-    #edit-modal,
-    .no-print,
-    #dynamic-bg,
-    #theme-decorations {
-        display: none !important;
     }
 
     #app,
@@ -140,21 +136,23 @@ body.text-white .resume-card:hover {
         padding: 0 !important;
     }
 
-    /* 🌟 จัดขนาดฟอนต์ใหม่สำหรับการ Print โดยเฉพาะ */
-    h1 {
+    /* ----------------------------------
+       1. PRINT: PORTFOLIO MODE
+    ------------------------------------- */
+    body.layout-portfolio h1 {
         font-size: 26pt !important;
         line-height: 1.2 !important;
         margin-bottom: 10px !important;
         text-align: center !important;
     }
 
-    header p {
+    body.layout-portfolio header p {
         font-size: 14pt !important;
         text-align: center !important;
         color: #475569 !important;
     }
 
-    h3 {
+    body.layout-portfolio h3 {
         font-size: 16pt !important;
         border-bottom: 2px solid #e2e8f0;
         padding-bottom: 5px !important;
@@ -162,18 +160,22 @@ body.text-white .resume-card:hover {
         margin-top: 20px !important;
     }
 
-    p,
-    span,
-    li,
-    a {
-        font-size: 11pt !important;
+    body.layout-portfolio .unified-card {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
     }
 
-    /* 🌟 กางเนื้อหาที่ซ่อนอยู่ออกมาให้หมด */
-    .fade-in,
-    .scroll-reveal,
-    .cinematic-image-wrapper,
-    .cinematic-image-inner {
+    body.layout-portfolio .unified-card>div:first-child {
+        text-align: left !important;
+        align-items: flex-start !important;
+        padding: 0 !important;
+    }
+
+    body.layout-portfolio .fade-in,
+    body.layout-portfolio .scroll-reveal,
+    body.layout-portfolio .cinematic-image-wrapper,
+    body.layout-portfolio .cinematic-image-inner {
         display: block !important;
         opacity: 1 !important;
         transform: none !important;
@@ -183,37 +185,22 @@ body.text-white .resume-card:hover {
         max-height: none !important;
     }
 
-    .scrollytelling-wrapper {
+    body.layout-portfolio .scrollytelling-wrapper {
         height: auto !important;
         margin-bottom: 20px !important;
     }
 
-    .sticky {
+    body.layout-portfolio .sticky {
         position: static !important;
         height: auto !important;
         overflow: visible !important;
     }
 
-    .scrolly-spacer {
+    body.layout-portfolio .scrolly-spacer {
         display: none !important;
     }
 
-    /* 🌟 ล้างการตั้งค่า Card กรอบใหญ่ๆ ทิ้งไป ทำตัวให้แบนราบเหมือนเอกสาร Word */
-    .unified-card {
-        border: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-    }
-
-    .unified-card>div:first-child {
-        padding: 0 !important;
-        text-align: left !important;
-        /* ให้ข้อความชิดซ้าย จะได้ไม่มีช่องว่างแปลกๆ */
-        align-items: flex-start !important;
-    }
-
-    /* 🌟 จัดการรูปภาพ ไม่ให้ล้นและไม่ให้ครอปแหว่ง */
-    .scrollytelling-track {
+    body.layout-portfolio .scrollytelling-track {
         transform: none !important;
         display: flex !important;
         flex-wrap: wrap !important;
@@ -224,66 +211,68 @@ body.text-white .resume-card:hover {
         border: none !important;
     }
 
-    .scrollytelling-track img {
+    body.layout-portfolio .scrollytelling-track img {
         height: auto !important;
         max-height: 200px !important;
-        /* จำกัดความสูงรูปไม่ให้กินที่ */
         width: auto !important;
         max-width: 45% !important;
         object-fit: contain !important;
-        /* ให้โชว์รูปเต็มใบ ไม่ตัดขอบ */
         border: 1px solid #cbd5e1 !important;
         border-radius: 8px !important;
         page-break-inside: avoid !important;
-        /* ป้องกันรูปแต่ละรูปถูกตัดครึ่งหน้า */
     }
 
-    .print-layout-wrapper {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-
-    .print-order-1 {
-        order: 1 !important;
-    }
-
-    .print-order-2 {
-        order: 2 !important;
-    }
-
-    .print-order-3 {
-        order: 3 !important;
-    }
-
-    .print-order-4 {
-        order: 4 !important;
-        break-before: auto !important;
-    }
-
-    /* 🌟 ให้ระบบขึ้นหน้าใหม่แบบ Auto ได้ ป้องกันอาการเว้นว่างเกินครึ่งกระดาษ */
-    .print-exp-item {
+    body.layout-portfolio .print-exp-item {
         page-break-inside: auto !important;
         break-inside: auto !important;
         margin-bottom: 30px !important;
         border: none !important;
         border-bottom: 2px dashed #cbd5e1 !important;
-        /* ใช้เส้นประคั่นระหว่างงานแทนกรอบ */
         padding: 0 0 20px 0 !important;
         border-radius: 0 !important;
     }
 
-    .print-exp-item:last-child {
+    body.layout-portfolio .print-exp-item:last-child {
         border-bottom: none !important;
     }
 
-    .print-exp-item h4 {
+    body.layout-portfolio .print-exp-item h4 {
         text-align: left !important;
         margin-bottom: 5px !important;
     }
 
-    .print-exp-item h5 {
+    body.layout-portfolio .print-exp-item h5 {
         text-align: left !important;
         margin-bottom: 10px !important;
+    }
+
+    /* ----------------------------------
+       2. PRINT: RESUME MODE 
+    ------------------------------------- */
+    body.layout-resume #app {
+        margin: 0 auto !important;
+        padding: 10mm 15mm !important;
+        border: none !important;
+        box-shadow: none !important;
+        min-height: auto !important;
+    }
+
+    body.layout-resume .resume-page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+        padding-top: 15mm !important;
+        margin-top: 0 !important;
+        border-top: none !important;
+    }
+
+    body.layout-resume .resume-card {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        border-left: 2px solid #94a3b8 !important;
+    }
+
+    body.layout-resume .glow-point {
+        display: none !important;
     }
 }
 
@@ -339,6 +328,21 @@ body.text-white .resume-card:hover {
     100% {
         border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
         transform: rotate(360deg);
+    }
+}
+
+/* 🌟 นำกลับมาให้แล้วครับ bg-pan */
+@keyframes bg-pan {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
     }
 }
 
