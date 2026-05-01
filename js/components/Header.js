@@ -1,6 +1,7 @@
 // js/components/Header.js
 const HeaderComponent = {
     render: (name, role, layout, avatar, colorMode, pStyle, lang) => {
+        if (!name && !role && !avatar) return '';
         const isDark = colorMode === 'dark';
 
         const themeConfig = {
@@ -25,8 +26,8 @@ const HeaderComponent = {
             ? `<img src="${avatar}" alt="Profile" class="w-24 h-24 object-cover rounded-md border-2 ${isDark ? 'border-slate-700' : t.resumeBorder}">`
             : '';
 
-        const nameText = name || (lang === 'th' ? 'ชื่อ-นามสกุล' : 'Full Name');
-        const roleText = role || (lang === 'th' ? 'ตำแหน่งงาน' : 'Professional Position');
+        const nameText = name || '';
+        const roleText = role || '';
 
         if (layout === 'resume') {
             return `
@@ -41,14 +42,22 @@ const HeaderComponent = {
         }
 
         return `
-            <header class="text-center mb-16 fade-in py-10 lg:py-20">
-                ${imageHtml}
-                <h1 class="text-6xl md:text-7xl lg:text-8xl leading-tight tracking-tight ${portfolioFont}">
-                    ${nameText}
-                </h1>
-                <p class="text-2xl md:text-3xl lg:text-4xl ${isDark ? 'text-slate-200' : 'text-slate-600'} mt-6 font-light tracking-widest uppercase">
-                    ${roleText}
-                </p>
+            <header class="portfolio-hero relative overflow-hidden mb-20 fade-in py-12 lg:py-24 px-4">
+                <div class="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] gap-10 items-center">
+                    <div class="text-center lg:text-left order-2 lg:order-1">
+                        <h1 class="hero-title text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight ${portfolioFont}">
+                            ${nameText}
+                        </h1>
+                        <p class="text-xl md:text-2xl lg:text-3xl ${isDark ? 'text-slate-200' : 'text-slate-600'} mt-7 font-light tracking-[0.25em] uppercase">
+                            ${roleText}
+                        </p>
+                    </div>
+                    <div class="order-1 lg:order-2 relative flex justify-center">
+                        <div class="hero-frame ${t.radius} relative">
+                            ${avatar ? `<img src="${avatar}" alt="Profile" class="hero-avatar ${t.radius} object-cover">` : `<div class="hero-avatar ${t.radius} flex items-center justify-center text-6xl font-black ${isDark ? 'bg-slate-900/80 text-slate-600' : 'bg-white text-slate-300'}">${(nameText || 'P').charAt(0)}</div>`}
+                        </div>
+                    </div>
+                </div>
             </header>
         `;
     }

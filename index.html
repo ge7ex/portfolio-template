@@ -6,8 +6,7 @@
     <title>AI Portfolio Pro Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
@@ -78,6 +77,7 @@
         class="fixed inset-0 z-[-1] bg-cover bg-center bg-no-repeat transition-all duration-700 opacity-0 bg-blend-overlay bg-[#0f172a]/90">
     </div>
     <div id="theme-decorations" class="fixed inset-0 z-[0] pointer-events-none overflow-hidden"></div>
+    <div id="scroll-progress" class="fixed top-0 left-0 h-1 w-0 z-[80] bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 shadow-[0_0_18px_rgba(59,130,246,.65)] transition-[width] duration-150"></div>
 
     <div id="watermark">Web Portfolio by Kasidech "Ge7ex" Settavanit</div>
 
@@ -166,7 +166,7 @@
                         data-lucide="x" class="w-7 h-7"></i></button>
             </div>
 
-            <div class="flex px-8 pt-4 gap-8 border-b border-slate-800 bg-[#0f172a]">
+            <div class="flex flex-wrap px-8 pt-4 gap-x-8 gap-y-3 border-b border-slate-800 bg-[#0f172a]">
                 <button onclick="switchTab('basic')" id="tab-basic"
                     class="tab-active pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
                         data-lucide="user" class="w-4 h-4"></i> Basic Info</button>
@@ -176,6 +176,15 @@
                 <button onclick="switchTab('experience')" id="tab-experience"
                     class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
                         data-lucide="briefcase" class="w-4 h-4"></i> Experience</button>
+                <button onclick="switchTab('sections')" id="tab-sections"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="graduation-cap" class="w-4 h-4"></i> Profile Extras</button>
+                <button onclick="switchTab('workExtras')" id="tab-workExtras"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="panel-top" class="w-4 h-4"></i> Work Extras</button>
+                <button onclick="switchTab('trustExtras')" id="tab-trustExtras"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="badge-check" class="w-4 h-4"></i> Trust & CTA</button>
             </div>
 
             <div class="p-8 overflow-y-auto flex-1 custom-scrollbar">
@@ -266,6 +275,94 @@
                                 (English)</label>
                             <input type="text" id="in-skills-en" placeholder="e.g. Planning, Management..."
                                 class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="content-sections" class="hidden space-y-6">
+                    <div class="extra-editor-panel">
+                        <div class="extra-editor-heading">
+                            <h3><i data-lucide="graduation-cap" class="w-5 h-5 text-blue-400"></i> Profile Extras</h3>
+                            <p>Education, certificates, and awards. Empty fields stay hidden in the portfolio, PDF, and DOCX.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="extra-language-column accent-blue">
+                                <h4>TH ข้อมูลภาษาไทย</h4>
+                                <label class="extra-label">การศึกษา <span>วุฒิ | สถาบัน | ปี | รายละเอียด</span></label>
+                                <textarea id="in-education-th" class="extra-textarea" placeholder="ปริญญาตรี วิทยาการคอมพิวเตอร์ | มหาวิทยาลัยตัวอย่าง | 2565 | เกียรตินิยม"></textarea>
+                                <label class="extra-label">ประกาศนียบัตร <span>ชื่อ | ผู้ออกใบรับรอง | ปี</span></label>
+                                <textarea id="in-certifications-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">รางวัลและความสำเร็จ <span>ชื่อ | หน่วยงาน | ปี | รายละเอียด</span></label>
+                                <textarea id="in-awards-th" class="extra-textarea"></textarea>
+                            </div>
+                            <div class="extra-language-column accent-amber">
+                                <h4>EN English Data</h4>
+                                <label class="extra-label">Education <span>Degree | School | Year | Detail</span></label>
+                                <textarea id="in-education-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Certifications <span>Name | Issuer | Year</span></label>
+                                <textarea id="in-certifications-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Awards <span>Name | Organization | Year | Detail</span></label>
+                                <textarea id="in-awards-en" class="extra-textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-workExtras" class="hidden space-y-6">
+                    <div class="extra-editor-panel">
+                        <div class="extra-editor-heading">
+                            <h3><i data-lucide="panel-top" class="w-5 h-5 text-cyan-400"></i> Work Extras</h3>
+                            <p>Case studies, services, and published work. These become extra portfolio sections and print-ready DOCX blocks.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="extra-language-column accent-blue">
+                                <h4>TH ข้อมูลภาษาไทย</h4>
+                                <label class="extra-label">กรณีศึกษา / ผลลัพธ์ <span>โปรเจกต์ | โจทย์ | วิธีทำ | ผลลัพธ์</span></label>
+                                <textarea id="in-caseStudies-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">บริการ <span>ชื่อบริการ | รายละเอียด</span></label>
+                                <textarea id="in-services-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">บทความ / สื่อเผยแพร่ <span>ชื่อ | รายละเอียด | URL</span></label>
+                                <textarea id="in-articles-th" class="extra-textarea"></textarea>
+                            </div>
+                            <div class="extra-language-column accent-amber">
+                                <h4>EN English Data</h4>
+                                <label class="extra-label">Case Studies <span>Project | Problem | Action | Result</span></label>
+                                <textarea id="in-caseStudies-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Services <span>Service | Description</span></label>
+                                <textarea id="in-services-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Articles / Publications <span>Title | Description | URL</span></label>
+                                <textarea id="in-articles-en" class="extra-textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-trustExtras" class="hidden space-y-6">
+                    <div class="extra-editor-panel">
+                        <div class="extra-editor-heading">
+                            <h3><i data-lucide="badge-check" class="w-5 h-5 text-violet-400"></i> Trust & CTA</h3>
+                            <p>Testimonials, clients, and a final call-to-action. Keep one item per line for clean cards.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="extra-language-column accent-blue">
+                                <h4>TH ข้อมูลภาษาไทย</h4>
+                                <label class="extra-label">คำรับรอง <span>คำพูด | ชื่อ | ตำแหน่ง</span></label>
+                                <textarea id="in-testimonials-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">ลูกค้า / หน่วยงาน <span>คั่นด้วย comma หรือขึ้นบรรทัดใหม่</span></label>
+                                <textarea id="in-clients-th" class="extra-textarea small"></textarea>
+                                <label class="extra-label">CTA <span>หัวข้อ | รายละเอียด | ข้อความปุ่ม | URL</span></label>
+                                <textarea id="in-cta-th" class="extra-textarea small"></textarea>
+                            </div>
+                            <div class="extra-language-column accent-amber">
+                                <h4>EN English Data</h4>
+                                <label class="extra-label">Testimonials <span>Quote | Name | Role</span></label>
+                                <textarea id="in-testimonials-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Clients / Partners <span>Comma or newline separated</span></label>
+                                <textarea id="in-clients-en" class="extra-textarea small"></textarea>
+                                <label class="extra-label">CTA <span>Headline | Description | Button | URL</span></label>
+                                <textarea id="in-cta-en" class="extra-textarea small"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -400,9 +497,17 @@
                     class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-orange-600 hover:bg-orange-500 shadow-lg shadow-orange-600/20 transition-all flex items-center justify-center gap-2 border border-orange-500">
                     <i data-lucide="file-presentation" class="w-4 h-4"></i> <span class="text-sm">Download PPTX</span>
                 </button>
-                <button id="btn-export-pdf" onclick="handlePrint()"
-                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 border border-emerald-500 hidden">
-                    <i data-lucide="printer" class="w-4 h-4"></i> <span class="text-sm">Save as PDF</span>
+                <button id="btn-export-pdf-portrait" onclick="handlePrint('portrait')"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 border border-emerald-500">
+                    <i data-lucide="printer" class="w-4 h-4"></i> <span class="text-sm">PDF Portrait</span>
+                </button>
+                <button id="btn-export-pdf-landscape" onclick="handlePrint('landscape')" aria-hidden="true" tabindex="-1"
+                    class="hidden flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-teal-600 hover:bg-teal-500 shadow-lg shadow-teal-600/30 transition-all items-center justify-center gap-2 border border-teal-500">
+                    <i data-lucide="panel-top" class="w-4 h-4"></i> <span class="text-sm">PDF Landscape</span>
+                </button>
+                <button id="btn-export-docx" onclick="handleExportDOCX()"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-600/20 transition-all flex items-center justify-center gap-2 border border-violet-500">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> <span class="text-sm">Download DOCX</span>
                 </button>
                 <button onclick="updatePreview()"
                     class="w-full md:w-auto px-10 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
@@ -419,6 +524,15 @@
     <script src="js/components/Experience.js"></script>
     <script src="js/components/Skill.js"></script>
     <script src="js/components/Contact.js"></script>
+    <script src="js/components/EducationComponent.js"></script>
+    <script src="js/components/CertificationComponent.js"></script>
+    <script src="js/components/AwardsComponent.js"></script>
+    <script src="js/components/CaseStudyComponent.js"></script>
+    <script src="js/components/ServicesComponent.js"></script>
+    <script src="js/components/TestimonialsComponent.js"></script>
+    <script src="js/components/ClientsComponent.js"></script>
+    <script src="js/components/CTAComponent.js"></script>
+    <script src="js/components/ArticlesComponent.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/exporter.js"></script>
 
@@ -442,7 +556,7 @@
         function setDirectTheme(theme) { const data = StorageHandler.load(); data.portfolioStyle = theme; StorageHandler.save(data); render(data); }
 
         function switchTab(tabId) {
-            ['basic', 'contact', 'experience'].forEach(t => {
+            ['basic', 'contact', 'experience', 'sections', 'workExtras', 'trustExtras'].forEach(t => {
                 document.getElementById('content-' + t).classList.add('hidden');
                 document.getElementById('content-' + t).classList.remove('block');
                 document.getElementById('tab-' + t).classList.replace('tab-active', 'tab-inactive');
@@ -621,7 +735,8 @@
         function updatePreview() {
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
-            const data = { layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
+            const data = { layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), extraExamplesSeeded: currentData.extraExamplesSeeded || false, avatar: currentAvatarBase64, exp: currentData.exp || [] };
             StorageHandler.save(data); render(data); toggleModal();
         }
 
@@ -633,23 +748,21 @@
             if (layout === 'resume') {
                 document.body.classList.add('layout-resume'); document.body.classList.remove('layout-portfolio');
                 if (document.getElementById('btn-export-pptx')) document.getElementById('btn-export-pptx').classList.add('hidden');
-                if (document.getElementById('btn-export-pdf')) document.getElementById('btn-export-pdf').classList.remove('hidden');
                 document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
                 document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md";
             } else {
                 document.body.classList.add('layout-portfolio'); document.body.classList.remove('layout-resume');
                 if (document.getElementById('btn-export-pptx')) document.getElementById('btn-export-pptx').classList.remove('hidden');
-                if (document.getElementById('btn-export-pdf')) document.getElementById('btn-export-pdf').classList.add('hidden');
                 document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
                 document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md";
             }
 
             if (colorMode === 'dark') { document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-700 text-white flex items-center justify-center gap-2 shadow-md"; document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"; } else { document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-900 flex items-center justify-center gap-2 shadow-md"; document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"; }
             document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active')); if (document.getElementById(`swatch-${pStyle}`)) document.getElementById(`swatch-${pStyle}`).classList.add('active');
-            const localizedData = { name: data[`name_${lang}`] || data.name_th || '', role: data[`role_${lang}`] || data.role_th || '', bio: data[`bio_${lang}`] || data.bio_th || '', skills: data[`skills_${lang}`] || data.skills_th || '', exp: (data.exp || []).map(e => ({ ...e, company: e[`company_${lang}`] || e.company_th || e.company || '', title: e[`title_${lang}`] || e.title_th || e.title || '', desc: e[`desc_${lang}`] || e.desc_th || e.desc || '', highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || [] })) };
+            const localizedData = { name: data[`name_${lang}`] || data.name_th || '', role: data[`role_${lang}`] || data.role_th || '', bio: data[`bio_${lang}`] || data.bio_th || '', skills: data[`skills_${lang}`] || data.skills_th || '', education: data[`education_${lang}`] || '', certifications: data[`certifications_${lang}`] || '', awards: data[`awards_${lang}`] || '', caseStudies: data[`caseStudies_${lang}`] || '', services: data[`services_${lang}`] || '', testimonials: data[`testimonials_${lang}`] || '', clients: data[`clients_${lang}`] || '', cta: data[`cta_${lang}`] || '', articles: data[`articles_${lang}`] || '', exp: (data.exp || []).map(e => ({ ...e, company: e[`company_${lang}`] || e.company_th || e.company || '', title: e[`title_${lang}`] || e.title_th || e.title || '', desc: e[`desc_${lang}`] || e.desc_th || e.desc || '', highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || [] })) };
             const themeBGs = { tech: { dark: 'bg-[#020617]', light: 'bg-slate-50' }, educ: { dark: 'bg-[#022c22]', light: 'bg-emerald-50' }, gov: { dark: 'bg-[#0f172a]', light: 'bg-slate-100' }, creative: { dark: 'bg-[#2e1065]', light: 'bg-fuchsia-50' }, minimal: { dark: 'bg-black', light: 'bg-white' }, eco: { dark: 'bg-[#042f2e]', light: 'bg-teal-50' }, bold: { dark: 'bg-[#450a0a]', light: 'bg-rose-50' }, luxury: { dark: 'bg-[#1e1b4b]', light: 'bg-indigo-50' } };
             const currentBg = themeBGs[pStyle] ? themeBGs[pStyle][colorMode] : themeBGs['tech'][colorMode];
-            document.body.className = `min-h-screen transition-colors duration-700 antialiased relative overflow-x-hidden ${currentBg} ${colorMode === 'light' ? "text-slate-900" : "text-white"} ${document.body.classList.contains('is-downloaded') ? 'is-downloaded' : ''} ${layout === 'resume' ? 'layout-resume' : 'layout-portfolio'}`;
+            document.body.className = `min-h-screen transition-colors duration-700 antialiased relative overflow-x-hidden ${currentBg} ${colorMode === 'light' ? "text-slate-900" : "text-white"} ${document.body.classList.contains('is-downloaded') ? 'is-downloaded' : ''} ${layout === 'resume' ? 'layout-resume' : 'layout-portfolio'} theme-${pStyle} mode-${colorMode}`;
 
             const decorationContainer = document.getElementById('theme-decorations');
             if (decorationContainer) {
@@ -661,7 +774,7 @@
                         case 'creative': decorationsHTML = `<div class="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-[radial-gradient(circle_at_center,rgba(217,70,239,0.15)_0%,transparent_60%)] animate-[creative-blob_15s_infinite_linear] will-change-transform"></div><div class="absolute bottom-1/4 right-1/4 w-[40vw] h-[40vw] bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.15)_0%,transparent_60%)] animate-[creative-blob_10s_infinite_linear_reverse] will-change-transform"></div>`; break;
                         case 'minimal': decorationsHTML = `<div class="absolute inset-0 opacity-10 dark:opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAiLz4KPHBhdGggZD0iTTAgMGgxdjFIMHptMiAyaDF2MUgyeiIgZmlsbD0iIzAwMCIgZmlsbC1vcGFjaXR5PSIwLjEiLz4KPC9zdmc+')]"></div>`; break;
                         case 'eco': decorationsHTML = `<div class="absolute -top-10 left-[20%] w-8 h-8 bg-green-500/30 rounded-tl-full rounded-br-full animate-[eco-leaf_10s_ease-in-out_infinite] will-change-transform shadow-[0_0_10px_rgba(34,197,94,0.3)]"></div><div class="absolute -top-10 left-[50%] w-6 h-6 bg-teal-500/30 rounded-tl-full rounded-br-full animate-[eco-leaf_15s_ease-in-out_infinite_2s] will-change-transform shadow-[0_0_10px_rgba(20,184,166,0.3)]"></div><div class="absolute -top-10 left-[80%] w-10 h-10 bg-emerald-500/20 rounded-tl-full rounded-br-full animate-[eco-leaf_12s_ease-in-out_infinite_1s] will-change-transform shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>`; break;
-                        case 'bold': decorationsHTML = `<div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-rose-500/5 to-transparent animate-[bold-pulse_4s_infinite] will-change-transform"></div><div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-t from-red-500/5 to-transparent animate-[bold-pulse_6s_infinite_1s] will-change-transform"></div>`; break;
+                        case 'bold': decorationsHTML = `<div class="absolute inset-0 opacity-70"><div class="absolute -top-24 -right-20 w-[46vw] h-[46vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(244,63,94,.24)_0%,rgba(244,63,94,.08)_38%,transparent_70%)] animate-[bold-orbit_12s_ease-in-out_infinite] will-change-transform"></div><div class="absolute bottom-[-18vh] left-[-12vw] w-[55vw] h-[55vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(251,113,133,.22)_0%,rgba(220,38,38,.10)_42%,transparent_72%)] animate-[bold-orbit_16s_ease-in-out_infinite_reverse] will-change-transform"></div><div class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(244,63,94,.10)_46%,rgba(255,255,255,.10)_50%,rgba(244,63,94,.10)_54%,transparent_100%)] animate-[bold-shine_5.5s_ease-in-out_infinite] will-change-transform"></div></div>`; break;
                         case 'luxury': decorationsHTML = `<div class="absolute w-full h-full pointer-events-none"><div class="absolute top-[80%] left-[10%] w-2 h-2 bg-amber-200 rounded-full shadow-[0_0_15px_#fde68a] animate-[luxury-dust_8s_infinite] will-change-transform"></div><div class="absolute top-[90%] left-[30%] w-3 h-3 bg-amber-300 rounded-full shadow-[0_0_20px_#fcd34d] animate-[luxury-dust_12s_infinite_2s] will-change-transform"></div><div class="absolute top-[70%] left-[80%] w-1.5 h-1.5 bg-amber-100 rounded-full shadow-[0_0_10px_#fef3c7] animate-[luxury-dust_6s_infinite_1s] will-change-transform"></div><div class="absolute top-[85%] left-[60%] w-2.5 h-2.5 bg-yellow-200 rounded-full shadow-[0_0_15px_#fef08a] animate-[luxury-dust_10s_infinite_4s] will-change-transform"></div></div>`; break;
                     }
                 } decorationContainer.innerHTML = decorationsHTML;
@@ -672,39 +785,74 @@
             let appContent = '';
             if (layout === 'resume') {
                 appContent = `
-                    <div class="print-layout-wrapper flex flex-col mt-2">
-                        <div class="resume-page-1">
+                    <div class="resume-cv-shell print-layout-wrapper">
+                        <aside class="resume-cv-sidebar">
                             <div id="header-section" class="print-order-1">
                                 ${HeaderComponent.render(localizedData.name, localizedData.role, layout, data.avatar, colorMode, pStyle, lang)}
                             </div>
-                            <div class="print-order-2 w-full grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-8 border-t border-slate-200">
-                                ${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}
+                            <div class="resume-sidebar-block print-order-2">
                                 ${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}
                             </div>
-                        </div>
-                        <div class="print-order-3 w-full resume-page-break">
-                            ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
-                        </div>
-                        <div class="print-order-4 w-full resume-page-break">
-                            ${ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang)}
-                        </div>
+                            <div class="resume-sidebar-block print-order-3">
+                                ${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}
+                            </div>
+                        </aside>
+                        <main class="resume-cv-main">
+                            <div class="print-order-4 resume-section-card">
+                                ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
+
+                                ${EducationComponent.render(localizedData.education, layout, colorMode, pStyle, lang)}
+                                ${CertificationComponent.render(localizedData.certifications, layout, colorMode, pStyle, lang)}
+                                ${AwardsComponent.render(localizedData.awards, layout, colorMode, pStyle, lang)}
+                                ${ServicesComponent.render(localizedData.services, layout, colorMode, pStyle, lang)}
+                                ${ClientsComponent.render(localizedData.clients, layout, colorMode, pStyle, lang)}
+                                ${ArticlesComponent.render(localizedData.articles, layout, colorMode, pStyle, lang)}
+                            </div>
+                            <div class="print-order-5 resume-section-card">
+                                ${ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang)}
+                                ${CaseStudyComponent.render(localizedData.caseStudies, layout, colorMode, pStyle, lang)}
+                                ${TestimonialsComponent.render(localizedData.testimonials, layout, colorMode, pStyle, lang)}
+                                ${CTAComponent.render(localizedData.cta, layout, colorMode, pStyle, lang)}
+                            </div>
+                        </main>
                     </div>
                 `;
             } else {
                 appContent = `
-                    <div class="print-layout-wrapper flex flex-col gap-12 mt-10 w-full">
-                        <div id="header-section" class="print-order-1 scroll-reveal w-full max-w-5xl mx-auto fade-in">
+                    <div class="print-layout-wrapper portfolio-board mt-10 w-full">
+                        <div class="portfolio-board-mark portfolio-board-mark-a"></div>
+                        <div class="portfolio-board-mark portfolio-board-mark-b"></div>
+                        <div id="header-section" class="print-order-1 portfolio-board-hero scroll-reveal w-full fade-in">
                             ${HeaderComponent.render(localizedData.name, localizedData.role, layout, data.avatar, colorMode, pStyle, lang)}
                         </div>
-                        <div class="print-order-2 w-full max-w-5xl mx-auto">
-                            ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
+                        <div class="print-order-2 portfolio-prime-grid w-full max-w-6xl mx-auto">
+                            <div class="portfolio-prime-main">
+                                ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
+                            </div>
+                            <div class="portfolio-prime-side">
+                                ${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}
+                                ${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}
+                            </div>
                         </div>
-                        <div class="print-order-3 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 mt-20">
-                            ${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}
-                            ${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}
-                        </div>
-                        <div class="print-order-4 w-full">
+                        <div class="print-order-4 portfolio-work-block w-full">
                             ${ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang)}
+                        </div>
+                        <div class="print-order-extra portfolio-extra-grid w-full max-w-6xl mx-auto">
+                            <div class="portfolio-extra-column">
+                                ${ServicesComponent.render(localizedData.services, layout, colorMode, pStyle, lang)}
+                                ${CaseStudyComponent.render(localizedData.caseStudies, layout, colorMode, pStyle, lang)}
+                                ${ArticlesComponent.render(localizedData.articles, layout, colorMode, pStyle, lang)}
+                            </div>
+                            <div class="portfolio-extra-column">
+                                ${EducationComponent.render(localizedData.education, layout, colorMode, pStyle, lang)}
+                                ${CertificationComponent.render(localizedData.certifications, layout, colorMode, pStyle, lang)}
+                                ${AwardsComponent.render(localizedData.awards, layout, colorMode, pStyle, lang)}
+                                ${ClientsComponent.render(localizedData.clients, layout, colorMode, pStyle, lang)}
+                                ${TestimonialsComponent.render(localizedData.testimonials, layout, colorMode, pStyle, lang)}
+                            </div>
+                        </div>
+                        <div class="print-order-extra portfolio-cta-row w-full max-w-6xl mx-auto">
+                            ${CTAComponent.render(localizedData.cta, layout, colorMode, pStyle, lang)}
                         </div>
                     </div>
                 `;
@@ -749,6 +897,12 @@
                 scrollyWrappers.forEach(w => { const t = w.querySelector('.scrollytelling-track'); if (t) t.removeAttribute('data-max-translate'); });
                 let isTicking = false;
                 window._scrollHandler = () => {
+                    const progressBar = document.getElementById('scroll-progress');
+                    if (progressBar) {
+                        const doc = document.documentElement;
+                        const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+                        progressBar.style.width = `${Math.min(100, Math.max(0, (window.scrollY / max) * 100))}%`;
+                    }
                     if (window.innerWidth < 1024) return;
                     if (!isTicking) {
                         window.requestAnimationFrame(() => {
@@ -774,8 +928,36 @@
             }
         }
 
-        function handlePrint() {
-            window.print();
+        function handlePrint(orientation = 'portrait') {
+            const modal = document.getElementById("edit-modal");
+            const wasOpen = modal && !modal.classList.contains("hidden");
+            if (wasOpen) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+
+            const oldPrintStyle = document.getElementById('dynamic-print-page-size');
+            if (oldPrintStyle) oldPrintStyle.remove();
+            const printStyle = document.createElement('style');
+            printStyle.id = 'dynamic-print-page-size';
+            printStyle.textContent = `@media print { @page { size: A4 ${orientation === 'landscape' ? 'landscape' : 'portrait'}; margin: 0; } body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }`;
+            document.head.appendChild(printStyle);
+
+            document.body.classList.toggle('print-landscape', orientation === 'landscape');
+            document.body.classList.toggle('print-portrait', orientation !== 'landscape');
+            const restoreModal = () => {
+                if (wasOpen) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+                window.removeEventListener('afterprint', restoreModal);
+            };
+            window.addEventListener('afterprint', restoreModal, { once: true });
+            window.scrollTo(0, 0);
+            setTimeout(() => { window.print(); }, 180);
+        }
+
+        function handleExportDOCX() {
+            const data = StorageHandler.load();
+            if (typeof Exporter === 'undefined' || !Exporter.generateDOCX) {
+                alert('DOCX exporter is not ready. Please reload this file.');
+                return;
+            }
+            Exporter.generateDOCX(data);
         }
 
         async function handleExportPPTX() {
@@ -785,41 +967,12 @@
             lucide.createIcons();
 
             try {
-                // ซ่อน UI ที่กวนใจทั้งหมดชั่วคราว
-                const app = document.getElementById('app');
-                const nav = document.querySelector('nav');
-                const wm = document.getElementById('watermark');
-                const modal = document.getElementById('edit-modal');
-
-                if (app) app.style.visibility = 'hidden';
-                if (nav) nav.style.visibility = 'hidden';
-                if (wm) wm.style.visibility = 'hidden';
-                if (modal) modal.style.visibility = 'hidden';
-
-                // แอบถ่ายเฉพาะพื้นหลังแบบใส
-                const canvas = await html2canvas(document.body, {
-                    scale: 1,
-                    windowWidth: 1920,
-                    windowHeight: 1080,
-                    backgroundColor: null
-                });
-
-                const bgSnapshot = canvas.toDataURL('image/jpeg', 0.8);
-
-                // คืนค่า UI
-                if (app) app.style.visibility = '';
-                if (nav) nav.style.visibility = '';
-                if (wm) wm.style.visibility = '';
-                if (modal) modal.style.visibility = '';
-
                 const data = StorageHandler.load();
-                data.bgSnapshot = bgSnapshot;
-
+                delete data.bgSnapshot;
                 Exporter.generatePPT(data);
             } catch (e) {
                 console.error(e);
-                const data = StorageHandler.load();
-                Exporter.generatePPT(data);
+                alert('Export PPTX failed. Please save your profile and try again.');
             } finally {
                 btn.innerHTML = originalHtml;
                 lucide.createIcons();
@@ -833,6 +986,11 @@
             document.getElementById('in-email').value = savedData.email || '';
             document.getElementById('in-phone').value = savedData.phone || '';
             document.getElementById('in-linkedin').value = savedData.linkedin || '';
+            ['education-th','education-en','certifications-th','certifications-en','awards-th','awards-en','caseStudies-th','caseStudies-en','services-th','services-en','testimonials-th','testimonials-en','clients-th','clients-en','cta-th','cta-en','articles-th','articles-en'].forEach(id => {
+                const key = id.replace('-', '_');
+                const el = document.getElementById(`in-${id}`);
+                if (el) el.value = savedData[key] || '';
+            });
             if (savedData.avatar) { currentAvatarBase64 = savedData.avatar; document.getElementById('avatar-preview').src = currentAvatarBase64; document.getElementById('avatar-preview').classList.remove('hidden'); }
             render(savedData);
         };

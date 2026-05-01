@@ -1,6 +1,7 @@
 // js/components/Bio.js
 const BioComponent = {
     render: (content, layout, colorMode, pStyle, lang) => {
+        if (!content || !String(content).trim()) return '';
         const isDark = colorMode === 'dark';
         const titleText = lang === 'th' ? 'ประวัติโดยย่อ' : 'Professional Summary';
         let titleClass = "";
@@ -27,6 +28,6 @@ const BioComponent = {
             textClass = `text-xl ${isDark ? 'text-slate-100' : 'text-slate-600'} leading-loose p-8 border backdrop-blur-md rounded-2xl ${isDark ? t.bgDark : t.bgLight} font-light`;
         }
 
-        return `<section class="mb-10 fade-in"><h3 class="${titleClass}">${titleText}</h3><div class="${textClass}">${content || (lang === 'th' ? 'กำลังรอให้คุณเขียนประวัติ...' : 'Waiting for your amazing story...')}</div></section>`;
+        return `<section class="mb-10 fade-in"><h3 class="${titleClass}">${titleText}</h3><div class="${textClass}">${content}</div></section>`;
     }
 };
