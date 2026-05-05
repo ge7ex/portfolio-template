@@ -125,7 +125,7 @@ const ExperienceComponent = {
                                         <div class="scrollytelling-track flex gap-6 items-center will-change-transform py-10 px-4">
                                             <div class="scrolly-spacer shrink-0 flex-none w-[5vw] lg:w-[10vw]"></div>
                                             ${item.images.map(imgSrc => `
-                                                <img src="${imgSrc}" class="h-[30vh] lg:h-[45vh] w-auto max-w-[85vw] lg:max-w-[60vw] object-cover rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'} shrink-0">
+                                                <img src="${imgSrc}" class="h-[26vh] lg:h-[36vh] max-h-[380px] w-auto max-w-[85vw] lg:max-w-[58vw] object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'} shrink-0 scrolly-full-image" loading="lazy">
                                             `).join('')}
                                             <div class="scrolly-spacer shrink-0 flex-none w-[150vw] lg:w-[200vw]"></div>
                                         </div>
