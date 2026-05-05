@@ -12,7 +12,9 @@ const HeaderComponent = {
             minimal: { border: isDark ? 'border-zinc-800' : 'border-zinc-200', fontDark: 'text-white tracking-widest uppercase font-light', fontLight: 'text-slate-900 tracking-widest uppercase font-light', radius: 'rounded-none', resumeAccent: 'text-slate-500', resumeBorder: 'border-slate-800' },
             eco: { border: 'border-teal-500 shadow-[0_0_25px_rgba(20,184,166,0.4)]', fontDark: 'bg-clip-text text-transparent bg-gradient-to-br from-teal-300 to-green-400', fontLight: 'bg-clip-text text-transparent bg-gradient-to-br from-teal-600 to-green-600', radius: 'rounded-tl-[4rem] rounded-br-[4rem]', resumeAccent: 'text-teal-600', resumeBorder: 'border-teal-500' },
             bold: { border: 'border-rose-500 shadow-[0_0_40px_-5px_rgba(244,63,94,0.5)] border-[5px]', fontDark: 'bg-clip-text text-transparent bg-gradient-to-r from-rose-400 via-red-400 to-orange-400 uppercase font-black', fontLight: 'bg-clip-text text-transparent bg-gradient-to-r from-rose-600 via-red-500 to-orange-600 uppercase font-black', radius: 'rounded-xl', resumeAccent: 'text-rose-600', resumeBorder: 'border-rose-500' },
-            luxury: { border: 'border-amber-300 border-x-4 border-y-0 shadow-[0_10px_40px_-10px_rgba(251,191,36,0.4)]', fontDark: 'font-serif bg-clip-text text-transparent bg-gradient-to-b from-amber-200 to-amber-500 tracking-wider', fontLight: 'font-serif bg-clip-text text-transparent bg-gradient-to-b from-indigo-900 to-purple-900 tracking-wider', radius: 'rounded-sm', resumeAccent: 'text-amber-600', resumeBorder: 'border-amber-400' }
+            luxury: { border: 'border-amber-300 border-x-4 border-y-0 shadow-[0_10px_40px_-10px_rgba(251,191,36,0.4)]', fontDark: 'font-serif bg-clip-text text-transparent bg-gradient-to-b from-amber-200 to-amber-500 tracking-wider', fontLight: 'font-serif bg-clip-text text-transparent bg-gradient-to-b from-indigo-900 to-purple-900 tracking-wider', radius: 'rounded-sm', resumeAccent: 'text-amber-600', resumeBorder: 'border-amber-400' },
+            health: { border: 'border-cyan-300 shadow-[0_0_30px_-5px_rgba(34,211,238,0.45)]', fontDark: 'bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-emerald-300 to-sky-400', fontLight: 'bg-clip-text text-transparent bg-gradient-to-r from-cyan-700 via-emerald-600 to-sky-700', radius: 'rounded-[2rem]', resumeAccent: 'text-cyan-600', resumeBorder: 'border-cyan-400' },
+            esports: { border: 'border-violet-400 shadow-[0_0_36px_-4px_rgba(139,92,246,0.55)]', fontDark: 'bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-cyan-300 to-fuchsia-400 uppercase font-black', fontLight: 'bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-cyan-600 to-fuchsia-700 uppercase font-black', radius: 'rounded-xl', resumeAccent: 'text-violet-600', resumeBorder: 'border-violet-500' }
         };
 
         const t = themeConfig[pStyle] || themeConfig['tech'];
@@ -43,14 +45,25 @@ const HeaderComponent = {
 
         return `
             <header class="portfolio-hero relative overflow-hidden mb-20 fade-in py-12 lg:py-24 px-4">
+                <div class="hero-orb hero-orb-one"></div>
+                <div class="hero-orb hero-orb-two"></div>
                 <div class="relative z-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_.95fr] gap-10 items-center">
                     <div class="text-center lg:text-left order-2 lg:order-1">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border ${isDark ? 'border-white/10 bg-white/5 text-slate-200' : 'border-slate-200 bg-white/70 text-slate-600'} backdrop-blur-xl mb-7 shadow-lg">
+                            <span class="w-2 h-2 rounded-full ${pStyle === 'luxury' ? 'bg-amber-300' : pStyle === 'bold' ? 'bg-rose-400' : 'bg-cyan-400'} animate-pulse"></span>
+                            <span class="text-xs font-bold uppercase tracking-[0.25em]">Interactive Portfolio</span>
+                        </div>
                         <h1 class="hero-title text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight ${portfolioFont}">
                             ${nameText}
                         </h1>
                         <p class="text-xl md:text-2xl lg:text-3xl ${isDark ? 'text-slate-200' : 'text-slate-600'} mt-7 font-light tracking-[0.25em] uppercase">
                             ${roleText}
                         </p>
+                        <div class="mt-10 flex flex-wrap justify-center lg:justify-start gap-3">
+                            <span class="hero-chip">Scrollytelling</span>
+                            <span class="hero-chip">Bilingual</span>
+                            <span class="hero-chip">Export Ready</span>
+                        </div>
                     </div>
                     <div class="order-1 lg:order-2 relative flex justify-center">
                         <div class="hero-frame ${t.radius} relative">

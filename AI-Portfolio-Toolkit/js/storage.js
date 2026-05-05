@@ -89,29 +89,6 @@ const StorageHandler = {
             }
         }
 
-        const extraExampleData = {
-            education_th: 'ปริญญาตรี วิทยาการคอมพิวเตอร์ | มหาวิทยาลัยตัวอย่าง | 2565 | เกียรตินิยมอันดับสอง',
-            education_en: 'B.Sc. Computer Science | Example University | 2022 | Second-class honors',
-            certifications_th: 'AI Product Strategy | Example Academy | 2566\nUX Research Foundation | Design Institute | 2565',
-            certifications_en: 'AI Product Strategy | Example Academy | 2023\nUX Research Foundation | Design Institute | 2022',
-            awards_th: 'รางวัลนวัตกรรมดิจิทัล | สมาคมเทคโนโลยีตัวอย่าง | 2566 | ทีมพัฒนาเครื่องมืออัตโนมัติสำหรับองค์กร',
-            awards_en: 'Digital Innovation Award | Example Technology Association | 2023 | Built an automation toolkit for enterprise teams',
-            caseStudies_th: 'Gov Service Portal | ขั้นตอนสมัครซับซ้อนและใช้เวลานาน | ออกแบบ flow ใหม่พร้อม dashboard ติดตามสถานะ | ลดเวลาทำงานลง 35%',
-            caseStudies_en: 'Gov Service Portal | Complex and slow application flow | Redesigned the flow with a status dashboard | Reduced operation time by 35%',
-            services_th: 'AI Portfolio Setup | จัดโครงสร้างโปรไฟล์และไฟล์นำเสนอให้พร้อมใช้\nResume / PDF Print Fix | ปรับ layout สำหรับพิมพ์จริงและส่งงาน',
-            services_en: 'AI Portfolio Setup | Structure a professional profile and presentation pack\nResume / PDF Print Fix | Tune layouts for real printing and submission',
-            testimonials_th: 'ทำงานเป็นระบบ เข้าใจโจทย์ และส่งไฟล์พร้อมใช้งานจริง | คุณตัวอย่าง | Project Owner',
-            testimonials_en: 'Clear process, sharp thinking, and files that were ready to use. | Alex Example | Project Owner',
-            clients_th: 'Example Agency, Demo University, Gov Innovation Lab',
-            clients_en: 'Example Agency, Demo University, Gov Innovation Lab',
-            cta_th: '',
-            cta_en: '',
-            articles_th: 'แนวทางออกแบบ Portfolio สำหรับ AI Workflow | บทความสรุปวิธีจัดข้อมูลให้อ่านง่ายและนำไปใช้ต่อได้ | https://example.com/article',
-            articles_en: 'Designing a Portfolio for AI Workflows | A practical note on structuring content for reuse and clarity | https://example.com/article'
-        };
-
-        const extraKeys = Object.keys(extraExampleData);
-
         const defaultData = {
             name_th: '', name_en: '',
             role_th: '', role_en: '',
@@ -132,16 +109,10 @@ const StorageHandler = {
             clients_th: '', clients_en: '',
             cta_th: '', cta_en: '',
             articles_th: '', articles_en: '',
-            extraExamplesSeeded: false,
             email: '', phone: '', linkedin: '', avatar: '',
             exp: []
         };
 
-        const merged = data ? { ...defaultData, ...data } : { ...defaultData };
-        const hasAnyExtraContent = extraKeys.some(key => String(merged[key] || '').trim());
-        if (!hasAnyExtraContent && !merged.extraExamplesSeeded) {
-            return { ...merged, ...extraExampleData, extraExamplesSeeded: true };
-        }
-        return merged;
+        return data ? { ...defaultData, ...data } : defaultData;
     }
 };
