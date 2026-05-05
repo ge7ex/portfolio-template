@@ -3723,3 +3723,70 @@ nav {
     max-height: 25mm !important;
   }
 }
+
+/* v32: print project images as clean artwork, not image cards. */
+@media print {
+  body.layout-portfolio .cinematic-image-wrapper,
+  body.layout-portfolio .cinematic-image-inner {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-top: 3mm !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio .scrolly-spacer {
+    display: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track,
+  body.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track,
+  body.print-landscape.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track {
+    display: grid !important;
+    grid-template-columns: repeat(var(--print-fit-cols, 3), minmax(0, 1fr)) !important;
+    gap: 3.2mm !important;
+    align-items: center !important;
+    justify-items: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  body.print-landscape.layout-portfolio .scrollytelling-track,
+  body.print-landscape.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 3mm !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track img,
+  body.layout-portfolio .scrolly-full-image,
+  body.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img,
+  body.print-landscape.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: var(--print-fit-img-h, 28mm) !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 3px !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  body.print-landscape.layout-portfolio .scrollytelling-track img,
+  body.print-landscape.layout-portfolio .scrolly-full-image,
+  body.print-landscape.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img {
+    max-height: 24mm !important;
+  }
+}
