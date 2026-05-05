@@ -32,11 +32,15 @@ const StorageHandler = {
             }
 
             // 🌟 2. สำหรับไฟล์ดาวน์โหลด: ให้อัปเดตสถานะกลับเข้าไปใน Data ที่ฝังอยู่ (ทำให้สลับ Layout/Theme ไปมาได้เรื่อยๆ)
+            const dataToStore = { ...data };
+            delete dataToStore._isFirstRunDemo;
+            delete dataToStore._hasStoredCache;
+
             if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) {
-                window.INJECTED_PORTFOLIO_DATA = data;
+                window.INJECTED_PORTFOLIO_DATA = dataToStore;
             }
 
-            localStorage.setItem('ai-portfolio-pro-cache', JSON.stringify(data));
+            localStorage.setItem('ai-portfolio-pro-cache', JSON.stringify(dataToStore));
             console.log("Data saved & sorted successfully!");
 
         } catch (e) {
@@ -47,13 +51,21 @@ const StorageHandler = {
 
     load: () => {
         let data = null;
+        let hasStoredCache = false;
 
         // 🌟 เช็คว่าเป็นการเปิดจากไฟล์ที่ดาวน์โหลดไปหรือไม่
         if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) {
             data = window.INJECTED_PORTFOLIO_DATA;
         } else {
             const d = localStorage.getItem('ai-portfolio-pro-cache');
-            data = d ? JSON.parse(d) : null;
+            hasStoredCache = d !== null;
+            try {
+                data = d ? JSON.parse(d) : null;
+            } catch (e) {
+                console.warn('Invalid portfolio cache ignored:', e);
+                data = null;
+                hasStoredCache = false;
+            }
         }
 
         // 🌟 3. Migration: แปลงข้อมูลระบบเก่า ให้รองรับ 2 ภาษาอัตโนมัติ
@@ -113,6 +125,42 @@ const StorageHandler = {
             exp: []
         };
 
-        return data ? { ...defaultData, ...data } : defaultData;
+        const firstRunDemoData = {
+            _isFirstRunDemo: true,
+            name_th: 'Your Portfolio',
+            name_en: 'Your Portfolio',
+            role_th: 'Portfolio Template',
+            role_en: 'Portfolio Template',
+            bio_th: 'Add your name, role, summary, skills, and project work to turn this template into a finished portfolio.',
+            bio_en: 'Add your name, role, summary, skills, and project work to turn this template into a finished portfolio.',
+            skills_th: 'Portfolio, Resume, Projects, Skills, Contact',
+            skills_en: 'Portfolio, Resume, Projects, Skills, Contact',
+            email: 'hello@example.com',
+            phone: '+66 00 000 0000',
+            linkedin: 'linkedin.com/in/your-profile',
+            exp: [{
+                startYear: new Date().getFullYear().toString(),
+                company_th: 'Your work or organization',
+                company_en: 'Your work or organization',
+                title_th: 'Featured project placeholder',
+                title_en: 'Featured project placeholder',
+                desc_th: 'Replace this block with your first project, responsibility, result, or achievement.',
+                desc_en: 'Replace this block with your first project, responsibility, result, or achievement.',
+                highlights_th: [
+                    'Add project screenshots from Edit',
+                    'Describe measurable results',
+                    'Export as portfolio, resume, PDF, DOCX, or PPTX'
+                ],
+                highlights_en: [
+                    'Add project screenshots from Edit',
+                    'Describe measurable results',
+                    'Export as portfolio, resume, PDF, DOCX, or PPTX'
+                ],
+                images: []
+            }]
+        };
+
+        if (data) return { ...defaultData, ...data, _hasStoredCache: hasStoredCache };
+        return hasStoredCache ? { ...defaultData, _hasStoredCache: true } : { ...defaultData, ...firstRunDemoData, _hasStoredCache: false };
     }
 };

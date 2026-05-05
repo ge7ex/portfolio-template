@@ -522,7 +522,8 @@
     <script src="js/exporter.js"></script>
 
     <script>
-        lucide.createIcons();
+        const createPortfolioIcons = () => { if (window.lucide) lucide.createIcons(); };
+        createPortfolioIcons();
         let currentAvatarBase64 = "";
         let currentExpImagesBase64 = [];
         let editingExpIndex = -1;
@@ -561,7 +562,7 @@
             const panel = document.getElementById('public-export-branch');
             if (!panel) return;
             panel.classList.toggle('hidden');
-            if (!panel.classList.contains('hidden') && window.lucide) lucide.createIcons();
+            if (!panel.classList.contains('hidden')) createPortfolioIcons();
         }
 
         // v28: robust fallback for the printer/export button.
@@ -883,7 +884,7 @@
             if (currentExpImagesBase64.length === 0) { preview.classList.add('hidden'); return; }
             preview.classList.remove('hidden');
             preview.innerHTML = currentExpImagesBase64.map((b64, idx) => `<div class="relative inline-block shrink-0 mt-2 mr-2"><img src="${b64}" class="h-16 w-16 object-cover rounded-md border border-slate-600"><button onclick="removeExpImage(${idx})" class="absolute -top-2 -right-2 bg-slate-900 border border-slate-600 hover:text-red-500 rounded-full w-5 h-5 flex items-center justify-center text-slate-300"><i data-lucide="x" class="w-3 h-3"></i></button></div>`).join('');
-            lucide.createIcons();
+            createPortfolioIcons();
         }
 
         function toggleEndDate() {
@@ -921,7 +922,7 @@
                 const btn = document.getElementById('btn-add-more-exp');
                 const originalHtml = btn.innerHTML;
                 btn.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-green-400"></i> <span class="hidden md:inline text-green-400">Saved!</span>`;
-                lucide.createIcons(); setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1000);
+                createPortfolioIcons(); setTimeout(() => { btn.innerHTML = originalHtml; createPortfolioIcons(); }, 1000);
             } else { cancelEditExp(); refreshExpPreview(); }
         }
 
@@ -949,7 +950,7 @@
             document.getElementById('btn-add-exp').classList.replace('bg-emerald-600/20', 'bg-amber-600/20');
             document.getElementById('btn-cancel-exp').classList.remove('hidden');
             document.getElementById('btn-add-more-exp').classList.add('hidden');
-            lucide.createIcons();
+            createPortfolioIcons();
         }
 
         function cancelEditExp() {
@@ -962,7 +963,7 @@
             document.getElementById('btn-add-exp').classList.replace('bg-amber-600/20', 'bg-emerald-600/20');
             document.getElementById('btn-cancel-exp').classList.add('hidden');
             document.getElementById('btn-add-more-exp').classList.remove('hidden');
-            lucide.createIcons();
+            createPortfolioIcons();
         }
 
         function removeExp(index) { const data = StorageHandler.load(); data.exp.splice(index, 1); StorageHandler.save(data); refreshExpPreview(); }
@@ -993,7 +994,7 @@
                     </div>
                 </div>`
             }).join('');
-            lucide.createIcons();
+            createPortfolioIcons();
         }
 
         function updatePreview() {
@@ -1006,6 +1007,51 @@
 
         function render(data) {
             const app = document.getElementById('app'); const layout = data.layout || 'portfolio'; const colorMode = data.colorMode || 'dark'; const pStyle = data.portfolioStyle || 'tech'; const lang = data.lang || 'th';
+            const hasVisibleProfileContent = (profileData) => {
+                const textKeys = [
+                    'name_th', 'name_en', 'role_th', 'role_en', 'bio_th', 'bio_en',
+                    'skills_th', 'skills_en', 'education_th', 'education_en',
+                    'certifications_th', 'certifications_en', 'awards_th', 'awards_en',
+                    'caseStudies_th', 'caseStudies_en', 'services_th', 'services_en',
+                    'testimonials_th', 'testimonials_en', 'clients_th', 'clients_en',
+                    'cta_th', 'cta_en', 'articles_th', 'articles_en', 'email', 'phone',
+                    'linkedin', 'avatar'
+                ];
+                const hasText = textKeys.some(key => String(profileData[key] || '').trim());
+                const hasExperience = Array.isArray(profileData.exp) && profileData.exp.some(item =>
+                    ['company_th', 'company_en', 'company', 'title_th', 'title_en', 'title', 'desc_th', 'desc_en', 'desc']
+                        .some(key => String(item[key] || '').trim()) ||
+                    (Array.isArray(item.highlights_th) && item.highlights_th.length > 0) ||
+                    (Array.isArray(item.highlights_en) && item.highlights_en.length > 0) ||
+                    (Array.isArray(item.images) && item.images.length > 0)
+                );
+                return hasText || hasExperience;
+            };
+            const isFirstRunEmptyState = !data._hasStoredCache && !hasVisibleProfileContent(data);
+            const displayData = isFirstRunEmptyState ? {
+                ...data,
+                _isFirstRunDemo: true,
+                name_th: 'Your Portfolio',
+                name_en: 'Your Portfolio',
+                role_th: 'Portfolio Template',
+                role_en: 'Portfolio Template',
+                bio_th: 'Add your name, role, summary, skills, and project work to turn this template into a finished portfolio.',
+                bio_en: 'Add your name, role, summary, skills, and project work to turn this template into a finished portfolio.',
+                skills_th: 'Portfolio, Resume, Projects, Skills, Contact',
+                skills_en: 'Portfolio, Resume, Projects, Skills, Contact',
+                exp: [{
+                    startYear: new Date().getFullYear().toString(),
+                    company_th: 'Your work or organization',
+                    company_en: 'Your work or organization',
+                    title_th: 'Featured project placeholder',
+                    title_en: 'Featured project placeholder',
+                    desc_th: 'Replace this block with your first project, responsibility, result, or achievement.',
+                    desc_en: 'Replace this block with your first project, responsibility, result, or achievement.',
+                    highlights_th: ['Add project screenshots from Edit', 'Describe measurable results', 'Export as portfolio, resume, PDF, DOCX, or PPTX'],
+                    highlights_en: ['Add project screenshots from Edit', 'Describe measurable results', 'Export as portfolio, resume, PDF, DOCX, or PPTX'],
+                    images: []
+                }]
+            } : data;
 
             if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) { document.body.classList.add('is-downloaded'); }
 
@@ -1029,10 +1075,10 @@
                 wheelLight.classList.toggle('active', colorMode === 'light');
             }
             document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active')); if (document.getElementById(`swatch-${pStyle}`)) document.getElementById(`swatch-${pStyle}`).classList.add('active');
-            const localizedData = { name: data[`name_${lang}`] || data.name_th || '', role: data[`role_${lang}`] || data.role_th || '', bio: data[`bio_${lang}`] || data.bio_th || '', skills: data[`skills_${lang}`] || data.skills_th || '', education: data[`education_${lang}`] || '', certifications: data[`certifications_${lang}`] || '', awards: data[`awards_${lang}`] || '', caseStudies: data[`caseStudies_${lang}`] || '', services: data[`services_${lang}`] || '', testimonials: data[`testimonials_${lang}`] || '', clients: data[`clients_${lang}`] || '', cta: data[`cta_${lang}`] || '', articles: data[`articles_${lang}`] || '', exp: (data.exp || []).map(e => ({ ...e, company: e[`company_${lang}`] || e.company_th || e.company || '', title: e[`title_${lang}`] || e.title_th || e.title || '', desc: e[`desc_${lang}`] || e.desc_th || e.desc || '', highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || [] })) };
+            const localizedData = { name: displayData[`name_${lang}`] || displayData.name_th || '', role: displayData[`role_${lang}`] || displayData.role_th || '', bio: displayData[`bio_${lang}`] || displayData.bio_th || '', skills: displayData[`skills_${lang}`] || displayData.skills_th || '', education: displayData[`education_${lang}`] || '', certifications: displayData[`certifications_${lang}`] || '', awards: displayData[`awards_${lang}`] || '', caseStudies: displayData[`caseStudies_${lang}`] || '', services: displayData[`services_${lang}`] || '', testimonials: displayData[`testimonials_${lang}`] || '', clients: displayData[`clients_${lang}`] || '', cta: displayData[`cta_${lang}`] || '', articles: displayData[`articles_${lang}`] || '', exp: (displayData.exp || []).map(e => ({ ...e, company: e[`company_${lang}`] || e.company_th || e.company || '', title: e[`title_${lang}`] || e.title_th || e.title || '', desc: e[`desc_${lang}`] || e.desc_th || e.desc || '', highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || [] })) };
             const themeBGs = { tech: { dark: 'bg-[#020617]', light: 'bg-slate-50' }, educ: { dark: 'bg-[#022c22]', light: 'bg-emerald-50' }, gov: { dark: 'bg-[#0f172a]', light: 'bg-slate-100' }, creative: { dark: 'bg-[#2e1065]', light: 'bg-fuchsia-50' }, minimal: { dark: 'bg-black', light: 'bg-white' }, eco: { dark: 'bg-[#042f2e]', light: 'bg-teal-50' }, bold: { dark: 'bg-[#450a0a]', light: 'bg-rose-50' }, luxury: { dark: 'bg-[#1e1b4b]', light: 'bg-indigo-50' }, health: { dark: 'bg-[#062b33]', light: 'bg-cyan-50' }, esports: { dark: 'bg-[#160b35]', light: 'bg-violet-50' } };
             const currentBg = themeBGs[pStyle] ? themeBGs[pStyle][colorMode] : themeBGs['tech'][colorMode];
-            document.body.className = `min-h-screen transition-colors duration-700 antialiased relative overflow-x-hidden ${currentBg} ${colorMode === 'light' ? "text-slate-900" : "text-white"} ${document.body.classList.contains('is-downloaded') ? 'is-downloaded' : ''} ${layout === 'resume' ? 'layout-resume' : 'layout-portfolio'} theme-${pStyle} mode-${colorMode}`;
+            document.body.className = `min-h-screen transition-colors duration-700 antialiased relative overflow-x-hidden ${currentBg} ${colorMode === 'light' ? "text-slate-900" : "text-white"} ${document.body.classList.contains('is-downloaded') ? 'is-downloaded' : ''} ${displayData._isFirstRunDemo ? 'is-first-run-demo' : ''} ${layout === 'resume' ? 'layout-resume' : 'layout-portfolio'} theme-${pStyle} mode-${colorMode}`;
 
             const decorationContainer = document.getElementById('theme-decorations');
             if (decorationContainer) {
@@ -1067,7 +1113,7 @@
                     <div class="resume-cv-shell print-layout-wrapper">
                         <aside class="resume-cv-sidebar">
                             <div id="header-section" class="print-order-1">
-                                ${HeaderComponent.render(localizedData.name, localizedData.role, layout, data.avatar, colorMode, pStyle, lang)}
+                                ${HeaderComponent.render(localizedData.name, localizedData.role, layout, displayData.avatar, colorMode, pStyle, lang)}
                             </div>
                             <div class="resume-sidebar-block print-order-2">
                                 ${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}
@@ -1099,7 +1145,7 @@
                 appContent = `
                     <div class="print-layout-wrapper flex flex-col gap-12 mt-10 w-full">
                         <div id="header-section" class="print-order-1 scroll-reveal w-full max-w-5xl mx-auto fade-in">
-                            ${HeaderComponent.render(localizedData.name, localizedData.role, layout, data.avatar, colorMode, pStyle, lang)}
+                                ${HeaderComponent.render(localizedData.name, localizedData.role, layout, displayData.avatar, colorMode, pStyle, lang)}
                         </div>
                         <div class="print-order-2 w-full max-w-5xl mx-auto">
                             ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
@@ -1131,7 +1177,7 @@
             app.innerHTML = appContent;
 
             if (document.getElementById('btn-lang')) document.getElementById('btn-lang').innerText = lang === 'th' ? 'TH' : 'EN';
-            setTimeout(() => { lucide.createIcons(); initThemeCarousel(); if (layout === 'portfolio') { initScrollEffects(); initMicroInteractions(); } initQuickEditHotspots(); }, 50);
+            setTimeout(() => { createPortfolioIcons(); initThemeCarousel(); if (layout === 'portfolio') { initScrollEffects(); initMicroInteractions(); } initQuickEditHotspots(); }, 50);
         }
 
         async function handleExportWeb() {
@@ -1140,7 +1186,7 @@
             try {
                 if (window.location.protocol === 'file:') { alert("⚠️ ฟีเจอร์ 'ดาวน์โหลด WEB' ต้องใช้งานผ่านอินเทอร์เน็ต (เช่น บน Vercel) เท่านั้นครับ"); return; }
                 btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-white"></i> <span class="text-sm">Downloading...</span>`;
-                lucide.createIcons();
+                createPortfolioIcons();
                 const data = StorageHandler.load(); const dataString = JSON.stringify(data);
                 const response = await fetch(window.location.href); let html = await response.text();
                 let baseUrl = window.location.origin + window.location.pathname;
@@ -1156,7 +1202,7 @@
                 a.download = `${safeName}_Web_Portfolio.html`;
                 document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
             } catch (err) { alert("เกิดข้อผิดพลาดในการดาวน์โหลดเว็บ"); }
-            finally { setTimeout(() => { btn.innerHTML = originalHtml; lucide.createIcons(); }, 1500); }
+            finally { setTimeout(() => { btn.innerHTML = originalHtml; createPortfolioIcons(); }, 1500); }
         }
 
 
@@ -1354,7 +1400,7 @@
                     <summary>Advanced bulk text edit / แก้หลายรายการแบบข้อความ</summary>
                     <p>รูปภาพจะยังคงอยู่กับแต่ละโปรเจกต์ตามลำดับเดิม หากต้องการแก้รูปให้ใช้ปุ่ม “แก้ข้อมูล/รูป” หรือ “เพิ่มรูป” ด้านบน</p>
                 </details>`;
-            lucide.createIcons();
+            createPortfolioIcons();
         }
 
         async function handleQuickExpImageUpload(event, index) {
@@ -1499,7 +1545,7 @@
                 btn.addEventListener('click', (ev) => { ev.stopPropagation(); openQuickEdit(key); });
                 el.appendChild(btn);
             });
-            lucide.createIcons();
+            createPortfolioIcons();
         }
 
         function openQuickEdit(key) {
@@ -1532,7 +1578,7 @@
             const pop = document.getElementById('quick-edit-popover');
             pop.classList.remove('hidden');
             pop.classList.add('flex');
-            lucide.createIcons();
+            createPortfolioIcons();
         }
 
         function closeQuickEdit() {
@@ -1636,7 +1682,7 @@
             const btn = document.querySelector('button[onclick="handleExportPPTX()"]');
             const originalHtml = btn.innerHTML;
             btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-white"></i> <span class="text-sm">Rendering...</span>`;
-            lucide.createIcons();
+            createPortfolioIcons();
 
             try {
                 const data = StorageHandler.load();
@@ -1678,11 +1724,14 @@
                 alert('Export PPTX failed. Please save your profile and try again.');
             } finally {
                 btn.innerHTML = originalHtml;
-                lucide.createIcons();
+                createPortfolioIcons();
             }
         }
 
-        window.onload = () => {
+        let hasBootedPortfolioApp = false;
+        function initializePortfolioApp() {
+            if (hasBootedPortfolioApp) return;
+            hasBootedPortfolioApp = true;
             const savedData = StorageHandler.load();
             if (document.getElementById('in-portfolio-style')) document.getElementById('in-portfolio-style').value = savedData.portfolioStyle || 'tech';
             ['name-th', 'name-en', 'role-th', 'role-en', 'bio-th', 'bio-en', 'skills-th', 'skills-en'].forEach(id => { const valKey = id.replace('-', '_'); if (document.getElementById(`in-${id}`)) document.getElementById(`in-${id}`).value = savedData[valKey] || ''; });
@@ -1696,7 +1745,14 @@
             });
             if (savedData.avatar) { currentAvatarBase64 = savedData.avatar; document.getElementById('avatar-preview').src = currentAvatarBase64; document.getElementById('avatar-preview').classList.remove('hidden'); }
             render(savedData);
-        };
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePortfolioApp, { once: true });
+        } else {
+            initializePortfolioApp();
+        }
+        window.addEventListener('load', initializePortfolioApp, { once: true });
     </script>
 </body>
 

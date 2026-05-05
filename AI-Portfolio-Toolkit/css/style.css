@@ -3,8 +3,6 @@ body {
     transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-
-
 button {
     transition: transform 0.2s active, background-color 0.3s ease;
 }
@@ -3789,4 +3787,40 @@ nav {
   body.print-landscape.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img {
     max-height: 24mm !important;
   }
+}
+
+/* First-run demo must be visibly non-empty after localStorage/cache is cleared. */
+body.is-first-run-demo .portfolio-hero {
+    background:
+        linear-gradient(135deg, rgba(30, 64, 175, .52), rgba(15, 23, 42, .82)),
+        radial-gradient(circle at 80% 18%, rgba(34, 211, 238, .38), transparent 34%),
+        radial-gradient(circle at 12% 76%, rgba(59, 130, 246, .34), transparent 36%) !important;
+    border-color: rgba(125, 211, 252, .48) !important;
+    box-shadow: 0 30px 120px rgba(15, 23, 42, .44), inset 0 0 0 1px rgba(255, 255, 255, .10) !important;
+}
+
+body.is-first-run-demo #header-section.scroll-reveal,
+body.is-first-run-demo #header-section.fade-in {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+body.is-first-run-demo .portfolio-hero .hero-title {
+    background-image: none !important;
+    color: #bfdbfe !important;
+    -webkit-text-fill-color: #bfdbfe !important;
+    opacity: 1 !important;
+    filter: drop-shadow(0 16px 36px rgba(34, 211, 238, .24)) !important;
+}
+
+body.is-first-run-demo .portfolio-hero p {
+    color: #e0f2fe !important;
+    opacity: 1 !important;
+}
+
+body.is-first-run-demo .portfolio-hero .hero-chip {
+    color: #eff6ff !important;
+    background: rgba(37, 99, 235, .30) !important;
+    border-color: rgba(125, 211, 252, .42) !important;
+    opacity: 1 !important;
 }
