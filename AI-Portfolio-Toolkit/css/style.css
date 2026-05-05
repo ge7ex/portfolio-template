@@ -3406,3 +3406,213 @@ nav {
     display: none !important;
   }
 }
+
+
+/* v29: Print Experience heading + first project auto-fit
+   Keeps the rest of the pagination rules unchanged, but prevents the
+   Experience title from being orphaned above the first/current project. */
+@media print {
+  body.layout-portfolio .experience-section,
+  body.layout-portfolio .experience-title-wrap,
+  body.layout-portfolio .experience-title,
+  body.layout-portfolio .experience-rows,
+  body.layout-portfolio .experience-rows > .print-first-exp {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  body.layout-portfolio .experience-title-wrap,
+  body.layout-portfolio .experience-title {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  body.layout-portfolio .experience-rows {
+    margin-top: 0 !important;
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  body.layout-portfolio .experience-rows > .print-first-exp,
+  body.layout-portfolio .experience-rows > .print-first-exp .unified-card {
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  body.layout-portfolio .experience-title-wrap + .experience-rows > .print-first-exp,
+  body.layout-portfolio .experience-rows > .print-first-exp:first-child {
+    margin-top: 0 !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-title,
+  body.print-landscape.layout-portfolio .experience-title {
+    margin-top: 0 !important;
+    margin-bottom: 3mm !important;
+    padding-bottom: 2mm !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp {
+    margin-bottom: 6mm !important;
+    padding-bottom: 5mm !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card {
+    padding: 4.5mm !important;
+    border-left-width: 2.5pt !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card > div:first-child {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card span {
+    font-size: 8.5pt !important;
+    line-height: 1.1 !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card h4,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp.print-exp-item h4 {
+    font-size: 15.5pt !important;
+    line-height: 1.14 !important;
+    margin: 1mm 0 !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card h5,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp.print-exp-item h5 {
+    font-size: 10pt !important;
+    line-height: 1.15 !important;
+    margin: 0 0 1.5mm 0 !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card p,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card li,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp.print-exp-item p,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp.print-exp-item li {
+    font-size: 8.8pt !important;
+    line-height: 1.3 !important;
+    margin-top: 1mm !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .unified-card ul {
+    margin-top: 1.5mm !important;
+    padding-left: 5mm !important;
+    row-gap: 1mm !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .cinematic-image-wrapper,
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .cinematic-image-inner {
+    margin-top: 2mm !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track {
+    display: grid !important;
+    grid-template-columns: repeat(var(--print-fit-cols, 3), minmax(0, 1fr)) !important;
+    gap: var(--print-fit-gap, 2.3mm) !important;
+    padding: 2mm 0 0 0 !important;
+    margin-top: 0 !important;
+    transform: none !important;
+  }
+
+  body.print-portrait.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: var(--print-fit-img-h, 26mm) !important;
+    max-height: var(--print-fit-img-h, 26mm) !important;
+    object-fit: cover !important;
+    border-radius: 6px !important;
+  }
+
+  body.print-landscape.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 2.5mm !important;
+  }
+
+  body.print-landscape.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img {
+    height: 25mm !important;
+    max-height: 25mm !important;
+  }
+}
+
+
+/* v30: Easier project/experience editing + image manager */
+.inline-project-edit {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: color-mix(in srgb, var(--theme-accent, #3b82f6) 78%, #0f172a);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 16px 42px color-mix(in srgb, var(--theme-accent, #3b82f6) 24%, transparent);
+  font-size: 13px;
+  font-weight: 900;
+}
+.inline-project-edit::before { content: '✎'; font-size: 13px; }
+.inline-project-edit:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.is-downloaded .inline-project-edit { display: none !important; }
+
+.quick-edit-card { max-height: min(88vh, 820px); overflow: auto; }
+.quick-edit-experience-manager { margin-bottom: 16px; }
+.quick-exp-toolbar {
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:14px; border-radius:20px; background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.10); margin-bottom:14px;
+}
+.quick-exp-toolbar strong { display:block; font-size:16px; color:#fff; }
+.quick-exp-toolbar span { display:block; font-size:12px; color:#94a3b8; margin-top:2px; }
+.quick-exp-toolbar button, .quick-exp-actions button, .quick-exp-file-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:9px 12px; border-radius:13px; background:#1e293b; color:#e2e8f0;
+  border:1px solid rgba(148,163,184,.20); font-size:12px; font-weight:900; cursor:pointer;
+}
+.quick-exp-toolbar button { background:var(--theme-accent, #2563eb); color:white; border-color:rgba(255,255,255,.16); white-space:nowrap; }
+.quick-exp-list { display:grid; gap:12px; }
+.quick-exp-card {
+  display:grid; grid-template-columns:1fr auto; gap:14px; align-items:center;
+  padding:14px; border-radius:20px; background:#020617; border:1px solid rgba(148,163,184,.20);
+}
+.quick-exp-title-row { display:flex; gap:10px; align-items:flex-start; min-width:0; }
+.quick-exp-number {
+  flex:0 0 auto; color:var(--theme-accent-2, #38bdf8); background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08); border-radius:999px; padding:4px 8px; font-size:11px; font-weight:900;
+}
+.quick-exp-card h4 { color:#fff; font-size:15px; font-weight:900; line-height:1.25; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; }
+.quick-exp-card p { color:#94a3b8; font-size:12px; margin:2px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; }
+.quick-exp-thumbs { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; min-height:52px; align-items:center; }
+.quick-exp-thumbs.is-empty { color:#64748b; font-size:12px; border:1px dashed rgba(148,163,184,.28); border-radius:14px; padding:10px 12px; }
+.quick-exp-thumb { position:relative; width:54px; height:54px; border-radius:13px; overflow:hidden; border:1px solid rgba(148,163,184,.35); background:#0f172a; }
+.quick-exp-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.quick-exp-thumb button { position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:rgba(15,23,42,.86); color:white; border:1px solid rgba(255,255,255,.16); }
+.quick-exp-more { width:54px; height:54px; border-radius:13px; display:flex; align-items:center; justify-content:center; color:#cbd5e1; background:#0f172a; border:1px solid rgba(148,163,184,.24); font-weight:900; }
+.quick-exp-actions { display:flex; flex-direction:column; gap:8px; align-items:stretch; }
+.quick-exp-actions button:hover, .quick-exp-file-btn:hover, .quick-exp-toolbar button:hover { filter:brightness(1.08); transform:translateY(-1px); }
+.quick-exp-actions .danger { color:#fecaca; background:rgba(239,68,68,.13); border-color:rgba(248,113,113,.25); }
+.quick-exp-file-btn input { display:none; }
+.quick-exp-empty { padding:18px; border-radius:18px; background:#020617; border:1px dashed rgba(148,163,184,.30); color:#94a3b8; text-align:center; font-weight:700; }
+.quick-exp-advanced { margin-top:14px; border-top:1px solid rgba(148,163,184,.18); padding-top:12px; color:#94a3b8; font-size:12px; }
+.quick-exp-advanced summary { cursor:pointer; color:#cbd5e1; font-weight:900; }
+.quick-edit-grid.quick-edit-grid-advanced { margin-top:10px; display:none; }
+.quick-edit-experience-manager:has(.quick-exp-advanced[open]) + .quick-edit-grid.quick-edit-grid-advanced { display:grid; }
+.exp-image-box-pulse,
+.exp-edit-target-pulse { box-shadow:0 0 0 4px color-mix(in srgb, var(--theme-accent, #3b82f6) 35%, transparent), 0 0 36px color-mix(in srgb, var(--theme-accent, #3b82f6) 22%, transparent) !important; border-color:var(--theme-accent, #3b82f6) !important; }
+.exp-preview-card { transition: border-color .18s ease, transform .18s ease; }
+.exp-preview-card:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--theme-accent, #3b82f6) 48%, #334155) !important; }
+
+@media (max-width: 820px) {
+  .quick-exp-toolbar, .quick-exp-card { grid-template-columns:1fr; display:grid; }
+  .quick-exp-card h4, .quick-exp-card p { max-width:100%; }
+  .quick-exp-actions { flex-direction:row; flex-wrap:wrap; }
+  .quick-exp-actions button, .quick-exp-file-btn { flex:1 1 130px; }
+}
+
+@media print {
+  .inline-project-edit, .quick-edit-experience-manager { display:none !important; }
+}

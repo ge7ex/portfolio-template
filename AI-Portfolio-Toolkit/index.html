@@ -188,7 +188,7 @@
                         data-lucide="layout-template" class="w-4 h-4"></i> Extra Sections</button>
             </div>
 
-            <div class="p-8 overflow-y-auto flex-1 custom-scrollbar">
+            <div id="edit-modal-body" class="p-8 overflow-y-auto flex-1 custom-scrollbar">
 
                 <div id="content-basic" class="block space-y-6">
                     <div
@@ -419,9 +419,10 @@
                             </div>
                         </div>
 
-                        <div class="mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                        <div id="exp-image-box" class="mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
                             <label class="block text-xs font-semibold text-slate-400 mb-2"><i data-lucide="image"
-                                    class="w-3 h-3 inline"></i> Project Images</label>
+                                    class="w-3 h-3 inline"></i> Project Images / รูปภาพโปรเจกต์</label>
+                            <p class="text-xs text-slate-500 mb-3">เพิ่ม/ลบรูปได้จากตรงนี้ แล้วกด <b class="text-emerald-400">Save & Close</b> เพื่อบันทึกทันที</p>
                             <input type="file" id="new-exp-img" accept="image/*" multiple
                                 onchange="handleExpImageUpload(event)"
                                 class="text-sm w-full text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
@@ -489,13 +490,14 @@
                 <div><span class="quick-edit-kicker">Quick Edit</span><h3 id="quick-edit-title">Edit section</h3></div>
                 <button type="button" onclick="closeQuickEdit()" class="quick-edit-close"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <div class="quick-edit-grid">
+            <div id="quick-edit-experience-manager" class="quick-edit-experience-manager hidden"></div>
+            <div class="quick-edit-grid" id="quick-edit-grid">
                 <label>TH<textarea id="quick-edit-th"></textarea></label>
                 <label>EN<textarea id="quick-edit-en"></textarea></label>
             </div>
             <div class="quick-edit-actions">
                 <button type="button" onclick="closeQuickEdit()">Cancel</button>
-                <button type="button" onclick="saveQuickEdit()">Save</button>
+                <button type="button" id="quick-edit-save-btn" onclick="saveQuickEdit()">Save</button>
             </div>
         </div>
     </div>
@@ -773,6 +775,40 @@
             if (!modal.classList.contains('hidden')) refreshExpPreview();
         }
 
+        function openExperienceEditor(index = -1) {
+            if (document.body.classList.contains('is-downloaded')) return;
+            closeQuickEdit();
+            const expIndex = Number(index);
+            const modal = document.getElementById('edit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            switchTab('experience');
+            refreshExpPreview();
+            if (Number.isInteger(expIndex) && expIndex >= 0) {
+                editExp(expIndex);
+            } else {
+                cancelEditExp();
+            }
+            setTimeout(() => {
+                const modalBody = document.getElementById('edit-modal-body');
+                const form = document.getElementById('content-experience');
+                const targetCard = form ? form.firstElementChild : null;
+                const titleInput = document.getElementById('new-exp-title-th') || document.getElementById('new-exp-title-en');
+                if (modalBody) modalBody.scrollTo({ top: form ? form.offsetTop : 0, behavior: 'smooth' });
+                if (form && !modalBody) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (targetCard) {
+                    targetCard.classList.add('exp-edit-target-pulse');
+                    setTimeout(() => targetCard.classList.remove('exp-edit-target-pulse'), 1600);
+                }
+                if (titleInput) {
+                    titleInput.focus({ preventScroll: true });
+                    titleInput.select();
+                }
+            }, 80);
+        }
+
         function toggleLang() {
             const data = StorageHandler.load();
             data.lang = data.lang === 'th' ? 'en' : 'th';
@@ -803,25 +839,40 @@
             }
         }
 
-        function handleExpImageUpload(event) {
-            Array.from(event.target.files).forEach(file => {
+        function resizeImageFileToBase64(file, maxWidth = 900, quality = 0.82) {
+            return new Promise((resolve, reject) => {
+                if (!file || !String(file.type || '').startsWith('image/')) { reject(new Error('รองรับเฉพาะไฟล์รูปภาพเท่านั้น')); return; }
+                if (file.size > 12 * 1024 * 1024) { reject(new Error('รูปใหญ่เกินไป กรุณาใช้รูปไม่เกิน 12MB')); return; }
                 const reader = new FileReader();
+                reader.onerror = () => reject(new Error('อ่านไฟล์รูปไม่สำเร็จ'));
                 reader.onload = function (e) {
                     const img = new Image();
+                    img.onerror = () => reject(new Error('ไฟล์รูปภาพไม่ถูกต้อง'));
                     img.onload = function () {
                         const canvas = document.createElement('canvas');
                         let width = img.width; let height = img.height;
-                        const MAX_WIDTH = 800;
-                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-                        canvas.width = width; canvas.height = height;
-                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                        currentExpImagesBase64.push(canvas.toDataURL('image/jpeg', 0.8));
-                        renderExpImagePreview();
+                        if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+                        canvas.width = Math.max(1, Math.round(width));
+                        canvas.height = Math.max(1, Math.round(height));
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             });
+        }
+
+        async function handleExpImageUpload(event) {
+            const files = Array.from(event.target.files || []);
+            for (const file of files) {
+                try {
+                    currentExpImagesBase64.push(await resizeImageFileToBase64(file, 900, 0.82));
+                    renderExpImagePreview();
+                } catch (err) {
+                    alert(err.message || 'อัปโหลดรูปไม่สำเร็จ');
+                }
+            }
             event.target.value = '';
         }
 
@@ -926,7 +977,21 @@
                 const showTitle = lang === 'th' ? (item.title_th || item.title) : (item.title_en || item.title_th || item.title);
                 const showCompany = lang === 'th' ? (item.company_th || item.company) : (item.company_en || item.company_th || item.company);
                 const sy = formatYear(item.startYear || item.year, lang); const ey = formatYear(item.endYear, lang); const showEnd = item.isCurrent ? (lang === 'th' ? ' - ปัจจุบัน' : ' - Present') : (ey ? ' - ' + ey : '');
-                return `<div class="flex justify-between items-center bg-[#0f172a] p-4 rounded-xl border border-slate-700 shadow-inner"><div><span class="text-emerald-400 font-bold text-sm bg-emerald-400/10 px-2 py-1 rounded inline-block mb-1">${sy}${showEnd}</span><h4 class="text-white font-medium text-lg">${showTitle}</h4>${showCompany ? `<p class="text-sm text-slate-400">@ ${showCompany}</p>` : ''}</div><div class="flex gap-2"><button onclick="editExp(${index})" class="text-amber-400 hover:bg-amber-400/20 p-2.5 rounded-xl transition-colors bg-amber-400/5"><i data-lucide="edit" class="w-4 h-4"></i></button><button onclick="removeExp(${index})" class="text-red-400 hover:bg-red-400/20 p-2.5 rounded-xl transition-colors bg-red-400/5"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`
+                const imgCount = (item.images || []).length;
+                return `<div class="exp-preview-card bg-[#0f172a] p-4 rounded-xl border border-slate-700 shadow-inner">
+                    <div class="flex justify-between gap-4 items-start">
+                        <div class="min-w-0">
+                            <span class="text-emerald-400 font-bold text-sm bg-emerald-400/10 px-2 py-1 rounded inline-block mb-1">${sy}${showEnd}</span>
+                            <h4 class="text-white font-medium text-lg truncate">${escapeHtml(showTitle || '(Untitled Project)')}</h4>
+                            ${showCompany ? `<p class="text-sm text-slate-400 truncate">@ ${escapeHtml(showCompany)}</p>` : ''}
+                            <p class="text-xs text-slate-500 mt-1">${imgCount} image${imgCount === 1 ? '' : 's'}</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 justify-end">
+                            <button onclick="openExperienceEditor(${index})" class="px-3 py-2 rounded-xl text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 text-xs font-bold flex items-center gap-1" title="แก้ข้อความและรูปภาพ"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้/รูป</button>
+                            <button onclick="removeExp(${index})" class="px-3 py-2 rounded-xl text-red-300 bg-red-400/10 hover:bg-red-400/20 border border-red-400/20 text-xs font-bold flex items-center gap-1"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button>
+                        </div>
+                    </div>
+                </div>`
             }).join('');
             lucide.createIcons();
         }
@@ -1233,6 +1298,126 @@
 
         let quickEditKey = null;
 
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[ch]));
+        }
+
+        function getExperienceLabel(item, lang = 'th') {
+            const title = lang === 'th' ? (item.title_th || item.title_en || item.title || '') : (item.title_en || item.title_th || item.title || '');
+            const company = lang === 'th' ? (item.company_th || item.company_en || item.company || '') : (item.company_en || item.company_th || item.company || '');
+            return { title: title || (lang === 'th' ? 'โปรเจกต์ยังไม่มีชื่อ' : 'Untitled project'), company };
+        }
+
+        function renderQuickExperienceManager(data = StorageHandler.load()) {
+            const holder = document.getElementById('quick-edit-experience-manager');
+            if (!holder) return;
+            const lang = data.lang || 'th';
+            const items = data.exp || [];
+            const cards = items.length ? items.map((item, index) => {
+                const label = getExperienceLabel(item, lang);
+                const thumbs = (item.images || []).slice(0, 6).map((src, imgIndex) => `
+                    <div class="quick-exp-thumb">
+                        <img src="${escapeHtml(src)}" alt="Project image ${imgIndex + 1}">
+                        <button type="button" onclick="removeQuickExpImage(${index}, ${imgIndex})" title="ลบรูปนี้"><i data-lucide="x" class="w-3 h-3"></i></button>
+                    </div>`).join('');
+                const more = (item.images || []).length > 6 ? `<span class="quick-exp-more">+${(item.images || []).length - 6}</span>` : '';
+                return `
+                    <article class="quick-exp-card">
+                        <div class="quick-exp-card-main">
+                            <div class="quick-exp-title-row">
+                                <span class="quick-exp-number">#${index + 1}</span>
+                                <div class="min-w-0">
+                                    <h4>${escapeHtml(label.title)}</h4>
+                                    ${label.company ? `<p>${escapeHtml(label.company)}</p>` : '<p>ไม่มีบริษัท/ลูกค้า</p>'}
+                                </div>
+                            </div>
+                            <div class="quick-exp-thumbs ${thumbs ? '' : 'is-empty'}">${thumbs || '<span>ยังไม่มีรูป — กดเพิ่มรูปได้ทันที</span>'}${more}</div>
+                        </div>
+                        <div class="quick-exp-actions">
+                            <button type="button" onclick="openExperienceEditor(${index})"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ข้อมูล/รูป</button>
+                            <label class="quick-exp-file-btn"><i data-lucide="image-plus" class="w-4 h-4"></i> เพิ่มรูป<input type="file" accept="image/*" multiple onchange="handleQuickExpImageUpload(event, ${index})"></label>
+                            <button type="button" onclick="duplicateQuickExp(${index})"><i data-lucide="copy" class="w-4 h-4"></i> สำเนา</button>
+                            <button type="button" class="danger" onclick="deleteQuickExp(${index})"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button>
+                        </div>
+                    </article>`;
+            }).join('') : `<div class="quick-exp-empty">ยังไม่มีประสบการณ์/โปรเจกต์ กด “เพิ่มโปรเจกต์ใหม่” เพื่อเริ่มกรอก</div>`;
+            holder.innerHTML = `
+                <div class="quick-exp-toolbar">
+                    <div>
+                        <strong>Project Manager</strong>
+                        <span>แก้ข้อความและรูปจากปุ่มนี้ง่ายกว่า bulk text ด้านล่าง</span>
+                    </div>
+                    <button type="button" onclick="openExperienceEditor(-1)"><i data-lucide="plus" class="w-4 h-4"></i> เพิ่มโปรเจกต์ใหม่</button>
+                </div>
+                <div class="quick-exp-list">${cards}</div>
+                <details class="quick-exp-advanced">
+                    <summary>Advanced bulk text edit / แก้หลายรายการแบบข้อความ</summary>
+                    <p>รูปภาพจะยังคงอยู่กับแต่ละโปรเจกต์ตามลำดับเดิม หากต้องการแก้รูปให้ใช้ปุ่ม “แก้ข้อมูล/รูป” หรือ “เพิ่มรูป” ด้านบน</p>
+                </details>`;
+            lucide.createIcons();
+        }
+
+        async function handleQuickExpImageUpload(event, index) {
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[index]) return;
+            const files = Array.from(event.target.files || []);
+            for (const file of files) {
+                try {
+                    data.exp[index].images = data.exp[index].images || [];
+                    data.exp[index].images.push(await resizeImageFileToBase64(file, 900, 0.82));
+                } catch (err) {
+                    alert(err.message || 'อัปโหลดรูปไม่สำเร็จ');
+                }
+            }
+            event.target.value = '';
+            StorageHandler.save(data);
+            render(data);
+            quickEditKey = 'experience';
+            const pop = document.getElementById('quick-edit-popover');
+            if (pop) { pop.classList.remove('hidden'); pop.classList.add('flex'); }
+            document.getElementById('quick-edit-title').textContent = 'Experience / ประสบการณ์';
+            document.getElementById('quick-edit-th').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'th');
+            document.getElementById('quick-edit-en').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'en');
+            renderQuickExperienceManager(StorageHandler.load());
+        }
+
+        function removeQuickExpImage(expIndex, imageIndex) {
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[expIndex] || !data.exp[expIndex].images) return;
+            data.exp[expIndex].images.splice(imageIndex, 1);
+            StorageHandler.save(data);
+            render(data);
+            quickEditKey = 'experience';
+            const pop = document.getElementById('quick-edit-popover');
+            if (pop) { pop.classList.remove('hidden'); pop.classList.add('flex'); }
+            document.getElementById('quick-edit-title').textContent = 'Experience / ประสบการณ์';
+            document.getElementById('quick-edit-th').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'th');
+            document.getElementById('quick-edit-en').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'en');
+            renderQuickExperienceManager(StorageHandler.load());
+        }
+
+        function duplicateQuickExp(index) {
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[index]) return;
+            const copy = JSON.parse(JSON.stringify(data.exp[index]));
+            copy.title_th = (copy.title_th || copy.title || 'Project') + ' (Copy)';
+            copy.title_en = (copy.title_en || copy.title || 'Project') + ' (Copy)';
+            data.exp.splice(index + 1, 0, copy);
+            StorageHandler.save(data);
+            render(data);
+            openQuickEdit('experience');
+        }
+
+        function deleteQuickExp(index) {
+            if (!confirm('ลบโปรเจกต์นี้ออกจาก Portfolio?')) return;
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[index]) return;
+            data.exp.splice(index, 1);
+            StorageHandler.save(data);
+            render(data);
+            openQuickEdit('experience');
+        }
+
         function serializeExperiencesForQuickEdit(data, targetLang) {
             return (data.exp || []).map(item => {
                 const title = item[`title_${targetLang}`] || item.title_th || item.title_en || item.title || '';
@@ -1323,12 +1508,22 @@
             quickEditKey = key;
             const data = StorageHandler.load();
             document.getElementById('quick-edit-title').textContent = map.title;
+            const expManager = document.getElementById('quick-edit-experience-manager');
+            const grid = document.getElementById('quick-edit-grid');
+            const saveBtn = document.getElementById('quick-edit-save-btn');
             if (map.special === 'experience') {
+                if (expManager) expManager.classList.remove('hidden');
+                if (grid) grid.classList.add('quick-edit-grid-advanced');
+                if (saveBtn) saveBtn.textContent = 'Save bulk text';
                 document.getElementById('quick-edit-th').placeholder = 'ชื่อโปรเจกต์ | บริษัท | รายละเอียด | bullet 1; bullet 2';
                 document.getElementById('quick-edit-en').placeholder = 'Project title | Company | Description | bullet 1; bullet 2';
                 document.getElementById('quick-edit-th').value = serializeExperiencesForQuickEdit(data, 'th');
                 document.getElementById('quick-edit-en').value = serializeExperiencesForQuickEdit(data, 'en');
+                renderQuickExperienceManager(data);
             } else {
+                if (expManager) { expManager.classList.add('hidden'); expManager.innerHTML = ''; }
+                if (grid) grid.classList.remove('quick-edit-grid-advanced');
+                if (saveBtn) saveBtn.textContent = 'Save';
                 document.getElementById('quick-edit-th').placeholder = '';
                 document.getElementById('quick-edit-en').placeholder = '';
                 document.getElementById('quick-edit-th').value = data[map.th] || '';

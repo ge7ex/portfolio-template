@@ -48,7 +48,7 @@ const ExperienceComponent = {
             return y.toString();
         };
 
-        const rows = items.map((item) => {
+        const rows = items.map((item, itemIndex) => {
             const sm = item.startMonth ? item.startMonth + ' ' : '';
 
             // ใช้ฟังก์ชัน formatYear เพื่อแปลงปี
@@ -61,6 +61,21 @@ const ExperienceComponent = {
 
             const hasImages = item.images && item.images.length > 0 && layout === 'portfolio';
             const bgAttr = hasImages ? `data-bg="${item.images[0]}"` : '';
+            const imageCount = item.images ? item.images.length : 0;
+            const isFirstPrintExp = layout === 'portfolio' && itemIndex === 0;
+            const getPrintFitVars = (count) => {
+                // Print-only fit variables: compress the first/current project image grid
+                // enough to keep the Experience heading and the first project together.
+                if (!count) return '';
+                if (count <= 2) return '--print-fit-cols:2;--print-fit-img-h:42mm;--print-fit-gap:3mm;';
+                if (count <= 4) return '--print-fit-cols:2;--print-fit-img-h:33mm;--print-fit-gap:2.6mm;';
+                if (count <= 6) return '--print-fit-cols:3;--print-fit-img-h:26mm;--print-fit-gap:2.3mm;';
+                if (count <= 9) return '--print-fit-cols:3;--print-fit-img-h:20mm;--print-fit-gap:2mm;';
+                return '--print-fit-cols:4;--print-fit-img-h:16mm;--print-fit-gap:1.8mm;';
+            };
+            const firstPrintClass = isFirstPrintExp ? ' print-first-exp print-keep-with-title' : '';
+            const firstPrintAttrs = isFirstPrintExp ? ` data-print-first-exp="true" data-print-images="${imageCount}"` : '';
+            const printFitVars = isFirstPrintExp ? getPrintFitVars(imageCount) : '';
 
             let highlightsHtml = '';
             if (item.highlights && item.highlights.length > 0) {
@@ -68,6 +83,9 @@ const ExperienceComponent = {
                 const liItems = item.highlights.map(h => `<li class="pl-1 leading-relaxed"><span class="ml-1">${h}</span></li>`).join('');
                 highlightsHtml = `<ul class="mt-4 space-y-3 list-disc pl-8 ${textColor} text-lg font-light">${liItems}</ul>`;
             }
+            const editProjectButton = layout === 'portfolio'
+                ? `<button type="button" class="inline-project-edit no-print" onclick="event.stopPropagation(); if (typeof openExperienceEditor === 'function') openExperienceEditor(${itemIndex});"><span>แก้ข้อมูล / รูปภาพ</span></button>`
+                : '';
 
             if (layout === 'resume') {
                 return `
@@ -91,7 +109,7 @@ const ExperienceComponent = {
                 if (hasImages) {
                     const scrollyHeight = (item.images.length * 85) + 250;
                     return `
-                    <div ${bgAttr} class="scrollytelling-wrapper relative mb-32 scroll-reveal print-exp-item" style="height: ${scrollyHeight}vh;">
+                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-32 scroll-reveal print-exp-item${firstPrintClass}" style="height: ${scrollyHeight}vh; ${printFitVars}">
                         <div class="sticky top-[10vh] w-full z-10 px-4 md:px-0">
                             <div class="${cardCls}">
                                 <div class="p-10 md:p-14 text-center flex flex-col items-center">
@@ -100,6 +118,7 @@ const ExperienceComponent = {
                                     ${item.company ? `<h5 class="text-xl md:text-2xl font-semibold ${companyColor} mb-6">${item.company}</h5>` : ''}
                                     ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-lg md:text-xl leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
                                     ${highlightsHtml ? `<div class="mt-2 text-left inline-block">${highlightsHtml}</div>` : ''}
+                                    ${editProjectButton}
                                 </div>
                                 <div class="cinematic-image-wrapper cinematic-collapsed w-full">
                                     <div class="cinematic-image-inner w-full ${innerDividerCls}">
@@ -118,7 +137,7 @@ const ExperienceComponent = {
                 }
                 else {
                     return `
-                    <div class="mb-24 px-4 md:px-0 scroll-reveal story-section flex flex-col items-center print-exp-item">
+                    <div${firstPrintAttrs} class="mb-24 px-4 md:px-0 scroll-reveal story-section flex flex-col items-center print-exp-item${firstPrintClass}" style="${printFitVars}">
                         <div class="${cardCls}">
                             <div class="p-10 md:p-14 text-center flex flex-col items-center">
                                 <span class="${yearCls}">${dateDisplay}</span>
@@ -126,6 +145,7 @@ const ExperienceComponent = {
                                 ${item.company ? `<h5 class="text-xl md:text-2xl font-semibold ${companyColor} mb-6">${item.company}</h5>` : ''}
                                 ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-lg md:text-xl leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
                                 ${highlightsHtml ? `<div class="mt-2 text-left inline-block">${highlightsHtml}</div>` : ''}
+                                ${editProjectButton}
                             </div>
                         </div>
                     </div>`;
@@ -142,13 +162,13 @@ const ExperienceComponent = {
         }
 
         return `
-            <section class="fade-in">
-                <div class="${titleWrapperCls}">
-                    <h3 class="${titleClass} justify-start">
+            <section class="fade-in experience-section">
+                <div class="${titleWrapperCls} experience-title-wrap">
+                    <h3 class="${titleClass} justify-start experience-title">
                         ${layout === 'portfolio' ? '<span class="mr-3 opacity-80">🚀</span>' : ''} ${mainTitleText}
                     </h3>
                 </div>
-                <div class="mt-6 md:mt-10">${rows}</div>
+                <div class="mt-6 md:mt-10 experience-rows">${rows}</div>
             </section>
         `;
     }
