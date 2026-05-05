@@ -100,12 +100,24 @@
             <i data-lucide="palette" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
         </button>
 
+        <button onclick="toggleExportBranch()" id="btn-export-branch"
+            class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative"
+            title="Export / Print">
+            <i data-lucide="printer" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        </button>
+
         <button onclick="toggleModal()"
             class="bg-emerald-600/90 hover:bg-emerald-500 text-white backdrop-blur-xl border border-emerald-400/30 px-5 h-11 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 group">
             <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
             <span class="text-sm">Edit</span>
         </button>
     </nav>
+
+    <div id="public-export-branch" class="hidden public-export-branch" aria-label="Quick export actions">
+        <button type="button" onclick="handleExportWeb()" title="Download WEB"><i data-lucide="download" class="w-4 h-4"></i><span>WEB</span></button>
+        <button type="button" onclick="handlePrint('portrait')" title="PDF Portrait"><i data-lucide="file-down" class="w-4 h-4"></i><span>PDF</span></button>
+        <button type="button" onclick="handleExportPPTX()" title="Download PPTX"><i data-lucide="file-presentation" class="w-4 h-4"></i><span>PPTX</span></button>
+    </div>
 
     <div id="theme-panel"
         class="hidden fixed top-20 right-6 z-40 bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-700 rounded-3xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] w-72 origin-top-right transition-all">
@@ -545,12 +557,34 @@
         document.addEventListener('click', (e) => {
             const panel = document.getElementById('theme-panel');
             const btn = document.getElementById('btn-appearance');
-            if (!panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) {
+            const exportPanel = document.getElementById('public-export-branch');
+            const exportBtn = document.getElementById('btn-export-branch');
+            if (panel && btn && !panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) {
                 panel.classList.add('hidden');
+            }
+            if (exportPanel && exportBtn && !exportPanel.classList.contains('hidden') && !exportPanel.contains(e.target) && !exportBtn.contains(e.target)) {
+                exportPanel.classList.add('hidden');
             }
         });
 
         function toggleThemePanel() { document.getElementById('theme-panel').classList.toggle('hidden'); }
+        function toggleExportBranch() {
+            const panel = document.getElementById('public-export-branch');
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+            if (!panel.classList.contains('hidden') && window.lucide) lucide.createIcons();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const exportBtn = document.getElementById('btn-export-branch');
+            if (exportBtn && !exportBtn.dataset.exportBound) {
+                exportBtn.dataset.exportBound = '1';
+                exportBtn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    toggleExportBranch();
+                }, true);
+            }
+        });
         function setDirectLayout(mode) { const data = StorageHandler.load(); data.layout = mode; StorageHandler.save(data); render(data); }
         function setDirectColorMode(mode) { const data = StorageHandler.load(); data.colorMode = mode; StorageHandler.save(data); render(data); }
         function setDirectTheme(theme) { const data = StorageHandler.load(); data.portfolioStyle = theme; StorageHandler.save(data); render(data); }

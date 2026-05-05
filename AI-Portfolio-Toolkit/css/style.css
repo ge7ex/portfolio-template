@@ -2198,6 +2198,150 @@ body.theme-luxury{--print-bg-1:#312e81;--print-bg-2:#111827;--print-accent:#b453
   display: none !important;
 }
 
+/* v28 merge: public export hitbox and print-safe profile-frame cleanup. */
+#btn-export-branch {
+  position: relative !important;
+  z-index: 120 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  touch-action: manipulation;
+}
+
+nav {
+  z-index: 120 !important;
+  pointer-events: auto !important;
+}
+
+.public-export-branch.hidden {
+  display: none !important;
+}
+
+.public-export-branch {
+  position: fixed;
+  top: 82px;
+  right: 92px;
+  z-index: 119 !important;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 999px;
+  pointer-events: auto !important;
+  background: rgba(15,23,42,.86);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 18px 50px rgba(0,0,0,.28);
+  transform-origin: top right;
+  animation: exportBranchIn .22s cubic-bezier(.2,.9,.2,1) both;
+}
+
+.public-export-branch button {
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #fff;
+  background: rgba(15,23,42,.88);
+  border: 1px solid rgba(255,255,255,.12);
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  transition: transform .18s ease, background .18s ease;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 28px color-mix(in srgb, var(--theme-accent, #2563eb) 22%, transparent);
+}
+
+.public-export-branch button:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: color-mix(in srgb, var(--theme-accent, #2563eb) 32%, rgba(15,23,42,.9));
+}
+
+.public-export-branch button span {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+@keyframes exportBranchIn {
+  from { opacity: 0; transform: translateY(-6px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 768px) {
+  .public-export-branch {
+    right: 18px;
+    top: 82px;
+  }
+}
+
+@media print {
+  .public-export-branch,
+  #btn-export-branch {
+    display: none !important;
+  }
+
+  .hero-frame,
+  .hero-frame *,
+  .hero-frame img,
+  .hero-avatar {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    mix-blend-mode: normal !important;
+  }
+
+  .hero-frame {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .hero-frame::before,
+  .hero-frame::after,
+  .hero-frame > .profile-scroll-glow,
+  .hero-frame > .profile-frame-glow,
+  .hero-frame > .profile-frame-aura,
+  .hero-frame > .profile-frame-orbit {
+    content: none !important;
+    display: none !important;
+    opacity: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  .hero-avatar,
+  .hero-frame img {
+    box-shadow: none !important;
+    background: transparent !important;
+    border-color: #0f172a !important;
+  }
+
+  #theme-decorations,
+  #dynamic-bg,
+  #cursor-orb,
+  #mouse-grid-field,
+  .theme-transition-overlay,
+  .theme-change-layer,
+  .theme-change-tech,
+  .theme-change-educ,
+  .theme-change-eco,
+  .theme-change-gov,
+  .theme-change-creative,
+  .theme-change-minimal,
+  .theme-change-bold,
+  .theme-change-luxury,
+  .theme-change-health,
+  .theme-change-esports {
+    display: none !important;
+    opacity: 0 !important;
+  }
+}
+
 /* V15 print pagination rules: keep portfolio sections from orphaning headers. */
 @media print {
   body.print-portrait.layout-portfolio .portfolio-board,
