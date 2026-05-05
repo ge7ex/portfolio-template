@@ -1,7 +1,7 @@
 // js/components/Contact.js
 const ContactComponent = {
     render: (email, phone, linkedin, layout, colorMode, pStyle, lang) => {
-        if (!email && !phone) return '';
+        if (!email && !phone && !linkedin) return '';
         const isDark = colorMode === 'dark';
         const titleText = lang === 'th' ? 'ข้อมูลติดต่อ' : 'Contact Info';
         let titleClass = ""; let containerClass = ""; let linkClass = "";
@@ -30,6 +30,6 @@ const ContactComponent = {
             linkClass = `${t.link} hover:underline`;
             containerClass = `space-y-4 ${isDark ? 'text-slate-300' : 'text-slate-600'} font-light`;
         }
-        return `<section class="fade-in"><h3 class="${titleClass}">${titleText}</h3><ul class="${containerClass}">${email ? `<li class="flex items-center gap-3"><i data-lucide="mail" class="w-4 h-4"></i> <span class="break-all">${email}</span></li>` : ''}${phone ? `<li class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4"></i> <span>${phone}</span></li>` : ''}${linkedin ? `<li class="flex items-center gap-3"><i data-lucide="linkedin" class="w-4 h-4"></i> <span class="${linkClass}">${linkedin}</span></li>` : ''}</ul></section>`;
+        return `<section class="fade-in contact-section"><h3 class="${titleClass}">${titleText}</h3><ul class="${containerClass}">${email ? `<li class="flex items-center gap-3"><i data-lucide="mail" class="w-4 h-4"></i> <span class="break-all">${email}</span></li>` : ''}${phone ? `<li class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4"></i> <span>${phone}</span></li>` : ''}${linkedin ? `<li class="flex items-center gap-3"><i data-lucide="linkedin" class="w-4 h-4"></i> <span class="${linkClass}">${linkedin}</span></li>` : ''}</ul></section>`;
     }
 };

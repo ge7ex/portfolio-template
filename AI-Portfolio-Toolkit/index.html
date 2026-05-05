@@ -492,8 +492,8 @@
             </div>
             <div id="quick-edit-experience-manager" class="quick-edit-experience-manager hidden"></div>
             <div class="quick-edit-grid" id="quick-edit-grid">
-                <label>TH<textarea id="quick-edit-th"></textarea></label>
-                <label>EN<textarea id="quick-edit-en"></textarea></label>
+                <label><span id="quick-edit-label-th">TH</span><textarea id="quick-edit-th"></textarea></label>
+                <label><span id="quick-edit-label-en">EN</span><textarea id="quick-edit-en"></textarea></label>
             </div>
             <div class="quick-edit-actions">
                 <button type="button" onclick="closeQuickEdit()">Cancel</button>
@@ -1501,10 +1501,25 @@
             }).filter(item => item.title_th || item.title_en || item.desc_th || item.desc_en || (item.highlights_th||[]).length || (item.highlights_en||[]).length || (item.images||[]).length);
         }
 
+        function setQuickEditTextLabels(leftLabel = 'TH', rightLabel = 'EN') {
+            const left = document.getElementById('quick-edit-label-th');
+            const right = document.getElementById('quick-edit-label-en');
+            if (left) left.textContent = leftLabel;
+            if (right) right.textContent = rightLabel;
+        }
+
+        function applyContactFromQuickEdit(data, emailText, contactText) {
+            const contactLines = String(contactText || '').split('\n').map(line => line.trim());
+            data.email = String(emailText || '').trim();
+            data.phone = contactLines[0] || '';
+            data.linkedin = contactLines.slice(1).join('\n').trim();
+        }
+
         const quickMap = {
             experience: { title: 'Experience / ประสบการณ์', special: 'experience' },
             bio: { title: 'Professional Summary / ประวัติโดยย่อ', th: 'bio_th', en: 'bio_en', selector: '#app section:has(h3)' },
-            skills: { title: 'Skills / ทักษะ', th: 'skills_th', en: 'skills_en', selector: '#app section' },
+            skills: { title: 'Skills / ทักษะ', th: 'skills_th', en: 'skills_en', selector: '.skills-section' },
+            contact: { title: 'Contact / ข้อมูลติดต่อ', special: 'contact', selector: '.contact-section' },
             education: { title: 'Education / การศึกษา', th: 'education_th', en: 'education_en', selector: '.education-section' },
             certifications: { title: 'Certifications / ประกาศนียบัตร', th: 'certifications_th', en: 'certifications_en', selector: '.cert-section' },
             awards: { title: 'Awards / รางวัล', th: 'awards_th', en: 'awards_en', selector: '.awards-section' },
@@ -1524,7 +1539,8 @@
             const candidates = [
                 ['experience', [...app.querySelectorAll('section')].find(s => /ประสบการณ์และผลงาน|Experience & Projects/i.test(s.textContent))],
                 ['bio', [...app.querySelectorAll('section')].find(s => /ประวัติโดยย่อ|Professional Summary/i.test(s.textContent))],
-                ['skills', [...app.querySelectorAll('section')].find(s => /ทักษะและความเชี่ยวชาญ|Skills/i.test(s.textContent))],
+                ['skills', app.querySelector('.skills-section')],
+                ['contact', app.querySelector('.contact-section')],
                 ['education', app.querySelector('.education-section')],
                 ['certifications', app.querySelector('.cert-section')],
                 ['awards', app.querySelector('.awards-section')],
@@ -1558,6 +1574,7 @@
             const grid = document.getElementById('quick-edit-grid');
             const saveBtn = document.getElementById('quick-edit-save-btn');
             if (map.special === 'experience') {
+                setQuickEditTextLabels('TH', 'EN');
                 if (expManager) expManager.classList.remove('hidden');
                 if (grid) grid.classList.add('quick-edit-grid-advanced');
                 if (saveBtn) saveBtn.textContent = 'Save bulk text';
@@ -1566,7 +1583,17 @@
                 document.getElementById('quick-edit-th').value = serializeExperiencesForQuickEdit(data, 'th');
                 document.getElementById('quick-edit-en').value = serializeExperiencesForQuickEdit(data, 'en');
                 renderQuickExperienceManager(data);
+            } else if (map.special === 'contact') {
+                setQuickEditTextLabels('Email', 'Phone / LinkedIn');
+                if (expManager) { expManager.classList.add('hidden'); expManager.innerHTML = ''; }
+                if (grid) grid.classList.remove('quick-edit-grid-advanced');
+                if (saveBtn) saveBtn.textContent = 'Save';
+                document.getElementById('quick-edit-th').placeholder = 'hello@example.com';
+                document.getElementById('quick-edit-en').placeholder = '+66 00 000 0000\nlinkedin.com/in/your-profile';
+                document.getElementById('quick-edit-th').value = data.email || '';
+                document.getElementById('quick-edit-en').value = [data.phone || '', data.linkedin || ''].filter(Boolean).join('\n');
             } else {
+                setQuickEditTextLabels('TH', 'EN');
                 if (expManager) { expManager.classList.add('hidden'); expManager.innerHTML = ''; }
                 if (grid) grid.classList.remove('quick-edit-grid-advanced');
                 if (saveBtn) saveBtn.textContent = 'Save';
@@ -1595,6 +1622,8 @@
             const map = quickMap[quickEditKey];
             if (map.special === 'experience') {
                 applyExperiencesFromQuickEdit(data, document.getElementById('quick-edit-th').value, document.getElementById('quick-edit-en').value);
+            } else if (map.special === 'contact') {
+                applyContactFromQuickEdit(data, document.getElementById('quick-edit-th').value, document.getElementById('quick-edit-en').value);
             } else {
                 data[map.th] = document.getElementById('quick-edit-th').value;
                 data[map.en] = document.getElementById('quick-edit-en').value;

@@ -29,6 +29,6 @@ const SkillsComponent = {
             titleClass = `font-bold mb-4 uppercase tracking-widest text-sm ${t.title}`;
             itemClass = `border px-4 py-2 text-sm backdrop-blur-sm ${isDark ? t.itemDark : t.itemLight}`;
         }
-        return `<section class="mb-10 fade-in"><h3 class="${titleClass}">${titleText}</h3><div class="flex flex-wrap gap-3">${skillList.map(s => `<span class="${itemClass}">${s}</span>`).join('')}</div></section>`;
+        return `<section class="mb-10 fade-in skills-section"><h3 class="${titleClass}">${titleText}</h3><div class="flex flex-wrap gap-3">${skillList.map(s => `<span class="${itemClass}">${s}</span>`).join('')}</div></section>`;
     }
 };
