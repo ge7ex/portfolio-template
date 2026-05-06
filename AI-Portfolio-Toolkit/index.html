@@ -1682,10 +1682,26 @@
             }
         }
 
-        function handlePrint(orientation = 'portrait') {
+        function preparePrintImages() {
+            const imgs = Array.from(document.querySelectorAll('.print-layout-wrapper img, .print-exp-item img, .scrollytelling-track img, #app img'));
+            imgs.forEach(img => {
+                const src = img.currentSrc || img.src || img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('data-full-src') || '';
+                img.loading = 'eager';
+                img.decoding = 'sync';
+                if (src && img.getAttribute('src') !== src) img.setAttribute('src', src);
+            });
+            return Promise.all(imgs.map(img => {
+                if (img.complete && img.naturalWidth) return Promise.resolve();
+                if (img.decode) return img.decode().catch(() => {});
+                return new Promise(resolve => { img.onload = img.onerror = resolve; setTimeout(resolve, 1500); });
+            }));
+        }
+
+        async function handlePrint(orientation = 'portrait') {
             const modal = document.getElementById("edit-modal");
             const wasOpen = modal && !modal.classList.contains("hidden");
             if (wasOpen) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+            document.querySelectorAll('.scroll-reveal').forEach(el => el.classList.add('show'));
             document.querySelectorAll('.cinematic-image-wrapper').forEach(el => {
                 el.classList.remove('cinematic-collapsed');
                 el.classList.add('cinematic-expanded');
@@ -1700,17 +1716,19 @@
             document.querySelectorAll('.scrollytelling-track').forEach(track => {
                 track.style.transform = 'none';
                 track.removeAttribute('data-max-translate');
+                track.style.overflow = 'visible';
             });
 
             const oldPrintStyle = document.getElementById('dynamic-print-page-size');
             if (oldPrintStyle) oldPrintStyle.remove();
             const printStyle = document.createElement('style');
             printStyle.id = 'dynamic-print-page-size';
-            printStyle.textContent = `@media print { @page { size: A4 ${orientation === 'landscape' ? 'landscape' : 'portrait'}; margin: 0; } body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }`;
+            printStyle.textContent = `@media print { @page { size: A4 ${orientation === 'landscape' ? 'landscape' : 'portrait'}; margin: 0; } body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .scroll-reveal { opacity: 1 !important; transform: none !important; } .scrollytelling-track { transform: none !important; overflow: visible !important; } }`;
             document.head.appendChild(printStyle);
 
             document.body.classList.toggle('print-landscape', orientation === 'landscape');
             document.body.classList.toggle('print-portrait', orientation !== 'landscape');
+            await preparePrintImages();
             setTimeout(() => { window.print(); }, 120);
         }
 

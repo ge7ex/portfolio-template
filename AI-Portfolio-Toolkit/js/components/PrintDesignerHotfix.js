@@ -14,6 +14,33 @@
     try { return JSON.parse(JSON.stringify(data || {})); } catch (_) { return data || {}; }
   }
 
+  function hasUsefulData(data) {
+    if (!data || isDemoData(data)) return false;
+    const keys = ['name_th', 'name_en', 'role_th', 'role_en', 'bio_th', 'bio_en', 'skills_th', 'skills_en', 'email', 'phone', 'linkedin', 'avatar'];
+    if (keys.some(key => escText(data[key]))) return true;
+    return Array.isArray(data.exp) && data.exp.some(item => {
+      if (!item) return false;
+      return ['title_th', 'title_en', 'company_th', 'company_en', 'desc_th', 'desc_en', 'title', 'company', 'desc'].some(key => escText(item[key])) ||
+        (Array.isArray(item.images) && item.images.some(Boolean));
+    });
+  }
+
+  function mergeUsefulData(primary, fallback) {
+    const base = clone(fallback || {});
+    const next = clone(primary || {});
+    Object.keys(next).forEach(key => {
+      const value = next[key];
+      if (Array.isArray(value)) {
+        if (value.length) base[key] = value;
+      } else if (value && typeof value === 'object') {
+        base[key] = { ...(base[key] || {}), ...value };
+      } else if (escText(value)) {
+        base[key] = value;
+      }
+    });
+    return base;
+  }
+
   function getCandidateFromWindow() {
     const names = ['__AI_PORTFOLIO_ACTIVE_DATA', 'ACTIVE_PORTFOLIO_DATA', 'currentData', 'portfolioData', 'profileData'];
     for (const name of names) {
@@ -90,19 +117,14 @@
   }
 
   function resolveActiveData(originalLoad) {
-    const win = getCandidateFromWindow();
-    if (win && !isDemoData(win)) return win;
+    let stored = null;
+    try { stored = originalLoad ? originalLoad() : null; } catch (_) { stored = null; }
 
-    const dom = getCandidateFromDom();
-    if (dom && !isDemoData(dom)) return dom;
-
-    try {
-      const stored = originalLoad ? originalLoad() : null;
-      if (stored && !isDemoData(stored)) return stored;
-      return stored || dom || win || null;
-    } catch (_) {
-      return dom || win || null;
+    const candidates = [getCandidateFromWindow(), stored, getCandidateFromDom()].filter(hasUsefulData);
+    if (candidates.length) {
+      return candidates.slice(1).reduce((acc, item) => mergeUsefulData(acc, item), candidates[0]);
     }
+    return stored || getCandidateFromDom() || getCandidateFromWindow() || null;
   }
 
   function installPatch() {

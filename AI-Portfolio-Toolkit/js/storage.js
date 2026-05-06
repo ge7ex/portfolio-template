@@ -165,7 +165,7 @@ const StorageHandler = {
     }
 };
 
-// V33 bootstrap: load PDF Layout Studio without mutating portfolio/resume data.
+// V35 bootstrap: load PDF Layout Studio without mutating portfolio/resume data.
 (function () {
     'use strict';
 
@@ -232,12 +232,12 @@ const StorageHandler = {
             return;
         }
         const script = document.createElement('script');
-        script.src = 'js/components/PrintDesigner.js?v=33-data3';
+        script.src = 'js/components/PrintDesigner.js?v=35-theme-imagefit';
         script.defer = true;
         script.dataset.printDesignerV33 = 'true';
         script.onload = () => {
             const hotfix = document.createElement('script');
-            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=33-data3';
+            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=35-theme-imagefit';
             hotfix.defer = true;
             document.body.appendChild(hotfix);
             addStudioButtons();
