@@ -224,7 +224,14 @@ const StorageHandler = {
         script.src = 'js/components/PrintDesigner.js?v=33';
         script.defer = true;
         script.dataset.printDesignerV33 = 'true';
-        script.onload = addStudioButtons;
+        script.onload = () => {
+        addStudioButtons();
+
+            const hotfix = document.createElement('script');
+                  hotfix.src = 'js/components/PrintDesignerHotfix.js?v=33h1';
+                  hotfix.defer = true;
+                  document.body.appendChild(hotfix);
+                };
         script.onerror = () => console.warn('PrintDesigner.js failed to load.');
         document.body.appendChild(script);
     }
