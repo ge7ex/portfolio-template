@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const PROFILE_KEY = 'ai-portfolio-print-designer-v33';
+  const PROFILE_KEY = 'ai-portfolio-print-designer-v33-data2';
   const MM = 3.7795275591;
   const px = mm => Math.round(mm * MM);
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -32,8 +32,129 @@
   function saveProfiles() { localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profiles)); toast('Print profile saved'); }
   function modeStore() { const d = defaultProfiles(); state.profiles[state.mode] ||= d[state.mode]; return state.profiles[state.mode]; }
   function activeProfile() { const store = modeStore(); let p = store.profiles.find(x => x.id === store.activeProfileId) || store.profiles[0]; store.activeProfileId = p.id; p.transforms ||= {}; state.activeProfile = p; return p; }
-  function getTextData() { const d = state.data || {}; const th = d.lang === 'th'; return { name: th ? d.name_th : d.name_en, role: th ? d.role_th : d.role_en, bio: th ? d.bio_th : d.bio_en, skills: th ? d.skills_th : d.skills_en }; }
+  function meaningfulText(value) {
+    const text = String(value || '').trim();
+    return /^(Your Portfolio|Portfolio Template|Your Name|hello@example\.com|\+66 00 000 0000|linkedin\.com\/in\/your-profile|Portfolio, Resume, Projects, Skills, Contact|Add your name, role, summary, skills, and project work to turn this template into a finished portfolio\.|Featured project placeholder|Your work or organization|Replace this block with your first project, responsibility, result, or achievement\.)$/i.test(text) ? '' : text;
+  }
+  function localText(thValue, enValue) {
+    const th = meaningfulText(thValue);
+    const en = meaningfulText(enValue);
+    return state.data && state.data.lang === 'en' ? (en || th) : (th || en);
+  }
+  function getTextData() {
+    const d = state.data || {};
+    return {
+      name: localText(d.name_th, d.name_en),
+      role: localText(d.role_th, d.role_en),
+      bio: localText(d.bio_th, d.bio_en),
+      skills: localText(d.skills_th, d.skills_en)
+    };
+  }
   function toast(msg) { const old = document.getElementById('pd-toast'); if (old) old.remove(); const t = document.createElement('div'); t.id = 'pd-toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 1800); }
+
+  function clone(data) {
+    try { return JSON.parse(JSON.stringify(data || {})); } catch (_) { return data || {}; }
+  }
+
+  function field(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : '';
+  }
+
+  function hasRealData(data) {
+    if (!data) return false;
+    const keys = ['name_th', 'name_en', 'role_th', 'role_en', 'bio_th', 'bio_en', 'skills_th', 'skills_en', 'email', 'phone', 'linkedin', 'avatar'];
+    const hasProfile = keys.some(key => meaningfulText(data[key]));
+    const hasExp = Array.isArray(data.exp) && data.exp.some(item =>
+      ['title_th', 'title_en', 'company_th', 'company_en', 'desc_th', 'desc_en', 'title', 'company', 'desc']
+        .some(key => meaningfulText(item && item[key])) ||
+      (Array.isArray(item.images) && item.images.some(Boolean))
+    );
+    return hasProfile || hasExp;
+  }
+
+  function dataFromEditForm() {
+    if (!document.getElementById('in-name-th') && !document.getElementById('in-name-en')) return null;
+    const stored = window.StorageHandler && StorageHandler.load ? StorageHandler.load() : {};
+    const draft = {
+      ...clone(stored),
+      name_th: field('in-name-th'),
+      name_en: field('in-name-en'),
+      role_th: field('in-role-th'),
+      role_en: field('in-role-en'),
+      bio_th: field('in-bio-th'),
+      bio_en: field('in-bio-en'),
+      skills_th: field('in-skills-th'),
+      skills_en: field('in-skills-en'),
+      email: field('in-email'),
+      phone: field('in-phone'),
+      linkedin: field('in-linkedin'),
+      education_th: field('in-education-th'),
+      education_en: field('in-education-en'),
+      certifications_th: field('in-certifications-th'),
+      certifications_en: field('in-certifications-en'),
+      awards_th: field('in-awards-th'),
+      awards_en: field('in-awards-en'),
+      caseStudies_th: field('in-caseStudies-th'),
+      caseStudies_en: field('in-caseStudies-en'),
+      services_th: field('in-services-th'),
+      services_en: field('in-services-en'),
+      testimonials_th: field('in-testimonials-th'),
+      testimonials_en: field('in-testimonials-en'),
+      clients_th: field('in-clients-th'),
+      clients_en: field('in-clients-en'),
+      cta_th: field('in-cta-th'),
+      cta_en: field('in-cta-en'),
+      articles_th: field('in-articles-th'),
+      articles_en: field('in-articles-en')
+    };
+    return hasRealData(draft) ? draft : null;
+  }
+
+  function imageSrc(img) {
+    return img ? (img.currentSrc || img.src || img.getAttribute('src') || '') : '';
+  }
+
+  function dataFromRenderedPage() {
+    const app = document.getElementById('app');
+    if (!app) return null;
+    const header = app.querySelector('header, .portfolio-hero, .resume-cv-sidebar header') || app;
+    const h1 = header.querySelector('h1') || app.querySelector('h1');
+    const roleEl = header.querySelector('p, h2, h3');
+    const avatar = imageSrc(app.querySelector('header img, .hero-avatar img, img.hero-avatar, .resume-cv-sidebar img'));
+    const d = {
+      ...(window.StorageHandler && StorageHandler.load ? StorageHandler.load() : {}),
+      name_th: meaningfulText(h1 && h1.textContent),
+      name_en: meaningfulText(h1 && h1.textContent),
+      role_th: meaningfulText(roleEl && roleEl.textContent),
+      role_en: meaningfulText(roleEl && roleEl.textContent),
+      avatar
+    };
+    const expRoot = app.querySelector('.experience-section');
+    if (expRoot) {
+      const items = Array.from(expRoot.querySelectorAll('.print-exp-item'));
+      d.exp = items.map((item, index) => {
+        const title = meaningfulText((item.querySelector('h4, h2, h3') || {}).textContent) || `Project ${index + 1}`;
+        const company = meaningfulText((item.querySelector('h5') || {}).textContent);
+        const desc = meaningfulText((item.querySelector('p') || {}).textContent);
+        const images = Array.from(item.querySelectorAll('img')).map(imageSrc).filter(Boolean).filter(src => src !== avatar);
+        return { title_th: title, title_en: title, company_th: company, company_en: company, desc_th: desc, desc_en: desc, images };
+      }).filter(item => item.title_th || item.company_th || item.desc_th || item.images.length);
+    }
+    return hasRealData(d) ? d : null;
+  }
+
+  function resolvePrintData() {
+    const form = dataFromEditForm();
+    if (form) return form;
+    if (hasRealData(window.__AI_PORTFOLIO_ACTIVE_DATA)) return clone(window.__AI_PORTFOLIO_ACTIVE_DATA);
+    if (hasRealData(window.INJECTED_PORTFOLIO_DATA)) return clone(window.INJECTED_PORTFOLIO_DATA);
+    const stored = window.StorageHandler && StorageHandler.load ? StorageHandler.load() : null;
+    if (hasRealData(stored)) return stored;
+    const rendered = dataFromRenderedPage();
+    if (rendered) return rendered;
+    return stored || {};
+  }
 
   function shell() {
     injectCss();
@@ -69,16 +190,66 @@
 
   function baseBoxes() {
     const d = state.data || {}, t = getTextData(), exp = Array.isArray(d.exp) ? d.exp : [], out = [];
-    out.push({ id: 'header', type: 'text', x: 14, y: 14, w: state.mode === 'resume' ? 72 : 125, h: 34, z: 1, html: `<h1>${esc(t.name || 'Your Name')}</h1><h3>${esc(t.role || '')}</h3>` });
-    if (d.avatar) out.push({ id: 'avatar', type: 'image', x: state.mode === 'resume' ? 14 : 155, y: 14, w: 32, h: 32, z: 2, src: d.avatar });
-    out.push({ id: 'bio', type: 'text', x: state.mode === 'resume' ? 14 : 14, y: state.mode === 'resume' ? 54 : 54, w: state.mode === 'resume' ? 74 : 180, h: 32, z: 1, html: `<h2>Summary</h2><p>${esc(t.bio || '')}</p>` });
-    if (t.skills) out.push({ id: 'skills', type: 'text', x: state.mode === 'resume' ? 14 : 14, y: state.mode === 'resume' ? 91 : 91, w: state.mode === 'resume' ? 74 : 180, h: 22, z: 1, html: `<h2>Skills</h2><p>${esc(t.skills)}</p>` });
-    let y = state.mode === 'resume' ? 122 : 122;
-    exp.slice(0, state.mode === 'resume' ? 6 : 4).forEach((e, i) => {
-      const th = d.lang === 'th'; const title = th ? e.title_th : e.title_en; const company = th ? e.company_th : e.company_en; const desc = th ? e.desc_th : e.desc_en;
-      out.push({ id: `exp-${i}`, type: 'text', x: state.mode === 'resume' ? 92 : 14, y, w: state.mode === 'resume' ? 104 : 180, h: 32, z: 1, html: `<h2>${esc(title || 'Project')}</h2><h3>${esc(company || '')}</h3><p>${esc(desc || '')}</p>` });
-      if (state.mode === 'portfolio' && Array.isArray(e.images)) e.images.slice(0, 4).forEach((src, j) => out.push({ id: `exp-${i}-img-${j}`, type: 'image', x: 14 + (j % 2) * 92, y: y + 38 + Math.floor(j / 2) * 50, w: 86, h: 44, z: 2, src }));
-      y += state.mode === 'resume' ? 38 : 140;
+    const th = d.lang === 'th';
+    const pageW = activeProfile().orientation === 'landscape' ? 297 : 210;
+    const margin = 12;
+    const gap = 7;
+    const contentW = pageW - margin * 2;
+    const rightColX = state.mode === 'resume' ? 92 : margin;
+    const rightColW = state.mode === 'resume' ? contentW - 80 : contentW;
+    const text = (thVal, enVal, fallback = '') => th ? (thVal || enVal || fallback) : (enVal || thVal || fallback);
+    const hasText = value => String(value || '').trim().length > 0;
+    const addText = (id, title, body, x, y, w, h, z = 1) => {
+      if (!hasText(body)) return y;
+      out.push({ id, type: 'text', x, y, w, h, z, html: `<h2>${esc(title)}</h2><p>${esc(body)}</p>` });
+      return y + h + gap;
+    };
+
+    out.push({ id: 'header', type: 'text', x: margin, y: margin, w: d.avatar ? contentW - 48 : contentW, h: 34, z: 1, html: `<h1>${esc(t.name || 'Your Name')}</h1><h3>${esc(t.role || '')}</h3>` });
+    if (d.avatar) out.push({ id: 'avatar', type: 'image', x: pageW - margin - 36, y: margin, w: 36, h: 36, z: 2, src: d.avatar });
+
+    let y = margin + 44;
+    y = addText('bio', th ? 'ประวัติโดยย่อ' : 'Summary', t.bio || '', margin, y, contentW, 30);
+    if (t.skills) y = addText('skills', th ? 'ทักษะและความเชี่ยวชาญ' : 'Skills', t.skills, margin, y, state.mode === 'resume' ? 68 : contentW, 24);
+    if (d.email || d.phone || d.linkedin) {
+      y = addText('contact', th ? 'ข้อมูลติดต่อ' : 'Contact', [d.email, d.phone, d.linkedin].filter(Boolean).join('\n'), state.mode === 'resume' ? margin : margin, y, state.mode === 'resume' ? 68 : contentW, 28);
+    }
+
+    if (state.mode === 'resume') y = margin + 44;
+    exp.forEach((e, i) => {
+      const title = text(e.title_th, e.title_en, 'Project');
+      const company = text(e.company_th, e.company_en, '');
+      const desc = text(e.desc_th, e.desc_en, '');
+      const highlights = text((e.highlights_th || []).join('\n'), (e.highlights_en || []).join('\n'), '');
+      const images = Array.isArray(e.images) ? e.images.filter(Boolean) : [];
+      const body = [company, desc, highlights].filter(Boolean).join('\n\n');
+      const imgRows = state.mode === 'portfolio' ? Math.ceil(images.length / 2) : 0;
+      const textH = Math.max(32, Math.min(62, 24 + Math.ceil(body.length / 160) * 8));
+      out.push({ id: `project-${i + 1}`, type: 'text', x: rightColX, y, w: rightColW, h: textH, z: 1, html: `<h2>${esc(title)}</h2><h3>${esc(company)}</h3><p>${esc([desc, highlights].filter(Boolean).join('\n'))}</p>` });
+      y += textH + 5;
+      if (state.mode === 'portfolio' && images.length) {
+        const imgW = images.length === 1 ? Math.min(120, rightColW) : (rightColW - 6) / 2;
+        const imgH = images.length === 1 ? 58 : 44;
+        images.forEach((src, j) => {
+          out.push({ id: `project-${i + 1}-image-${j + 1}`, type: 'image', x: rightColX + (j % 2) * (imgW + 6), y: y + Math.floor(j / 2) * (imgH + 5), w: imgW, h: imgH, z: 2, src });
+        });
+        y += imgRows * (imgH + 5);
+      }
+      y += gap;
+    });
+
+    [
+      ['education', th ? 'การศึกษา' : 'Education', text(d.education_th, d.education_en)],
+      ['certifications', th ? 'ประกาศนียบัตร' : 'Certifications', text(d.certifications_th, d.certifications_en)],
+      ['awards', th ? 'รางวัล' : 'Awards', text(d.awards_th, d.awards_en)],
+      ['case-studies', th ? 'กรณีศึกษา' : 'Case Studies', text(d.caseStudies_th, d.caseStudies_en)],
+      ['services', th ? 'บริการ' : 'Services', text(d.services_th, d.services_en)],
+      ['testimonials', th ? 'คำรับรอง' : 'Testimonials', text(d.testimonials_th, d.testimonials_en)],
+      ['clients', th ? 'ลูกค้า' : 'Clients', text(d.clients_th, d.clients_en)],
+      ['articles', th ? 'บทความ' : 'Articles', text(d.articles_th, d.articles_en)],
+      ['cta', th ? 'คำเชิญชวน' : 'CTA', text(d.cta_th, d.cta_en)]
+    ].forEach(([id, title, body]) => {
+      y = addText(id, title, body, rightColX, y, rightColW, Math.max(24, Math.min(54, 20 + Math.ceil(String(body || '').length / 180) * 8)));
     });
     return out;
   }
@@ -89,7 +260,10 @@
     const sel = document.getElementById('pd-profile'); sel.innerHTML = store.profiles.map(pr => `<option value="${esc(pr.id)}">${esc(pr.name)}</option>`).join(''); sel.value = store.activeProfileId;
     document.getElementById('pd-orientation').value = p.orientation; document.getElementById('pd-scale').value = p.pageScale || 100; document.getElementById('pd-snap').checked = !!p.snap; document.getElementById('pd-grid').checked = !!p.grid;
     const page = document.getElementById('pd-page'); applyPage(); page.innerHTML = '';
-    baseBoxes().forEach(b => page.appendChild(makeObject({ ...b, ...(p.transforms[b.id] || {}) })));
+    const boxes = baseBoxes();
+    const minPageH = p.orientation === 'landscape' ? 210 : 297;
+    page.style.minHeight = Math.ceil(boxes.reduce((max, b) => Math.max(max, (b.y || 0) + (b.h || 0) + 12), minPageH)) + 'mm';
+    boxes.forEach(b => page.appendChild(makeObject({ ...b, ...(p.transforms[b.id] || {}) })));
     state.selectedId = null; syncPanel();
   }
 
@@ -118,7 +292,7 @@
   function updateSelectedFromPanel() { const el = selected(); if (!el) return; setBox(el, { x:+document.getElementById('pd-x').value||0, y:+document.getElementById('pd-y').value||0, w:+document.getElementById('pd-w').value||20, h:+document.getElementById('pd-h').value||10, r:+document.getElementById('pd-r').value||0, z:+document.getElementById('pd-z').value||1 }); saveSelected(); }
 
   function printPdf() { saveSelected(); const p = activeProfile(); let st = document.getElementById('pd-print-size'); if (st) st.remove(); st = document.createElement('style'); st.id = 'pd-print-size'; st.textContent = `@media print{@page{size:A4 ${p.orientation === 'landscape' ? 'landscape' : 'portrait'};margin:0}}`; document.head.appendChild(st); document.body.classList.add('print-designer-printing'); window.print(); setTimeout(() => document.body.classList.remove('print-designer-printing'), 600); }
-  function open(mode) { shell(); state.data = window.StorageHandler && StorageHandler.load ? StorageHandler.load() : {}; state.profiles = loadProfiles(); state.mode = mode === 'resume' || mode === 'portfolio' ? mode : (state.data.layout || 'portfolio'); activeProfile(); document.getElementById('print-designer-root').classList.remove('hidden'); document.body.classList.add('print-designer-open'); render(); }
+  function open(mode) { shell(); state.data = resolvePrintData(); state.profiles = loadProfiles(); state.mode = mode === 'resume' || mode === 'portfolio' ? mode : (state.data.layout || 'portfolio'); activeProfile(); document.getElementById('print-designer-root').classList.remove('hidden'); document.body.classList.add('print-designer-open'); render(); }
   function close() { saveSelected(); const root = document.getElementById('print-designer-root'); if (root) root.classList.add('hidden'); document.body.classList.remove('print-designer-open'); }
 
   function installExportButton() {

@@ -3824,3 +3824,73 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
     border-color: rgba(125, 211, 252, .42) !important;
     opacity: 1 !important;
 }
+
+/* Codex V33 print safety: print must not depend on scrollytelling scroll/expanded state. */
+@media print {
+  body.layout-portfolio .scrollytelling-wrapper,
+  body.print-portrait.layout-portfolio .scrollytelling-wrapper,
+  body.print-landscape.layout-portfolio .scrollytelling-wrapper {
+    height: auto !important;
+    min-height: 0 !important;
+    margin-bottom: 8mm !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio .cinematic-image-wrapper,
+  body.layout-portfolio .cinematic-image-wrapper.cinematic-collapsed,
+  body.layout-portfolio .cinematic-image-wrapper.cinematic-expanded,
+  body.layout-portfolio .cinematic-image-inner,
+  body.print-portrait.layout-portfolio .cinematic-image-wrapper,
+  body.print-landscape.layout-portfolio .cinematic-image-wrapper {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track,
+  body.print-portrait.layout-portfolio .scrollytelling-track,
+  body.print-landscape.layout-portfolio .scrollytelling-track {
+    display: grid !important;
+    transform: none !important;
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    grid-template-columns: repeat(var(--print-fit-cols, 3), minmax(0, 1fr)) !important;
+    gap: var(--print-fit-gap, 3mm) !important;
+  }
+
+  body.layout-portfolio .scrolly-spacer {
+    display: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track img,
+  body.layout-portfolio .scrolly-full-image,
+  body.print-portrait.layout-portfolio .scrollytelling-track img,
+  body.print-landscape.layout-portfolio .scrollytelling-track img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: var(--print-fit-img-h, 28mm) !important;
+    max-height: var(--print-fit-img-h, 28mm) !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  body.print-landscape.layout-portfolio .scrollytelling-track {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  body.print-landscape.layout-portfolio .scrollytelling-track img,
+  body.print-landscape.layout-portfolio .scrolly-full-image {
+    height: 24mm !important;
+    max-height: 24mm !important;
+  }
+}

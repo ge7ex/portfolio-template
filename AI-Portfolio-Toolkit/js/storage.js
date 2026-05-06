@@ -174,18 +174,29 @@ const StorageHandler = {
             '#btn-export-docx',
             '#btn-export-pdf-landscape',
             '[onclick="handleExportDOCX()"]',
-            '[onclick="handlePrint(\'landscape\')"]',
-            '[onclick="handlePrint(\"landscape\")"]'
+            '[onclick="handlePrint(\'landscape\')"]'
         ];
         selectors.forEach(selector => {
-            document.querySelectorAll(selector).forEach(btn => {
-                btn.classList.add('hidden');
-                btn.style.display = 'none';
-                btn.disabled = true;
-                btn.setAttribute('aria-hidden', 'true');
-                btn.tabIndex = -1;
-            });
+            try {
+                document.querySelectorAll(selector).forEach(disableLegacyButton);
+            } catch (err) {
+                console.warn('Skipped invalid legacy print selector:', selector, err);
+            }
         });
+        document.querySelectorAll('button[onclick]').forEach(btn => {
+            const action = btn.getAttribute('onclick') || '';
+            if (action.includes('handlePrint') && action.includes('landscape')) {
+                disableLegacyButton(btn);
+            }
+        });
+    }
+
+    function disableLegacyButton(btn) {
+        btn.classList.add('hidden');
+        btn.style.display = 'none';
+        btn.disabled = true;
+        btn.setAttribute('aria-hidden', 'true');
+        btn.tabIndex = -1;
     }
 
     function addStudioButtons() {
@@ -221,17 +232,16 @@ const StorageHandler = {
             return;
         }
         const script = document.createElement('script');
-        script.src = 'js/components/PrintDesigner.js?v=33';
+        script.src = 'js/components/PrintDesigner.js?v=33-data3';
         script.defer = true;
         script.dataset.printDesignerV33 = 'true';
         script.onload = () => {
-        addStudioButtons();
-
             const hotfix = document.createElement('script');
-                  hotfix.src = 'js/components/PrintDesignerHotfix.js?v=33h1';
-                  hotfix.defer = true;
-                  document.body.appendChild(hotfix);
-                };
+            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=33-data3';
+            hotfix.defer = true;
+            document.body.appendChild(hotfix);
+            addStudioButtons();
+        };
         script.onerror = () => console.warn('PrintDesigner.js failed to load.');
         document.body.appendChild(script);
     }

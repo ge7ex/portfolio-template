@@ -1052,6 +1052,7 @@
                     images: []
                 }]
             } : data;
+            if (typeof window !== 'undefined') window.__AI_PORTFOLIO_ACTIVE_DATA = JSON.parse(JSON.stringify(displayData));
 
             if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) { document.body.classList.add('is-downloaded'); }
 
@@ -1685,6 +1686,21 @@
             const modal = document.getElementById("edit-modal");
             const wasOpen = modal && !modal.classList.contains("hidden");
             if (wasOpen) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+            document.querySelectorAll('.cinematic-image-wrapper').forEach(el => {
+                el.classList.remove('cinematic-collapsed');
+                el.classList.add('cinematic-expanded');
+                el.style.maxHeight = 'none';
+                el.style.overflow = 'visible';
+            });
+            document.querySelectorAll('.cinematic-image-inner').forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+                el.style.overflow = 'visible';
+            });
+            document.querySelectorAll('.scrollytelling-track').forEach(track => {
+                track.style.transform = 'none';
+                track.removeAttribute('data-max-translate');
+            });
 
             const oldPrintStyle = document.getElementById('dynamic-print-page-size');
             if (oldPrintStyle) oldPrintStyle.remove();
