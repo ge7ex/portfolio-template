@@ -1281,6 +1281,8 @@ body.theme-minimal{--resume-accent:#334155;--resume-accent-2:#94a3b8;--resume-si
 body.theme-eco{--resume-accent:#0d9488;--resume-accent-2:#2dd4bf;--resume-sidebar-1:#0f766e;--resume-sidebar-2:#115e59;--resume-sidebar-3:#0f172a}
 body.theme-bold{--resume-accent:#e11d48;--resume-accent-2:#fb7185;--resume-sidebar-1:#be123c;--resume-sidebar-2:#7f1d1d;--resume-sidebar-3:#111827}
 body.theme-luxury{--resume-accent:#b45309;--resume-accent-2:#fbbf24;--resume-sidebar-1:#92400e;--resume-sidebar-2:#312e81;--resume-sidebar-3:#111827}
+body.theme-health{--resume-accent:#22d3ee;--resume-accent-2:#10b981;--resume-sidebar-1:#0e7490;--resume-sidebar-2:#047857;--resume-sidebar-3:#062b33}
+body.theme-esports{--resume-accent:#8b5cf6;--resume-accent-2:#22d3ee;--resume-sidebar-1:#6d28d9;--resume-sidebar-2:#0e7490;--resume-sidebar-3:#160b35}
 body.layout-resume .resume-cv-sidebar{background:linear-gradient(165deg,var(--resume-sidebar-1) 0%,var(--resume-sidebar-2) 42%,var(--resume-sidebar-3) 100%)!important}
 body.layout-resume .resume-cv-main h3,body.layout-resume .section-title{color:var(--resume-accent)!important;border-bottom-color:var(--resume-accent)!important}
 body.layout-resume .resume-cv-main .resume-card{border-left-color:var(--resume-accent)!important}
@@ -1629,6 +1631,8 @@ body.theme-minimal{--print-bg-1:#111827;--print-bg-2:#000000;--print-accent:#334
 body.theme-eco{--print-bg-1:#115e59;--print-bg-2:#042f2e;--print-accent:#0d9488;--print-accent-2:#2dd4bf}
 body.theme-bold{--print-bg-1:#7f1d1d;--print-bg-2:#450a0a;--print-accent:#e11d48;--print-accent-2:#fb7185}
 body.theme-luxury{--print-bg-1:#312e81;--print-bg-2:#111827;--print-accent:#b45309;--print-accent-2:#fbbf24}
+body.theme-health{--print-bg-1:#062b33;--print-bg-2:#042f2e;--print-accent:#22d3ee;--print-accent-2:#10b981}
+body.theme-esports{--print-bg-1:#160b35;--print-bg-2:#020617;--print-accent:#8b5cf6;--print-accent-2:#22d3ee}
 
 @media print {
   html, body {
@@ -3823,4 +3827,74 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
     background: rgba(37, 99, 235, .30) !important;
     border-color: rgba(125, 211, 252, .42) !important;
     opacity: 1 !important;
+}
+
+/* Codex V33 print safety: print must not depend on scrollytelling scroll/expanded state. */
+@media print {
+  body.layout-portfolio .scrollytelling-wrapper,
+  body.print-portrait.layout-portfolio .scrollytelling-wrapper,
+  body.print-landscape.layout-portfolio .scrollytelling-wrapper {
+    height: auto !important;
+    min-height: 0 !important;
+    margin-bottom: 8mm !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio .cinematic-image-wrapper,
+  body.layout-portfolio .cinematic-image-wrapper.cinematic-collapsed,
+  body.layout-portfolio .cinematic-image-wrapper.cinematic-expanded,
+  body.layout-portfolio .cinematic-image-inner,
+  body.print-portrait.layout-portfolio .cinematic-image-wrapper,
+  body.print-landscape.layout-portfolio .cinematic-image-wrapper {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track,
+  body.print-portrait.layout-portfolio .scrollytelling-track,
+  body.print-landscape.layout-portfolio .scrollytelling-track {
+    display: grid !important;
+    transform: none !important;
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    grid-template-columns: repeat(var(--print-fit-cols, 3), minmax(0, 1fr)) !important;
+    gap: var(--print-fit-gap, 3mm) !important;
+  }
+
+  body.layout-portfolio .scrolly-spacer {
+    display: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track img,
+  body.layout-portfolio .scrolly-full-image,
+  body.print-portrait.layout-portfolio .scrollytelling-track img,
+  body.print-landscape.layout-portfolio .scrollytelling-track img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: var(--print-fit-img-h, 28mm) !important;
+    max-height: var(--print-fit-img-h, 28mm) !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  body.print-landscape.layout-portfolio .scrollytelling-track {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  body.print-landscape.layout-portfolio .scrollytelling-track img,
+  body.print-landscape.layout-portfolio .scrolly-full-image {
+    height: 24mm !important;
+    max-height: 24mm !important;
+  }
 }

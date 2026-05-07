@@ -164,3 +164,92 @@ const StorageHandler = {
         return hasStoredCache ? { ...defaultData, _hasStoredCache: true } : { ...defaultData, ...firstRunDemoData, _hasStoredCache: false };
     }
 };
+
+// V35 bootstrap: load PDF Layout Studio without mutating portfolio/resume data.
+(function () {
+    'use strict';
+
+    function hideLegacyPrintButtons() {
+        const selectors = [
+            '#btn-export-docx',
+            '#btn-export-pdf-landscape',
+            '[onclick="handleExportDOCX()"]',
+            '[onclick="handlePrint(\'landscape\')"]'
+        ];
+        selectors.forEach(selector => {
+            try {
+                document.querySelectorAll(selector).forEach(disableLegacyButton);
+            } catch (err) {
+                console.warn('Skipped invalid legacy print selector:', selector, err);
+            }
+        });
+        document.querySelectorAll('button[onclick]').forEach(btn => {
+            const action = btn.getAttribute('onclick') || '';
+            if (action.includes('handlePrint') && action.includes('landscape')) {
+                disableLegacyButton(btn);
+            }
+        });
+    }
+
+    function disableLegacyButton(btn) {
+        btn.classList.add('hidden');
+        btn.style.display = 'none';
+        btn.disabled = true;
+        btn.setAttribute('aria-hidden', 'true');
+        btn.tabIndex = -1;
+    }
+
+    function addStudioButtons() {
+        hideLegacyPrintButtons();
+        const publicBranch = document.getElementById('public-export-branch');
+        if (publicBranch && !document.getElementById('btn-print-designer-studio')) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.id = 'btn-print-designer-studio';
+            btn.title = 'PDF Layout Studio';
+            btn.innerHTML = '<i data-lucide="layout-template" class="w-4 h-4"></i><span>Studio</span>';
+            btn.onclick = () => window.PrintDesigner && window.PrintDesigner.open ? window.PrintDesigner.open() : alert('Print Designer is not ready.');
+            publicBranch.appendChild(btn);
+        }
+
+        const exportPanel = document.getElementById('export-panel');
+        if (exportPanel && !document.getElementById('btn-print-designer-panel')) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.id = 'btn-print-designer-panel';
+            btn.className = 'bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all';
+            btn.innerHTML = '<i data-lucide="layout-template" class="w-5 h-5"></i> PDF Layout Studio';
+            btn.onclick = () => window.PrintDesigner && window.PrintDesigner.open ? window.PrintDesigner.open() : alert('Print Designer is not ready.');
+            exportPanel.appendChild(btn);
+        }
+
+        if (window.lucide && lucide.createIcons) lucide.createIcons();
+    }
+
+    function loadPrintDesignerScript() {
+        if (window.PrintDesigner || document.querySelector('script[data-print-designer-v33]')) {
+            addStudioButtons();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'js/components/PrintDesigner.js?v=35-theme-imagefit';
+        script.defer = true;
+        script.dataset.printDesignerV33 = 'true';
+        script.onload = () => {
+            const hotfix = document.createElement('script');
+            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=35-theme-imagefit';
+            hotfix.defer = true;
+            document.body.appendChild(hotfix);
+            addStudioButtons();
+        };
+        script.onerror = () => console.warn('PrintDesigner.js failed to load.');
+        document.body.appendChild(script);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadPrintDesignerScript);
+    } else {
+        loadPrintDesignerScript();
+    }
+    setTimeout(addStudioButtons, 1200);
+})();
