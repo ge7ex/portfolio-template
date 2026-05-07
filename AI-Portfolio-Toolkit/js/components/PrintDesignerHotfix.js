@@ -1,5 +1,5 @@
 // js/components/PrintDesignerHotfix.js
-// V33 hotfix: make PDF Layout Studio prefer the currently rendered page data.
+// V39 hotfix: active data resolver + responsive/mobile QA + print pagination guard.
 (function () {
   'use strict';
 
@@ -154,10 +154,155 @@
     return true;
   }
 
+  function ensureViewportMeta() {
+    let meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'viewport';
+      document.head.prepend(meta);
+    }
+    meta.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
+  }
+
+  function injectResponsiveAndPaginationCss() {
+    if (document.getElementById('v39-responsive-pagination-hotfix')) return;
+    const style = document.createElement('style');
+    style.id = 'v39-responsive-pagination-hotfix';
+    style.textContent = `
+      /* V39 Responsive QA: mobile/tablet shell, editor modal, studio, and print pagination guard. */
+      html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+      img, video, canvas, svg { max-width: 100%; height: auto; }
+      #app { overflow-wrap: anywhere; }
+
+      @media (max-width: 1023px) {
+        body { overflow-x: hidden; }
+        nav {
+          left: max(10px, env(safe-area-inset-left)) !important;
+          right: max(10px, env(safe-area-inset-right)) !important;
+          top: max(10px, env(safe-area-inset-top)) !important;
+          transform: none !important;
+          width: auto !important;
+          max-width: calc(100vw - 20px) !important;
+          overflow-x: auto !important;
+          overflow-y: hidden !important;
+          justify-content: flex-start !important;
+          gap: .5rem !important;
+          padding: .45rem !important;
+          border-radius: 1.25rem !important;
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        nav::-webkit-scrollbar { display: none !important; }
+        nav button { flex: 0 0 auto !important; min-width: 44px !important; min-height: 44px !important; }
+        #app.container { width: 100% !important; max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; padding-top: 6.5rem !important; }
+        #theme-panel {
+          position: fixed !important;
+          left: max(12px, env(safe-area-inset-left)) !important;
+          right: max(12px, env(safe-area-inset-right)) !important;
+          top: 76px !important;
+          width: auto !important;
+          max-height: calc(100dvh - 92px) !important;
+          overflow-y: auto !important;
+        }
+        #public-export-branch {
+          position: fixed !important;
+          right: max(12px, env(safe-area-inset-right)) !important;
+          bottom: max(12px, env(safe-area-inset-bottom)) !important;
+          z-index: 70 !important;
+        }
+        #edit-modal { padding: .75rem !important; align-items: stretch !important; }
+        #edit-modal > div {
+          width: 100% !important;
+          max-width: 100% !important;
+          max-height: calc(100dvh - 1.5rem) !important;
+          border-radius: 1.25rem !important;
+        }
+        #edit-modal .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+        #edit-modal .p-8 { padding: 1rem !important; }
+        #edit-modal .gap-8 { gap: .75rem !important; }
+        #edit-modal [id^="tab-"] { flex: 0 0 auto !important; white-space: nowrap !important; }
+        #edit-modal .border-b.bg-\[\#0f172a\], #edit-modal .flex.px-8.pt-4 {
+          overflow-x: auto !important;
+          scrollbar-width: none !important;
+        }
+        #edit-modal .border-b.bg-\[\#0f172a\]::-webkit-scrollbar, #edit-modal .flex.px-8.pt-4::-webkit-scrollbar { display:none!important; }
+        #edit-modal .grid { min-width: 0 !important; }
+        #edit-modal input, #edit-modal textarea, #edit-modal select { font-size: 16px !important; min-width: 0 !important; }
+      }
+
+      @media (max-width: 640px) {
+        nav .px-4 { padding-left: .8rem !important; padding-right: .8rem !important; }
+        nav button[onclick="toggleModal()"] span { display: none !important; }
+        .portfolio-hero { border-radius: 1.5rem !important; }
+        .hero-title { font-size: clamp(2.25rem, 14vw, 4rem) !important; line-height: .95 !important; }
+        .hero-frame { width: min(88vw, 300px) !important; padding: 10px !important; }
+        .unified-card { border-radius: 1.5rem !important; }
+        .scrollytelling-track img { width: 82vw !important; max-width: 82vw !important; height: 220px !important; }
+        .resume-cv-shell { grid-template-columns: 1fr !important; border-radius: 1.5rem !important; }
+        .resume-cv-sidebar, .resume-cv-main { padding: 1.25rem !important; }
+      }
+
+      @media (max-width: 900px) {
+        .print-designer-root .pd-body { grid-template-columns: 1fr !important; }
+        .print-designer-root .pd-sidebar {
+          max-height: 38dvh !important;
+          border-right: 0 !important;
+          border-bottom: 1px solid rgba(148,163,184,.25) !important;
+        }
+        .print-designer-root .pd-workspace { padding: 12px !important; }
+        .print-designer-root .pd-stage { justify-content: flex-start !important; padding: 12px !important; }
+        .print-designer-root .pd-page { transform-origin: top left !important; }
+        .print-designer-root .pd-topbar { height: auto !important; min-height: 68px !important; align-items: flex-start !important; }
+        .print-designer-root .pd-top-actions { overflow-x: auto !important; flex-wrap: nowrap !important; max-width: 100% !important; }
+        .print-designer-root .pd-top-actions button { flex: 0 0 auto !important; }
+      }
+
+      @media print {
+        /* V39 pagination rule: keep headings with their first content block and avoid orphaned project cards. */
+        h1, h2, h3, h4, h5, .pd-section-heading, .resume-cv-main h3, .resume-cv-sidebar h3 {
+          break-after: avoid-page !important;
+          page-break-after: avoid !important;
+          orphans: 3 !important;
+          widows: 3 !important;
+        }
+        p, li, .pd-project-desc, .pd-project-list {
+          orphans: 3 !important;
+          widows: 3 !important;
+        }
+        .resume-card, .print-exp-item, .unified-card, .print-order-extra, .pd-project, .pd-image, .pd-object-content {
+          break-inside: avoid-page !important;
+          page-break-inside: avoid !important;
+        }
+        .experience-section, .resume-cv-main, .resume-cv-sidebar, .print-layout-wrapper {
+          break-inside: auto !important;
+          page-break-inside: auto !important;
+        }
+        .cinematic-image-wrapper, .cinematic-image-inner, .scrollytelling-wrapper, .scrollytelling-track {
+          max-height: none !important;
+          overflow: visible !important;
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function installV39() {
+    ensureViewportMeta();
+    injectResponsiveAndPaginationCss();
+  }
+
   if (!installPatch()) {
     const timer = setInterval(() => {
       if (installPatch()) clearInterval(timer);
     }, 300);
     setTimeout(() => clearInterval(timer), 8000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installV39, { once: true });
+  } else {
+    installV39();
   }
 })();
