@@ -49,7 +49,7 @@
         if (value && typeof value === 'object' && (value.name_th || value.name_en || value.bio_th || value.bio_en || value.exp)) {
           return clone(value);
         }
-      } catch (_) {}
+      } catch (_) { }
     }
     return null;
   }
@@ -298,6 +298,262 @@
       if (installPatch()) clearInterval(timer);
     }, 300);
     setTimeout(() => clearInterval(timer), 8000);
+  }
+
+  // =========================
+  // V39 RESPONSIVE + PAGINATION QA
+  // =========================
+
+  function ensureViewportMeta() {
+    let meta = document.querySelector('meta[name="viewport"]');
+
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'viewport';
+      document.head.prepend(meta);
+    }
+
+    meta.setAttribute(
+      'content',
+      'width=device-width, initial-scale=1, viewport-fit=cover'
+    );
+  }
+
+  function injectV39Css() {
+    if (document.getElementById('v39-responsive-hotfix')) return;
+
+    const style = document.createElement('style');
+    style.id = 'v39-responsive-hotfix';
+
+    style.textContent = `
+      /* =========================
+         V39 Responsive QA
+      ========================== */
+
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+
+      img,
+      video,
+      canvas,
+      svg {
+        max-width: 100%;
+        height: auto;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+
+      #app {
+        overflow-wrap: anywhere;
+      }
+
+      /* =========================
+         Tablet / Mobile Nav
+      ========================== */
+
+      @media (max-width: 1023px) {
+
+        nav {
+          left: 10px !important;
+          right: 10px !important;
+          top: 10px !important;
+
+          width: auto !important;
+          max-width: calc(100vw - 20px);
+
+          overflow-x: auto !important;
+          overflow-y: hidden !important;
+
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+
+          padding: 6px !important;
+          gap: 8px !important;
+
+          justify-content: flex-start !important;
+        }
+
+        nav::-webkit-scrollbar {
+          display: none !important;
+        }
+
+        nav button {
+          flex: 0 0 auto !important;
+          min-width: 44px !important;
+          min-height: 44px !important;
+        }
+
+        #app.container {
+          padding-top: 7rem !important;
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+        }
+
+        #theme-panel {
+          left: 12px !important;
+          right: 12px !important;
+          top: 76px !important;
+
+          width: auto !important;
+
+          max-height: calc(100dvh - 90px);
+          overflow-y: auto !important;
+        }
+
+        #edit-modal {
+          padding: .75rem !important;
+        }
+
+        #edit-modal > div {
+          width: 100% !important;
+          max-width: 100% !important;
+
+          max-height: calc(100dvh - 1.5rem) !important;
+
+          border-radius: 1.25rem !important;
+        }
+
+        #edit-modal input,
+        #edit-modal textarea,
+        #edit-modal select {
+          font-size: 16px !important;
+        }
+
+        .resume-cv-shell {
+          grid-template-columns: 1fr !important;
+        }
+
+        .resume-cv-sidebar,
+        .resume-cv-main {
+          width: 100% !important;
+        }
+      }
+
+      /* =========================
+         Small Mobile
+      ========================== */
+
+      @media (max-width: 640px) {
+
+        nav button[onclick="toggleModal()"] span {
+          display: none !important;
+        }
+
+        .hero-title {
+          font-size: clamp(2.2rem, 14vw, 4rem) !important;
+          line-height: .95 !important;
+        }
+
+        .hero-frame {
+          width: min(88vw, 300px) !important;
+        }
+
+        .unified-card {
+          border-radius: 1.5rem !important;
+        }
+
+        .scrollytelling-track img {
+          width: 82vw !important;
+          max-width: 82vw !important;
+          height: 220px !important;
+        }
+      }
+
+      /* =========================
+         Studio Responsive
+      ========================== */
+
+      @media (max-width: 900px) {
+
+        .print-designer-root .pd-body {
+          grid-template-columns: 1fr !important;
+        }
+
+        .print-designer-root .pd-sidebar {
+          max-height: 38dvh !important;
+
+          border-right: 0 !important;
+          border-bottom: 1px solid rgba(148,163,184,.25) !important;
+        }
+
+        .print-designer-root .pd-stage {
+          justify-content: flex-start !important;
+          padding: 12px !important;
+        }
+
+        .print-designer-root .pd-top-actions {
+          overflow-x: auto !important;
+          flex-wrap: nowrap !important;
+        }
+
+        .print-designer-root .pd-top-actions button {
+          flex: 0 0 auto !important;
+        }
+      }
+
+      /* =========================
+         PRINT PAGINATION RULES
+      ========================== */
+
+      @media print {
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        .pd-section-heading {
+          break-after: avoid-page !important;
+          page-break-after: avoid !important;
+
+          orphans: 3 !important;
+          widows: 3 !important;
+        }
+
+        p,
+        li {
+          orphans: 3 !important;
+          widows: 3 !important;
+        }
+
+        .resume-card,
+        .print-exp-item,
+        .unified-card,
+        .pd-project,
+        .pd-image {
+          break-inside: avoid-page !important;
+          page-break-inside: avoid !important;
+        }
+
+        .cinematic-image-wrapper,
+        .cinematic-image-inner,
+        .scrollytelling-wrapper,
+        .scrollytelling-track {
+          max-height: none !important;
+          overflow: visible !important;
+
+          opacity: 1 !important;
+          transform: none !important;
+        }
+
+        .studio-grid,
+        .studio-guide,
+        .studio-overlay {
+          display: none !important;
+        }
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function installV39() {
+    ensureViewportMeta();
+    injectV39Css();
   }
 
   if (document.readyState === 'loading') {
