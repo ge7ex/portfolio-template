@@ -4264,3 +4264,113 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
     display: none !important;
   }
 }
+
+
+/* ================================
+   V41 Mobile Vertical Scrollytelling + Studio Restore Guard
+   - Mobile/tablet keeps vertical swipe flow, not horizontal image gallery.
+   - Desktop scrollytelling remains unchanged.
+   - Studio print remains V38 stable + active-data hotfix via storage.js.
+================================ */
+@media (max-width: 1023px) {
+  body.layout-portfolio .scrollytelling-wrapper,
+  body.layout-portfolio .experience-rows > .print-first-exp {
+    height: auto !important;
+    min-height: 0 !important;
+    margin-bottom: clamp(28px, 8vw, 54px) !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio .scrollytelling-wrapper .sticky,
+  body.layout-portfolio .experience-rows > .print-first-exp > .sticky,
+  body.layout-portfolio .sticky {
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    top: auto !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  body.layout-portfolio .scrolly-spacer {
+    display: none !important;
+  }
+
+  body.layout-portfolio .cinematic-image-wrapper,
+  body.layout-portfolio .cinematic-image-inner {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track,
+  body.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: clamp(14px, 4vw, 22px) !important;
+    margin: clamp(16px, 4vw, 24px) 0 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    scroll-snap-type: none !important;
+    scroll-padding: 0 !important;
+    transform: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track::-webkit-scrollbar,
+  body.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  body.layout-portfolio .scrollytelling-track img,
+  body.layout-portfolio .scrolly-full-image,
+  body.layout-portfolio .experience-rows > .print-first-exp .scrollytelling-track img {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    scroll-snap-align: none !important;
+    transform: none !important;
+    margin: 0 !important;
+    border-radius: clamp(14px, 4vw, 22px) !important;
+    background: rgba(15, 23, 42, .22) !important;
+  }
+
+  body.layout-portfolio .scrollytelling-wrapper .unified-card {
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio .scrollytelling-wrapper .unified-card > div:first-child {
+    padding-top: clamp(18px, 5vw, 32px) !important;
+    padding-bottom: clamp(18px, 5vw, 32px) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body.layout-portfolio .scrollytelling-wrapper .unified-card h4 {
+    font-size: clamp(1.7rem, 8.2vw, 2.45rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  body.layout-portfolio .scrollytelling-wrapper .unified-card h5,
+  body.layout-portfolio .scrollytelling-wrapper .unified-card p,
+  body.layout-portfolio .scrollytelling-wrapper .unified-card li {
+    max-width: 100% !important;
+  }
+}
+/* V41 END
+================================ */

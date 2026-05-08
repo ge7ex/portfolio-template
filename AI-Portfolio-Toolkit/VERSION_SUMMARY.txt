@@ -1,62 +1,29 @@
-AI-Portfolio-Toolkit — Latest local package
-Version: V40 mobile option B patch on top of V39
-Branch target: gpt/portfolio-working
-Main branch: do not modify until QA passes
+VERSION SUMMARY - V41 Mobile Vertical + Studio Restore
 
-Summary
-- V40 keeps the V39 PrintDesigner / portrait PDF / pagination fixes.
-- Mobile option B is added: desktop navbar stays unchanged, but mobile/tablet narrow view collapses the top controls into one branch menu button.
-- Mobile branch menu includes Language, Portfolio, Resume, Theme, PDF, PPTX, and Edit actions.
-- Mobile scrollytelling/experience layout is changed to a touch-friendly horizontal gallery and no longer depends on desktop scroll-height staging.
-- Mobile hero/header spacing is tightened so the top area is less crowded and has less empty vertical space.
-- Print PDF Landscape remains hidden/disabled. Portrait PDF remains the intended path.
+Status:
+- Based on V40 mobile branch button UI.
+- Restores the stable V38 PDF Layout Studio engine because the V39 integrated/no-op hotfix path could make Studio fall back to placeholder data such as 'Your Name'.
+- Keeps the active data hotfix as a separate file so Studio can read the currently rendered portfolio/resume data before opening.
+- Changes mobile/tablet scrollytelling back to vertical swipe flow. Project images no longer become a horizontal left/right gallery on mobile.
+- PDF export remains portrait-only. Landscape PDF UI stays hidden/disabled.
 
-Changed files in this package
+Main runtime files:
 - AI-Portfolio-Toolkit/index.html
-  - Adds #btn-mobile-menu and #mobile-control-panel.
-  - Adds close/toggle/sync helpers for mobile branch controls.
-  - Keeps desktop controls active for PC/laptop.
+  V40 mobile branch button shell and portrait-only print call.
 - AI-Portfolio-Toolkit/css/style.css
-  - Adds V40 Mobile Branch Controls + Responsive Mobile Layout override section at the end.
-  - Hides the wide desktop navbar controls only on narrow mobile screens.
-  - Converts mobile scrollytelling to touch-scroll gallery behavior.
-
-Important inherited V39 files
-- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
-  - Main Studio engine with integrated active-data resolver, production-themed print renderer, image crop/resize, portrait-only PDF, and pagination CSS injection.
-- AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
-  - Compatibility stub only. The previous hotfix logic is integrated into PrintDesigner.js.
+  V40 mobile branch UI + V41 mobile vertical scrollytelling override at the end of the file.
 - AI-Portfolio-Toolkit/js/storage.js
-  - Lazy-loads PrintDesigner.js with V39 cache-busting query.
-- AI-Portfolio-Toolkit/_version_snapshots/PrintDesigner-v39.js
-  - Snapshot of the latest PrintDesigner.js base used by this package.
+  Lazy-loads PrintDesigner.js and then PrintDesignerHotfix.js using V41 cache-busting query strings.
+- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
+  Stable V38 Print Designer engine: PDF Layout Studio, drag/resize/crop, production-themed print renderer.
+- AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
+  V41/V38 active-data hotfix: prevents Studio from opening with demo/placeholder data when real data is already rendered.
 
-Upload / Git usage
-1. Checkout the working branch only:
-   git checkout gpt/portfolio-working
-   git pull origin gpt/portfolio-working
+Version snapshots:
+- AI-Portfolio-Toolkit/_version_snapshots/PrintDesigner-v38-stable-used-by-v41.js
+- AI-Portfolio-Toolkit/_version_snapshots/PrintDesignerHotfix-v41-active-data.js
 
-2. Replace the local AI-Portfolio-Toolkit folder with this package version.
-
-3. Review before commit:
-   git status
-   git diff -- AI-Portfolio-Toolkit/index.html
-   git diff -- AI-Portfolio-Toolkit/css/style.css
-   git diff -- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
-   git diff -- AI-Portfolio-Toolkit/js/storage.js
-
-4. Commit to working branch only:
-   git add AI-Portfolio-Toolkit
-   git commit -m "V40 add mobile branch controls and responsive scrollytelling"
-   git push origin gpt/portfolio-working
-
-QA checklist before merging to main
-- Open on desktop/laptop: top nav should remain unchanged.
-- Open on mobile width: top nav should show one compact menu/branch button.
-- Tap the mobile branch button: Language, Portfolio, Resume, Theme, PDF, PPTX, and Edit should appear.
-- Switch Portfolio/Resume from mobile branch and confirm the active button updates.
-- Open Theme from mobile branch and confirm the existing theme wheel still opens.
-- Scroll experience/projects on mobile and confirm images are touch-scrollable without a large blank scrollytelling gap.
-- Open PDF Layout Studio and confirm real data appears, not placeholder data.
-- Print PDF as A4 portrait.
-- Do not test or expose PDF landscape; landscape PDF is intentionally disabled.
+Files intentionally not included:
+- README_V*.md notes
+- Multiple old version note files
+- Accidental nested upload folders

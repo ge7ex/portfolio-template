@@ -227,16 +227,19 @@ const StorageHandler = {
     }
 
     function loadPrintDesignerScript() {
-        if (window.PrintDesigner || document.querySelector('script[data-print-designer-v39]')) {
+        if (window.PrintDesigner || document.querySelector('script[data-print-designer-v41]')) {
             addStudioButtons();
             return;
         }
         const script = document.createElement('script');
-        script.src = 'js/components/PrintDesigner.js?v=39-integrated-portrait';
+        script.src = 'js/components/PrintDesigner.js?v=41-studio-restore';
         script.defer = true;
-        script.dataset.printDesignerV39 = 'true';
+        script.dataset.printDesignerV41 = 'true';
         script.onload = () => {
-            // V39: active data resolver and pagination guard are integrated in PrintDesigner.js.
+            const hotfix = document.createElement('script');
+            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=41-active-data';
+            hotfix.defer = true;
+            document.body.appendChild(hotfix);
             addStudioButtons();
         };
         script.onerror = () => console.warn('PrintDesigner.js failed to load.');
