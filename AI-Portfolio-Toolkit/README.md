@@ -1,6 +1,6 @@
-# AI Portfolio Toolkit v43
+# AI Portfolio Toolkit v44
 
-## What changed in v43
+## What changed in v44
 
 - Canva AI prompt package now detects the current mode before download.
   - Portfolio mode downloads a Portfolio / Scrollytelling Website prompt.
@@ -21,7 +21,7 @@
 Open `index.html` in a browser. For WEB export, deploy to a web host such as Vercel because browser security blocks full web export from `file://` pages.
 
 
-## v43 hotfix
+## v44 hotfix
 - Rebuilt the cursor grid as a visible overlay above portfolio content but below the navbar.
 - Removed legacy grid injection from render so the center tile cannot get stuck.
 - The grid appears only after mouse movement in Portfolio mode and hides in Resume, print, mobile, and edit modal states.

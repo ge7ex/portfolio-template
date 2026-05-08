@@ -4144,7 +4144,7 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
 /* ==================================
    v39 Cursor-local seamless tilt grid + full A4 resume layout
 ===================================== */
-:root{--project-version:'v43'}
+:root{--project-version:'v44'}
 #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4209,7 +4209,7 @@ body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;obje
    - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
 ===================================== */
 :root{
-  --project-version:'v43';
+  --project-version:'v44';
   --resume-a4-width:210mm;
   --resume-a4-height:297mm;
   --resume-left-col:64mm;
@@ -4571,7 +4571,7 @@ body.layout-resume .resume-cv-main .font-mono{
    v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
    The grid is intentionally above portfolio content but below the fixed nav.
 ===================================== */
-:root{--project-version:'v43'}
+:root{--project-version:'v44'}
 body.layout-portfolio #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4831,5 +4831,29 @@ body:not(.layout-portfolio) #cursor-local-grid{
     min-height: 0 !important;
     position: static !important;
     top: auto !important;
+  }
+}
+
+
+/* ==================================
+   v44 Mobile Scrollytelling Transform Fix
+   Reason: previous mobile CSS used transform: translate3d(0,0,0)!important;
+   that overrides JS inline transform on touch devices. The scroll engine now writes
+   --scrolly-x and CSS applies it with !important, so project images move again.
+===================================== */
+body.layout-portfolio .experience-section .scrollytelling-track,
+body.layout-portfolio .scrollytelling-track {
+  transform: translate3d(var(--scrolly-x, 0px), 0, 0) !important;
+  will-change: transform !important;
+}
+@media (max-width: 1023px) {
+  body.layout-portfolio .experience-section .scrollytelling-track,
+  body.layout-portfolio .scrollytelling-track {
+    transform: translate3d(var(--scrolly-x, 0px), 0, 0) !important;
+    transition: none !important;
+    touch-action: pan-y !important;
+  }
+  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded {
+    max-height: min(49vh, 420px) !important;
   }
 }
