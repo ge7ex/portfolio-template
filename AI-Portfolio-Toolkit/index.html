@@ -106,6 +106,12 @@
             <i data-lucide="printer" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
         </button>
 
+        <button onclick="toggleCanvaBranch()" id="btn-canva-branch"
+            class="canva-icon-button bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative"
+            title="Download Canva AI prompt package">
+            <span class="canva-mark" aria-hidden="true">C</span>
+        </button>
+
         <button onclick="toggleModal()"
             class="bg-emerald-600/90 hover:bg-emerald-500 text-white backdrop-blur-xl border border-emerald-400/30 px-5 h-11 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 group">
             <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
@@ -118,6 +124,14 @@
         <button type="button" onclick="handlePrint('portrait')" title="PDF Portrait"><i data-lucide="file-down" class="w-4 h-4"></i><span>PDF</span></button>
         <button type="button" onclick="handleExportPPTX()" title="Download PPTX"><i data-lucide="file-presentation" class="w-4 h-4"></i><span>PPTX</span></button>
     </div>
+
+    <div id="public-canva-branch" class="hidden public-canva-branch" aria-label="Canva AI export package">
+        <button type="button" onclick="downloadCanvaPackage()" title="Download Canva AI prompt package"><i data-lucide="package-down" class="w-4 h-4"></i><span>Canva AI Pack</span></button>
+        <button type="button" onclick="copyCanvaPrompt('en')" title="Copy English Canva Prompt"><i data-lucide="copy" class="w-4 h-4"></i><span>Copy EN</span></button>
+        <button type="button" onclick="copyCanvaPrompt('th')" title="Copy Thai Canva Prompt"><i data-lucide="copy-check" class="w-4 h-4"></i><span>Copy TH</span></button>
+    </div>
+
+    <div id="canva-copy-toast" class="hidden canva-copy-toast" role="status" aria-live="polite">Canva AI package ready</div>
 
     <div id="theme-panel"
         class="hidden fixed top-20 right-6 z-40 bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-700 rounded-3xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] w-72 origin-top-right transition-all">
@@ -533,11 +547,16 @@
             const btn = document.getElementById('btn-appearance');
             const exportPanel = document.getElementById('public-export-branch');
             const exportBtn = document.getElementById('btn-export-branch');
+            const canvaPanel = document.getElementById('public-canva-branch');
+            const canvaBtn = document.getElementById('btn-canva-branch');
             if (panel && btn && !panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) {
                 panel.classList.add('hidden');
             }
             if (exportPanel && exportBtn && !exportPanel.classList.contains('hidden') && !exportPanel.contains(e.target) && !exportBtn.contains(e.target)) {
                 exportPanel.classList.add('hidden');
+            }
+            if (canvaPanel && canvaBtn && !canvaPanel.classList.contains('hidden') && !canvaPanel.contains(e.target) && !canvaBtn.contains(e.target)) {
+                canvaPanel.classList.add('hidden');
             }
         });
 
@@ -562,7 +581,268 @@
             const panel = document.getElementById('public-export-branch');
             if (!panel) return;
             panel.classList.toggle('hidden');
+            const canvaPanel = document.getElementById('public-canva-branch');
+            if (canvaPanel && !panel.classList.contains('hidden')) canvaPanel.classList.add('hidden');
             if (!panel.classList.contains('hidden')) createPortfolioIcons();
+        }
+
+        function toggleCanvaBranch() {
+            const panel = document.getElementById('public-canva-branch');
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+            const exportPanel = document.getElementById('public-export-branch');
+            if (exportPanel && !panel.classList.contains('hidden')) exportPanel.classList.add('hidden');
+            if (!panel.classList.contains('hidden')) createPortfolioIcons();
+        }
+
+        function safeCanvaText(value) {
+            return String(value || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim();
+        }
+
+        function pickLang(data, key, lang = 'en') {
+            if (lang === 'th') return safeCanvaText(data[`${key}_th`] || data[`${key}_en`] || data[key] || '');
+            return safeCanvaText(data[`${key}_en`] || data[`${key}_th`] || data[key] || '');
+        }
+
+        function getCanvaTimestamp() {
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        }
+
+        function getThemeDescription(style, mode, lang = 'en') {
+            const map = {
+                tech: { en: 'Tech/startup look with blue-cyan glow, dark premium background, glass cards, clean futuristic spacing.', th: 'ธีมเทคโนโลยี/สตาร์ทอัพ โทนฟ้า-ไซแอน มีแสง glow พื้นหลังเข้มแบบพรีเมียม การ์ดแก้ว และระยะหายใจแบบอนาคต' },
+                educ: { en: 'Education/professional academic style with emerald accents, calm hierarchy, trustworthy spacing.', th: 'ธีมการศึกษา/วิชาการ โทนเขียวมรกต ดูน่าเชื่อถือ ลำดับชั้นอ่านง่าย และระยะจัดวางสุภาพ' },
+                gov: { en: 'Government/formal style with amber accents, restrained contrast, official and credible feeling.', th: 'ธีมราชการ/ทางการ โทนทองอำพัน คอนทราสต์พอดี สุภาพ เป็นทางการ และน่าเชื่อถือ' },
+                creative: { en: 'Creative style with fuchsia-purple gradients, expressive rounded shapes, energetic portfolio feeling.', th: 'ธีมครีเอทีฟ โทนม่วง-ฟูเชีย ใช้ gradient และรูปทรงโค้งมน มีพลังและดูทันสมัย' },
+                minimal: { en: 'Minimal editorial style with monochrome contrast, clean grid, strong typography, no visual clutter.', th: 'ธีมมินิมอลแบบ editorial ใช้คอนทราสต์ขาวดำ กริดสะอาด ตัวอักษรเด่น และไม่รก' },
+                eco: { en: 'Eco/nature style with teal-green accents, soft organic shapes, premium environmental feeling.', th: 'ธีม eco/nature โทนเขียวทีล รูปทรงออร์แกนิก นุ่มตา และพรีเมียม' },
+                bold: { en: 'Bold high-impact style with rose/red accents, strong titles, confident visual rhythm.', th: 'ธีม bold โทนแดง-โรส หัวข้อหนักแน่น จังหวะภาพมั่นใจและโดดเด่น' },
+                luxury: { en: 'Luxury style with gold accents, deep navy/purple background, elegant serif-like hierarchy.', th: 'ธีม luxury โทนทองกับพื้นน้ำเงิน/ม่วงเข้ม ดูหรู เรียบ และจัดลำดับแบบพรีเมียม' },
+                health: { en: 'Health and wellness style with cyan-emerald accents, fresh clean gradients, friendly trust.', th: 'ธีม health/wellness โทนไซแอน-เขียวมรกต สะอาด สดชื่น เป็นมิตร และน่าเชื่อถือ' },
+                esports: { en: 'Esports style with violet-cyan neon accents, dynamic contrast, bold gamer identity.', th: 'ธีม esports โทนม่วง-ไซแอนนีออน คอนทราสต์จัด ตัวตนเกมเมอร์ชัดเจน' }
+            };
+            const fallback = map.tech;
+            const item = map[style] || fallback;
+            return `${item[lang] || item.en} ${lang === 'th' ? `โหมดสีปัจจุบัน: ${mode || 'dark'}.` : `Current color mode: ${mode || 'dark'}.`}`;
+        }
+
+        function normalizeHighlights(item, lang = 'en') {
+            const primary = lang === 'th'
+                ? (item.highlights_th || item.highlights_en || item.highlights || [])
+                : (item.highlights_en || item.highlights_th || item.highlights || []);
+            if (Array.isArray(primary)) return primary.map(safeCanvaText).filter(Boolean);
+            return String(primary || '').split('\n').map(safeCanvaText).filter(Boolean);
+        }
+
+        function buildExperienceLines(data, lang = 'en') {
+            const exp = Array.isArray(data.exp) ? data.exp : [];
+            if (!exp.length) return lang === 'th' ? '- ไม่มีข้อมูลประสบการณ์ที่บันทึกไว้' : '- No saved experience data.';
+            return exp.map((item, index) => {
+                const title = safeCanvaText(lang === 'th' ? (item.title_th || item.title_en || item.title) : (item.title_en || item.title_th || item.title)) || (lang === 'th' ? `ประสบการณ์ ${index + 1}` : `Experience ${index + 1}`);
+                const company = safeCanvaText(lang === 'th' ? (item.company_th || item.company_en || item.company) : (item.company_en || item.company_th || item.company));
+                const desc = safeCanvaText(lang === 'th' ? (item.desc_th || item.desc_en || item.desc) : (item.desc_en || item.desc_th || item.desc));
+                const present = lang === 'th' ? 'ปัจจุบัน' : 'Present';
+                const period = `${safeCanvaText(item.startMonth)} ${safeCanvaText(item.startYear)} - ${item.isCurrent ? present : `${safeCanvaText(item.endMonth)} ${safeCanvaText(item.endYear)}`.trim()}`.trim();
+                const highlights = normalizeHighlights(item, lang).slice(0, 8).map(h => `  • ${h}`).join('\n');
+                return `- ${title}${company ? (lang === 'th' ? ` | ${company}` : ` at ${company}`) : ''}${period ? ` (${period})` : ''}${desc ? `\n  ${desc}` : ''}${highlights ? `\n${highlights}` : ''}`;
+            }).join('\n');
+        }
+
+        function buildOptionalLines(data, lang = 'en') {
+            const labels = lang === 'th'
+                ? [['education','การศึกษา'], ['certifications','ประกาศนียบัตร'], ['awards','รางวัล'], ['caseStudies','กรณีศึกษา'], ['services','บริการ'], ['testimonials','คำรับรอง'], ['clients','ลูกค้า/หน่วยงาน'], ['cta','CTA'], ['articles','บทความ/สื่อเผยแพร่']]
+                : [['education','Education'], ['certifications','Certifications'], ['awards','Awards'], ['caseStudies','Case studies'], ['services','Services'], ['testimonials','Testimonials'], ['clients','Clients / Partners'], ['cta','CTA'], ['articles','Articles / Publications']];
+            return labels.map(([key, label]) => `${label}: ${pickLang(data, key, lang) || '-'}`).join('\n');
+        }
+
+        function buildCanvaPrompt(data = StorageHandler.load(), lang = 'en') {
+            const isTh = lang === 'th';
+            const name = pickLang(data, 'name', lang) || (isTh ? 'เจ้าของพอร์ตโฟลิโอ' : 'Portfolio Owner');
+            const role = pickLang(data, 'role', lang) || (isTh ? 'ผู้เชี่ยวชาญ' : 'Professional');
+            const bio = pickLang(data, 'bio', lang);
+            const skills = pickLang(data, 'skills', lang);
+            const style = safeCanvaText(data.portfolioStyle || 'tech');
+            const mode = safeCanvaText(data.colorMode || 'dark');
+            const contact = [
+                data.email ? `Email: ${safeCanvaText(data.email)}` : '',
+                data.phone ? `Phone: ${safeCanvaText(data.phone)}` : '',
+                data.linkedin ? `LinkedIn: ${safeCanvaText(data.linkedin)}` : ''
+            ].filter(Boolean).join(' | ');
+
+            if (isTh) {
+                return `สร้างเว็บไซต์พอร์ตโฟลิโอแบบ scrollytelling ใน Canva AI โดยอ้างอิงข้อมูลและธีมต่อไปนี้ให้ครบถ้วน
+
+เป้าหมายงานออกแบบ:
+- สร้างเป็นหน้าเว็บพอร์ตโฟลิโอ ไม่ใช่เรซูเม่ธรรมดา และไม่ใช่ไฟล์สำหรับพิมพ์
+- Hero section ต้องไม่มีปุ่ม Print, ไม่มี Theme selector, ไม่มี Mode selector, และไม่มีปุ่มเปลี่ยนภาษา
+- ให้ทำเป็น public-facing portfolio website ที่ผู้ชมเลื่อนขึ้นลงได้อย่างลื่นไหล
+- ต้องมีความรู้สึกแบบ scrollytelling: เมื่อเลื่อนหน้าเว็บ ให้เนื้อหากับภาพผลงานค่อย ๆ เปิดเผยเป็นลำดับ มี section ของประสบการณ์/โปรเจกต์ที่เล่าเรื่องได้
+- หาก Canva AI ไม่สามารถทำ animation จริงได้ ให้จำลองด้วย long-form landing page ที่มีลำดับ section ชัดเจน, image gallery, timeline, card, และ visual rhythm แบบ scrollytelling
+- ต้องรักษาลักษณะธีม สี อารมณ์ และข้อมูลที่แสดงอยู่ในเว็บต้นฉบับให้ใกล้เคียงที่สุด
+
+Theme to duplicate:
+${getThemeDescription(style, mode, 'th')}
+
+Profile data:
+ชื่อ: ${name}
+บทบาท/ตำแหน่ง: ${role}
+สรุปประวัติ: ${bio || 'สรุปประวัติจากข้อมูลที่มีให้กระชับและเป็นมืออาชีพ'}
+ทักษะ: ${skills || '-'}
+ติดต่อ: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'th')}
+
+Optional sections:
+${buildOptionalLines(data, 'th')}
+
+ข้อกำหนดการออกแบบ:
+- ใช้ภาษาไทยจากข้อมูลนี้เป็นหลัก แต่สามารถใช้หัวข้อภาษาอังกฤษสั้น ๆ ได้ถ้าทำให้ดีไซน์ดูเป็นสากล
+- เน้น hierarchy ชัดเจน อ่านง่าย และดูพรีเมียม
+- Hero ต้องมีชื่อ บทบาท สรุปสั้น และภาพ/visual centerpiece แต่ไม่ต้องมีปุ่มควบคุมระบบของเว็บต้นฉบับ
+- สร้าง section ต่อเนื่อง: About, Skills, Experience/Projects, Optional sections, Contact
+- ทำให้เว็บไซต์เหมาะกับ desktop และ mobile โดยยังให้ผู้ใช้เลื่อนขึ้นลงเป็นหลัก
+- ห้ามเพิ่มข้อมูลที่ไม่มีอยู่จริง ถ้าข้อมูลบางส่วนไม่มี ให้จัด layout ให้สวยโดยไม่แต่งเรื่องเพิ่ม`;
+            }
+
+            return `Create a Canva AI website portfolio that duplicates the current portfolio theme, visual direction, and visible content as completely as possible.
+
+Design goal:
+- Build a public-facing portfolio website, not a printable document and not a generic resume.
+- The hero section must NOT include Print, Theme selector, Mode selector, or Language switch controls.
+- Keep it as a smooth vertical scrolling website.
+- Use a scrollytelling feeling: as visitors scroll, content and project visuals should be revealed in a cinematic sequence. Experience/project sections should feel like story cards with image galleries, timelines, and strong visual rhythm.
+- If Canva AI cannot create real scroll animation, simulate the scrollytelling experience with a long-form landing page, clearly staged sections, timeline blocks, image galleries, and cinematic spacing.
+- Duplicate the original theme mood, color system, spacing, and portfolio identity as closely as Canva allows.
+
+Theme to duplicate:
+${getThemeDescription(style, mode, 'en')}
+
+Profile data:
+Name: ${name}
+Role: ${role}
+Professional summary: ${bio || 'Create a concise professional summary from the available profile data.'}
+Skills: ${skills || '-'}
+Contact: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'en')}
+
+Optional sections:
+${buildOptionalLines(data, 'en')}
+
+Design requirements:
+- Use English text only unless the provided content exists only in Thai.
+- Use a premium modern hierarchy, strong typography, readable spacing, glass/card surfaces when appropriate, and theme-matched accent colors.
+- Hero section should include name, role, short summary, and a visual centerpiece, but no system controls from the original app.
+- Include sections in this order when data exists: About, Skills, Experience/Projects, Optional sections, Contact.
+- Make it responsive for desktop and mobile while keeping vertical scrolling as the main interaction.
+- Do not invent achievements, clients, certifications, or metrics that are not present in the data.`;
+        }
+
+        function buildCanvaInstruction(lang = 'en') {
+            if (lang === 'th') {
+                return `วิธีนำไฟล์ไปใช้กับ Canva AI / Magic Design
+
+1. เปิด Canva แล้วเข้าเมนู Canva AI, Magic Design, หรือช่องสร้างเว็บไซต์ด้วย AI ตามหน้าที่บัญชีของคุณรองรับ
+2. เปิดไฟล์ canva_prompt_th.txt หรือ canva_prompt_en.txt
+3. คัดลอกข้อความ prompt ทั้งหมด แล้ววางลงใน Canva AI
+4. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษก่อน แล้วตามด้วยข้อมูลสำคัญจาก portfolio_data_snapshot.json
+5. หลัง Canva สร้างดีไซน์แล้ว ให้ตรวจสอบชื่อ ตำแหน่ง ประสบการณ์ รูปภาพ และข้อมูลติดต่ออีกครั้งก่อนเผยแพร่
+6. ไฟล์ portfolio_data_snapshot.json คือข้อมูล ณ เวลาที่กดดาวน์โหลด ใช้สำหรับเก็บหลักฐาน/สำรองข้อมูล และใช้คัดลอกข้อมูลเพิ่มเข้า Canva ได้
+
+หมายเหตุ:
+- ชุดไฟล์นี้ไม่ใช้ Canva API และไม่ใช้ Canva SDK จึงไม่มีค่า API
+- Canva AI อาจไม่รองรับ animation แบบ scrollytelling เต็มรูปแบบ ให้ใช้ prompt เพื่อให้ Canva สร้าง layout ที่จำลองประสบการณ์การเลื่อนหน้าเว็บแทน
+- ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
+            }
+            return `How to use these files with Canva AI / Magic Design
+
+1. Open Canva and go to Canva AI, Magic Design, or the AI website creation flow available in your account.
+2. Open canva_prompt_en.txt or canva_prompt_th.txt.
+3. Copy the full prompt and paste it into Canva AI.
+4. If Canva limits prompt length, start with the English prompt first, then add important missing data from portfolio_data_snapshot.json.
+5. After Canva generates the design, carefully review the name, role, experience, images, and contact information before publishing.
+6. portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
+
+Notes:
+- This package does not use Canva API or Canva SDK, so there is no API cost.
+- Canva AI may not support full scrollytelling animation. The prompt asks Canva to simulate the feeling through staged sections, image galleries, and cinematic vertical layout.
+- Review privacy and team sharing settings before pasting sensitive personal data into Canva.`;
+        }
+
+        function buildCanvaDataSnapshot(data = StorageHandler.load()) {
+            const clean = JSON.parse(JSON.stringify(data || {}));
+            delete clean._isFirstRunDemo;
+            delete clean._hasStoredCache;
+            return {
+                exported_at: new Date().toISOString(),
+                export_type: 'canva_ai_prompt_package_no_api_no_sdk',
+                app_note: 'Snapshot of portfolio data at download time. This file is generated locally in the browser.',
+                canva_package_files: [
+                    'canva_prompt_en.txt',
+                    'canva_prompt_th.txt',
+                    'canva_instruction_en.txt',
+                    'canva_instruction_th.txt',
+                    'portfolio_data_snapshot.json'
+                ],
+                data: clean
+            };
+        }
+
+        function downloadTextFile(filename, content, mime = 'text/plain;charset=utf-8') {
+            const blob = new Blob([content], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+
+        function downloadCanvaPackage() {
+            const data = StorageHandler.load();
+            const stamp = getCanvaTimestamp();
+            const prefix = `canva_ai_${stamp}`;
+            downloadTextFile(`${prefix}_prompt_en.txt`, buildCanvaPrompt(data, 'en'));
+            downloadTextFile(`${prefix}_prompt_th.txt`, buildCanvaPrompt(data, 'th'));
+            downloadTextFile(`${prefix}_instruction_en.txt`, buildCanvaInstruction('en'));
+            downloadTextFile(`${prefix}_instruction_th.txt`, buildCanvaInstruction('th'));
+            downloadTextFile(`${prefix}_portfolio_data_snapshot.json`, JSON.stringify(buildCanvaDataSnapshot(data), null, 2), 'application/json;charset=utf-8');
+            showCanvaToast('Canva AI package downloaded');
+        }
+
+        async function copyCanvaPrompt(lang = 'en') {
+            const prompt = buildCanvaPrompt(StorageHandler.load(), lang === 'th' ? 'th' : 'en');
+            try {
+                await navigator.clipboard.writeText(prompt);
+                showCanvaToast(lang === 'th' ? 'Thai Canva prompt copied' : 'English Canva prompt copied');
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = prompt;
+                textarea.setAttribute('readonly', 'readonly');
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showCanvaToast(lang === 'th' ? 'Thai Canva prompt copied' : 'English Canva prompt copied');
+            }
+        }
+
+        function showCanvaToast(message) {
+            const toast = document.getElementById('canva-copy-toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.add('hidden'), 2200);
         }
 
         // v28: robust fallback for the printer/export button.
@@ -575,6 +855,15 @@
                     ev.preventDefault();
                     ev.stopPropagation();
                     toggleExportBranch();
+                }, true);
+            }
+            const canvaBtn = document.getElementById('btn-canva-branch');
+            if (canvaBtn && !canvaBtn.dataset.canvaBound) {
+                canvaBtn.dataset.canvaBound = '1';
+                canvaBtn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    toggleCanvaBranch();
                 }, true);
             }
         });
@@ -1656,7 +1945,7 @@
                         heroFrame.style.setProperty('--profile-scroll-angle', `${Math.round(pageProgress * 720)}deg`);
                         heroFrame.style.setProperty('--profile-scroll-glow', `${0.45 + pageProgress * 0.45}`);
                     }
-                    if (window.innerWidth < 1024) return;
+                    // v31 responsive scrollytelling: keep vertical scroll-driven motion on mobile/tablet too.
                     if (!isTicking) {
                         window.requestAnimationFrame(() => {
                             scrollyWrappers.forEach(wrapper => {

@@ -3028,7 +3028,7 @@ body > nav.fixed {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 28px color-mix(in srgb, var(--theme-accent) 22%, transparent);
 }
 .public-export-branch button:hover { transform: translateY(-2px) scale(1.04); background: color-mix(in srgb, var(--theme-accent) 32%, rgba(15,23,42,.9)); }
-.public-export-branch button span { font-size: 9px; font-weight: 900; letter-spacing: .08em; }
+.public-export-branch button span { font-size: 9.5px; font-weight: 900; letter-spacing: .08em; }
 @keyframes exportBranchIn { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 .theme-mode-branch {
@@ -3823,4 +3823,263 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
     background: rgba(37, 99, 235, .30) !important;
     border-color: rgba(125, 211, 252, .42) !important;
     opacity: 1 !important;
+}
+
+/* ==================================
+   v30 Free Canva AI Package
+   No API / no SDK: downloads EN/TH prompts, instructions, and data snapshot.
+===================================== */
+.canva-icon-button .canva-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 950;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #00c4cc 0%, #7d2ae8 52%, #ff66c4 100%);
+  box-shadow: 0 0 18px rgba(125, 42, 232, .45), inset 0 0 0 1px rgba(255,255,255,.28);
+}
+
+.public-canva-branch.hidden,
+.canva-copy-toast.hidden { display: none !important; }
+
+.public-canva-branch {
+  position: fixed;
+  top: 82px;
+  right: 38px;
+  z-index: 119;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .88);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 50px rgba(0,0,0,.28);
+  transform-origin: top right;
+  animation: exportBranchIn .22s cubic-bezier(.2,.9,.2,1) both;
+  pointer-events: auto !important;
+}
+
+.public-canva-branch button {
+  min-width: 92px;
+  height: 60px;
+  border-radius: 999px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: white;
+  cursor: pointer;
+  pointer-events: auto !important;
+  background: linear-gradient(135deg, rgba(0,196,204,.22), rgba(125,42,232,.22), rgba(255,102,196,.16));
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 10px 28px rgba(125,42,232,.18);
+  transition: transform .2s ease, background .2s ease;
+}
+
+.public-canva-branch button:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: linear-gradient(135deg, rgba(0,196,204,.34), rgba(125,42,232,.34), rgba(255,102,196,.24));
+}
+
+.public-canva-branch button span {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.canva-copy-toast {
+  position: fixed;
+  top: 154px;
+  right: 42px;
+  z-index: 130;
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #00c4cc, #7d2ae8);
+  box-shadow: 0 16px 42px rgba(0,0,0,.28);
+}
+
+@media (max-width: 768px) {
+  .public-canva-branch {
+    left: 12px;
+    right: 12px;
+    top: 138px;
+    border-radius: 26px;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  .public-canva-branch button { min-width: 82px; }
+  .canva-copy-toast { left: 16px; right: 16px; top: 220px; text-align: center; }
+}
+
+@media print {
+  .public-canva-branch,
+  .canva-copy-toast,
+  #btn-canva-branch { display: none !important; }
+}
+
+
+/* ==================================
+   v31 Responsive Scrollytelling
+   Goal: mobile/tablet keeps the same vertical-scroll feeling as desktop.
+   - Do not convert project visuals to horizontal swipe carousel.
+   - Keep sticky story card and drive image track by page scroll.
+   - Compact hero/nav for smaller screens.
+===================================== */
+@media (max-width: 1023px) {
+  body.layout-portfolio #app {
+    padding-left: clamp(12px, 3vw, 28px) !important;
+    padding-right: clamp(12px, 3vw, 28px) !important;
+    padding-top: 5.8rem !important;
+  }
+
+  nav {
+    left: 10px !important;
+    right: 10px !important;
+    top: 10px !important;
+    transform: none !important;
+    width: calc(100vw - 20px) !important;
+    max-width: calc(100vw - 20px) !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    border-radius: 22px !important;
+    padding: 7px !important;
+    gap: 8px !important;
+    scrollbar-width: none !important;
+  }
+  nav::-webkit-scrollbar { display: none !important; }
+  nav button { flex: 0 0 auto !important; }
+  nav button span { white-space: nowrap !important; }
+
+  .portfolio-hero {
+    margin-top: 1rem !important;
+    padding: 2rem 1.15rem !important;
+    border-radius: 28px !important;
+  }
+  .hero-title,
+  .portfolio-hero h1 {
+    font-size: clamp(2.25rem, 11vw, 4.4rem) !important;
+    line-height: 1.05 !important;
+  }
+  .hero-chip { font-size: .66rem !important; padding: .5rem .7rem !important; }
+  .hero-frame { width: min(76vw, 320px) !important; padding: 10px !important; }
+  .hero-floating-card { display: none !important; }
+
+  /* Restore desktop-like scrollytelling behavior on touch devices. */
+  .scrollytelling-wrapper {
+    height: calc((var(--scrolly-images, 3) * 72vh) + 185vh) !important;
+    min-height: 240vh !important;
+    margin-bottom: 16vh !important;
+  }
+  .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio .scrollytelling-wrapper .sticky {
+    position: sticky !important;
+    top: 5.5rem !important;
+    height: auto !important;
+    padding-top: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .layout-portfolio .unified-card {
+    max-width: 100% !important;
+    border-radius: 28px !important;
+  }
+  .layout-portfolio .unified-card > div:first-child {
+    padding: 1.45rem 1.15rem !important;
+  }
+  .layout-portfolio .unified-card h4 {
+    font-size: clamp(1.65rem, 8vw, 3rem) !important;
+    line-height: 1.12 !important;
+    letter-spacing: -0.045em !important;
+  }
+  .layout-portfolio .unified-card h5 {
+    font-size: clamp(1rem, 4.6vw, 1.35rem) !important;
+    margin-bottom: .9rem !important;
+  }
+  .layout-portfolio .unified-card p,
+  .layout-portfolio .unified-card li {
+    font-size: .98rem !important;
+    line-height: 1.65 !important;
+  }
+  .cinematic-image-wrapper {
+    overflow: hidden !important;
+  }
+  .cinematic-image-wrapper.cinematic-expanded {
+    max-height: 54vh !important;
+  }
+  .cinematic-image-wrapper.cinematic-collapsed {
+    max-height: 0 !important;
+  }
+  .cinematic-image-inner {
+    opacity: 0 !important;
+    transform: scale(.97) translateY(16px) !important;
+  }
+  .cinematic-image-wrapper.cinematic-expanded .cinematic-image-inner {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .scrollytelling-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    scrollbar-width: auto !important;
+    padding: 1.25rem .75rem 1.5rem !important;
+    gap: 1rem !important;
+    will-change: transform !important;
+  }
+  .scrollytelling-track::-webkit-scrollbar { display: none !important; }
+  .scrolly-spacer {
+    display: block !important;
+    flex: 0 0 8vw !important;
+    width: 8vw !important;
+  }
+  .scrollytelling-track .scrolly-spacer:last-child {
+    flex-basis: 140vw !important;
+    width: 140vw !important;
+  }
+  .scrollytelling-track img,
+  .scrollytelling-track .scrolly-full-image {
+    scroll-snap-align: none !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: 82vw !important;
+    height: clamp(190px, 33vh, 310px) !important;
+    max-height: 34vh !important;
+    object-fit: contain !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .portfolio-hero { padding: 3rem 2rem !important; }
+  .hero-frame { width: min(42vw, 390px) !important; }
+  .scrollytelling-wrapper {
+    height: calc((var(--scrolly-images, 3) * 78vh) + 210vh) !important;
+    min-height: 270vh !important;
+  }
+  .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio .scrollytelling-wrapper .sticky {
+    top: 6.2rem !important;
+  }
+  .layout-portfolio .unified-card > div:first-child {
+    padding: 2rem 2.25rem !important;
+  }
+  .cinematic-image-wrapper.cinematic-expanded { max-height: 58vh !important; }
+  .scrollytelling-track img,
+  .scrollytelling-track .scrolly-full-image {
+    max-width: 62vw !important;
+    height: clamp(240px, 36vh, 360px) !important;
+    max-height: 38vh !important;
+  }
 }
