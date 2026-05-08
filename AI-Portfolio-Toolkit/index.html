@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
@@ -746,12 +747,19 @@ Design requirements:
             if (lang === 'th') {
                 return `วิธีนำไฟล์ไปใช้กับ Canva AI / Magic Design
 
-1. เปิด Canva แล้วเข้าเมนู Canva AI, Magic Design, หรือช่องสร้างเว็บไซต์ด้วย AI ตามหน้าที่บัญชีของคุณรองรับ
-2. เปิดไฟล์ canva_prompt_th.txt หรือ canva_prompt_en.txt
-3. คัดลอกข้อความ prompt ทั้งหมด แล้ววางลงใน Canva AI
-4. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษก่อน แล้วตามด้วยข้อมูลสำคัญจาก portfolio_data_snapshot.json
-5. หลัง Canva สร้างดีไซน์แล้ว ให้ตรวจสอบชื่อ ตำแหน่ง ประสบการณ์ รูปภาพ และข้อมูลติดต่ออีกครั้งก่อนเผยแพร่
-6. ไฟล์ portfolio_data_snapshot.json คือข้อมูล ณ เวลาที่กดดาวน์โหลด ใช้สำหรับเก็บหลักฐาน/สำรองข้อมูล และใช้คัดลอกข้อมูลเพิ่มเข้า Canva ได้
+ขั้นตอนสำคัญมาก:
+1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
+2. ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Website Code, Code for website, หรือช่องสร้างเว็บด้วย AI ที่รองรับการสร้างหน้าเว็บจากคำสั่ง
+3. ห้ามเริ่มจาก template presentation / poster / document ทั่วไปก่อน เพราะ Canva มักจะไม่ทำ layout ให้เหมือนเว็บ scrollytelling
+4. เปิดไฟล์ canva_prompt_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
+5. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน เพราะ Canva เข้าใจ prompt ภาษาอังกฤษได้แม่นกว่า
+6. หาก Canva จำกัดความยาว prompt ให้เริ่มจาก canva_prompt_en.txt แล้วเติมข้อมูลสำคัญจาก portfolio_data_snapshot.json เฉพาะส่วนที่จำเป็น
+7. หลัง Canva สร้างดีไซน์แล้ว ให้ตรวจสอบชื่อ ตำแหน่ง ประสบการณ์ รูปภาพ และข้อมูลติดต่ออีกครั้งก่อนเผยแพร่
+
+ไฟล์ข้อมูล:
+- portfolio_data_snapshot.json คือข้อมูลทั้งหมด ณ เวลาที่กดดาวน์โหลด ใช้สำรองข้อมูลและคัดลอกข้อมูลเพิ่มเข้า Canva ได้
+- ไฟล์ .json สามารถเปิดด้วย Notepad ได้ โดยคลิกขวา > Open with > Notepad หรือเปิดด้วย VS Code / browser ก็ได้
+- ถ้าเห็นตัวอักษรติดกันเยอะ ให้ใช้ Notepad แบบ Word Wrap หรือเปิดผ่าน VS Code จะอ่านง่ายกว่า
 
 หมายเหตุ:
 - ชุดไฟล์นี้ไม่ใช้ Canva API และไม่ใช้ Canva SDK จึงไม่มีค่า API
@@ -760,12 +768,19 @@ Design requirements:
             }
             return `How to use these files with Canva AI / Magic Design
 
-1. Open Canva and go to Canva AI, Magic Design, or the AI website creation flow available in your account.
-2. Open canva_prompt_en.txt or canva_prompt_th.txt.
-3. Copy the full prompt and paste it into Canva AI.
-4. If Canva limits prompt length, start with the English prompt first, then add important missing data from portfolio_data_snapshot.json.
-5. After Canva generates the design, carefully review the name, role, experience, images, and contact information before publishing.
-6. portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
+Very important steps:
+1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
+2. Choose the Code, Website Code, Code for website, or AI website creation function that can generate a web page from a prompt.
+3. Do not start from a normal presentation / poster / document template, because Canva will usually not recreate the scrollytelling website layout correctly.
+4. Open canva_prompt_en.txt and paste the full prompt into Canva's Code/Website AI function.
+5. canva_prompt_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
+6. If Canva limits prompt length, start with canva_prompt_en.txt, then add only the most important missing details from portfolio_data_snapshot.json.
+7. After Canva generates the design, carefully review the name, role, experience, images, and contact information before publishing.
+
+Data files:
+- portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
+- .json files can be opened with Notepad: right click > Open with > Notepad. You can also open them with VS Code or a browser.
+- If the JSON appears as a long block of text, enable Word Wrap in Notepad or open it in VS Code for easier reading.
 
 Notes:
 - This package does not use Canva API or Canva SDK, so there is no API cost.
@@ -805,16 +820,40 @@ Notes:
             setTimeout(() => URL.revokeObjectURL(url), 1500);
         }
 
-        function downloadCanvaPackage() {
+        async function downloadCanvaPackage() {
             const data = StorageHandler.load();
             const stamp = getCanvaTimestamp();
-            const prefix = `canva_ai_${stamp}`;
-            downloadTextFile(`${prefix}_prompt_en.txt`, buildCanvaPrompt(data, 'en'));
-            downloadTextFile(`${prefix}_prompt_th.txt`, buildCanvaPrompt(data, 'th'));
-            downloadTextFile(`${prefix}_instruction_en.txt`, buildCanvaInstruction('en'));
-            downloadTextFile(`${prefix}_instruction_th.txt`, buildCanvaInstruction('th'));
-            downloadTextFile(`${prefix}_portfolio_data_snapshot.json`, JSON.stringify(buildCanvaDataSnapshot(data), null, 2), 'application/json;charset=utf-8');
-            showCanvaToast('Canva AI package downloaded');
+            const folderName = `canva-ai-pack-${stamp}`;
+            const files = {
+                'canva_prompt_en.txt': buildCanvaPrompt(data, 'en'),
+                'canva_prompt_th.txt': buildCanvaPrompt(data, 'th'),
+                'canva_instruction_en.txt': buildCanvaInstruction('en'),
+                'canva_instruction_th.txt': buildCanvaInstruction('th'),
+                'portfolio_data_snapshot.json': JSON.stringify(buildCanvaDataSnapshot(data), null, 2)
+            };
+
+            if (!window.JSZip) {
+                Object.entries(files).forEach(([filename, content]) => {
+                    downloadTextFile(`${folderName}_${filename}`, content, filename.endsWith('.json') ? 'application/json;charset=utf-8' : 'text/plain;charset=utf-8');
+                });
+                showCanvaToast('JSZip unavailable: files downloaded separately');
+                return;
+            }
+
+            const zip = new JSZip();
+            const packFolder = zip.folder(folderName);
+            Object.entries(files).forEach(([filename, content]) => packFolder.file(filename, content));
+            const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${folderName}.zip`;
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+            showCanvaToast('Canva AI Pack ZIP downloaded');
         }
 
         async function copyCanvaPrompt(lang = 'en') {

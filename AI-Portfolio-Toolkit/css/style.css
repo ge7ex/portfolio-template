@@ -4083,3 +4083,60 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
     max-height: 38vh !important;
   }
 }
+
+
+/* ==================================
+   v32 Mobile spacing fix
+   - Reduce oversized gaps between project cards on phones.
+   - Keep vertical scrollytelling, but shorten the scroll stage.
+===================================== */
+@media (max-width: 767px) {
+  .experience-section .experience-title-wrap { margin-bottom: .75rem !important; }
+  .experience-section .experience-rows { margin-top: .75rem !important; }
+
+  .story-section,
+  .scrollytelling-wrapper {
+    margin-bottom: 2.5rem !important;
+  }
+
+  .scrollytelling-wrapper {
+    height: calc((var(--scrolly-images, 1) * 34vh) + 82vh) !important;
+    min-height: 112vh !important;
+  }
+
+  .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio .scrollytelling-wrapper .sticky {
+    top: 5rem !important;
+  }
+
+  .layout-portfolio .unified-card > div:first-child {
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.25rem !important;
+  }
+
+  .cinematic-image-wrapper.cinematic-expanded {
+    max-height: 48vh !important;
+  }
+
+  .scrollytelling-track {
+    padding-top: .85rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .scrollytelling-track img,
+  .scrollytelling-track .scrolly-full-image {
+    height: clamp(170px, 29vh, 260px) !important;
+    max-height: 30vh !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .story-section,
+  .scrollytelling-wrapper {
+    margin-bottom: 4rem !important;
+  }
+  .scrollytelling-wrapper {
+    height: calc((var(--scrolly-images, 1) * 46vh) + 118vh) !important;
+    min-height: 150vh !important;
+  }
+}
