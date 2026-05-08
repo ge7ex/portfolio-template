@@ -82,14 +82,20 @@
 
     <div id="watermark">Web Portfolio by Kasidech "Ge7ex" Settavanit</div>
 
-    <nav class="fixed top-6 right-6 z-50 flex items-center gap-3">
+    <nav class="fixed top-6 right-6 z-50 flex items-center gap-3" aria-label="Primary portfolio controls">
+        <button type="button" onclick="toggleMobileControls(event)" id="btn-mobile-menu"
+            class="bg-slate-900/85 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-12 h-12 rounded-full shadow-lg transition-all font-bold uppercase text-sm hidden items-center justify-center"
+            aria-expanded="false" aria-controls="mobile-control-panel" title="Menu">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+
         <button onclick="toggleLang()" id="btn-lang"
             class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all font-bold uppercase text-sm flex items-center justify-center">
             EN
         </button>
 
         <div
-            class="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-1 rounded-full flex shadow-lg items-center relative">
+            class="layout-pill-switcher bg-slate-900/80 backdrop-blur-xl border border-white/10 p-1 rounded-full flex shadow-lg items-center relative">
             <button onclick="setDirectLayout('portfolio')" id="btn-pill-portfolio"
                 class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md">Portfolio</button>
             <button onclick="setDirectLayout('resume')" id="btn-pill-resume"
@@ -107,12 +113,28 @@
             <i data-lucide="printer" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
         </button>
 
-        <button onclick="toggleModal()"
+        <button onclick="toggleModal()" id="btn-edit-main"
             class="bg-emerald-600/90 hover:bg-emerald-500 text-white backdrop-blur-xl border border-emerald-400/30 px-5 h-11 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 group">
             <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
             <span class="text-sm">Edit</span>
         </button>
     </nav>
+
+    <div id="mobile-control-panel" class="hidden mobile-control-panel" aria-label="Mobile quick controls">
+        <div class="mobile-control-head">
+            <span>Quick Controls</span>
+            <button type="button" onclick="closeMobileControls()" aria-label="Close mobile menu"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="mobile-control-grid">
+            <button type="button" onclick="toggleLang(); closeMobileControls();" id="mobile-btn-lang" class="mobile-control-button">EN</button>
+            <button type="button" onclick="setDirectLayout('portfolio'); closeMobileControls();" id="mobile-pill-portfolio" class="mobile-control-button">Portfolio</button>
+            <button type="button" onclick="setDirectLayout('resume'); closeMobileControls();" id="mobile-pill-resume" class="mobile-control-button">Resume</button>
+            <button type="button" onclick="toggleThemePanel(); closeMobileControls();" id="mobile-btn-appearance" class="mobile-control-button"><i data-lucide="palette" class="w-4 h-4"></i><span>Theme</span></button>
+            <button type="button" onclick="handlePrint('portrait'); closeMobileControls();" id="mobile-btn-pdf" class="mobile-control-button"><i data-lucide="file-down" class="w-4 h-4"></i><span>PDF</span></button>
+            <button type="button" onclick="handleExportPPTX(); closeMobileControls();" id="mobile-btn-pptx" class="mobile-control-button"><i data-lucide="file-presentation" class="w-4 h-4"></i><span>PPTX</span></button>
+            <button type="button" onclick="toggleModal(); closeMobileControls();" id="mobile-btn-edit" class="mobile-control-button mobile-control-primary"><i data-lucide="settings" class="w-4 h-4"></i><span>Edit</span></button>
+        </div>
+    </div>
 
     <div id="public-export-branch" class="hidden public-export-branch" aria-label="Quick export actions">
         <button type="button" onclick="handleExportWeb()" title="Download WEB"><i data-lucide="download" class="w-4 h-4"></i><span>WEB</span></button>
@@ -579,6 +601,56 @@
                 }, true);
             }
         });
+        function closeMobileControls() {
+            const panel = document.getElementById('mobile-control-panel');
+            const btn = document.getElementById('btn-mobile-menu');
+            if (panel) panel.classList.add('hidden');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleMobileControls(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const panel = document.getElementById('mobile-control-panel');
+            const btn = document.getElementById('btn-mobile-menu');
+            if (!panel) return;
+            const willOpen = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !willOpen);
+            if (btn) btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            if (willOpen) {
+                const exportPanel = document.getElementById('public-export-branch');
+                if (exportPanel) exportPanel.classList.add('hidden');
+                createPortfolioIcons();
+            }
+        }
+
+        function syncMobileControls(data = StorageHandler.load()) {
+            const lang = data.lang || 'th';
+            const layout = data.layout || 'portfolio';
+            const colorMode = data.colorMode || 'dark';
+            const langBtn = document.getElementById('mobile-btn-lang');
+            if (langBtn) langBtn.textContent = lang === 'th' ? 'TH' : 'EN';
+            ['portfolio', 'resume'].forEach(mode => {
+                const btn = document.getElementById(`mobile-pill-${mode}`);
+                if (btn) btn.classList.toggle('is-active', layout === mode);
+            });
+            document.body.dataset.mobileColorMode = colorMode;
+            const mobilePptx = document.getElementById('mobile-btn-pptx');
+            if (mobilePptx) mobilePptx.classList.toggle('hidden', layout === 'resume');
+            const mobileEdit = document.getElementById('mobile-btn-edit');
+            if (mobileEdit) mobileEdit.classList.toggle('hidden', document.body.classList.contains('is-downloaded'));
+        }
+
+        document.addEventListener('click', (event) => {
+            const panel = document.getElementById('mobile-control-panel');
+            const btn = document.getElementById('btn-mobile-menu');
+            if (!panel || panel.classList.contains('hidden')) return;
+            if (panel.contains(event.target) || (btn && btn.contains(event.target))) return;
+            closeMobileControls();
+        }, true);
+
         function setDirectLayout(mode) { const data = StorageHandler.load(); data.layout = mode; StorageHandler.save(data); render(data); }
         function setDirectColorMode(mode) { const data = StorageHandler.load(); data.colorMode = mode; StorageHandler.save(data); render(data); }
         function setDirectTheme(theme, opts = {}) {
@@ -1179,6 +1251,7 @@
             app.innerHTML = appContent;
 
             if (document.getElementById('btn-lang')) document.getElementById('btn-lang').innerText = lang === 'th' ? 'TH' : 'EN';
+            syncMobileControls({ layout, colorMode, lang });
             setTimeout(() => { createPortfolioIcons(); initThemeCarousel(); if (layout === 'portfolio') { initScrollEffects(); initMicroInteractions(); } initQuickEditHotspots(); }, 50);
         }
 

@@ -1,32 +1,35 @@
 AI-Portfolio-Toolkit — Latest local package
-Version: V39 local-safe package
+Version: V40 mobile option B patch on top of V39
 Branch target: gpt/portfolio-working
 Main branch: do not modify until QA passes
 
 Summary
-- V39 integrates the previous PrintDesignerHotfix active-data resolver directly into PrintDesigner.js.
-- PrintDesignerHotfix.js is now a no-op compatibility stub. It can remain in the repo without changing behavior.
-- PDF Layout Studio is locked to A4 portrait. Landscape PDF orientation is no longer exposed in Studio and print is forced to @page A4 portrait.
-- Existing image fit controls remain available for portrait/landscape-shaped images: Crop, Resize/Contain, Fill, horizontal/vertical position, Fit Landscape image, Fit Portrait image.
-- Responsive QA guard is included: viewport meta, mobile/tablet navigation overflow safety, modal sizing, Studio mobile shell, and print pagination rules.
-- Pagination rules keep headings with content, avoid splitting cards/projects/images where possible, and force lazy/scrollytelling images visible during print.
+- V40 keeps the V39 PrintDesigner / portrait PDF / pagination fixes.
+- Mobile option B is added: desktop navbar stays unchanged, but mobile/tablet narrow view collapses the top controls into one branch menu button.
+- Mobile branch menu includes Language, Portfolio, Resume, Theme, PDF, PPTX, and Edit actions.
+- Mobile scrollytelling/experience layout is changed to a touch-friendly horizontal gallery and no longer depends on desktop scroll-height staging.
+- Mobile hero/header spacing is tightened so the top area is less crowded and has less empty vertical space.
+- Print PDF Landscape remains hidden/disabled. Portrait PDF remains the intended path.
 
-Important files
+Changed files in this package
 - AI-Portfolio-Toolkit/index.html
-  - Adds viewport meta for mobile/tablet responsive behavior.
-  - Hides the old Landscape PDF button and forces handlePrint() to A4 portrait.
+  - Adds #btn-mobile-menu and #mobile-control-panel.
+  - Adds close/toggle/sync helpers for mobile branch controls.
+  - Keeps desktop controls active for PC/laptop.
+- AI-Portfolio-Toolkit/css/style.css
+  - Adds V40 Mobile Branch Controls + Responsive Mobile Layout override section at the end.
+  - Hides the wide desktop navbar controls only on narrow mobile screens.
+  - Converts mobile scrollytelling to touch-scroll gallery behavior.
+
+Important inherited V39 files
 - AI-Portfolio-Toolkit/js/components/PrintDesigner.js
-  - Main V39 Studio engine.
-  - Includes integrated active-data resolver, production-themed print renderer, image crop/resize, portrait-only PDF, and V39 responsive/pagination CSS injection.
+  - Main Studio engine with integrated active-data resolver, production-themed print renderer, image crop/resize, portrait-only PDF, and pagination CSS injection.
 - AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
-  - V39 compatibility stub only. The previous hotfix logic is integrated into PrintDesigner.js.
+  - Compatibility stub only. The previous hotfix logic is integrated into PrintDesigner.js.
 - AI-Portfolio-Toolkit/js/storage.js
   - Lazy-loads PrintDesigner.js with V39 cache-busting query.
-  - No longer needs to load PrintDesignerHotfix.js after PrintDesigner.js.
 - AI-Portfolio-Toolkit/_version_snapshots/PrintDesigner-v39.js
-  - Clear version snapshot of the latest PrintDesigner.js.
-- AI-Portfolio-Toolkit/_version_snapshots/PrintDesignerHotfix-v39-stub.js
-  - Clear snapshot of the compatibility stub.
+  - Snapshot of the latest PrintDesigner.js base used by this package.
 
 Upload / Git usage
 1. Checkout the working branch only:
@@ -38,23 +41,22 @@ Upload / Git usage
 3. Review before commit:
    git status
    git diff -- AI-Portfolio-Toolkit/index.html
-   git diff -- AI-Portfolio-Toolkit/js/storage.js
+   git diff -- AI-Portfolio-Toolkit/css/style.css
    git diff -- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
-   git diff -- AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
+   git diff -- AI-Portfolio-Toolkit/js/storage.js
 
 4. Commit to working branch only:
    git add AI-Portfolio-Toolkit
-   git commit -m "V39 integrate print designer hotfix and lock portrait print"
+   git commit -m "V40 add mobile branch controls and responsive scrollytelling"
    git push origin gpt/portfolio-working
 
 QA checklist before merging to main
-- Open portfolio page on desktop.
-- Open portfolio page on mobile width.
-- Open edit modal on mobile width and verify it scrolls without horizontal overflow.
-- Open PDF Layout Studio.
-- Confirm Orientation shows Portrait only.
-- Confirm real profile data appears, not Your Name placeholder.
-- Confirm project/experience text is visible in Studio print.
-- Confirm images are visible even before scrolling the experience section.
+- Open on desktop/laptop: top nav should remain unchanged.
+- Open on mobile width: top nav should show one compact menu/branch button.
+- Tap the mobile branch button: Language, Portfolio, Resume, Theme, PDF, PPTX, and Edit should appear.
+- Switch Portfolio/Resume from mobile branch and confirm the active button updates.
+- Open Theme from mobile branch and confirm the existing theme wheel still opens.
+- Scroll experience/projects on mobile and confirm images are touch-scrollable without a large blank scrollytelling gap.
+- Open PDF Layout Studio and confirm real data appears, not placeholder data.
 - Print PDF as A4 portrait.
 - Do not test or expose PDF landscape; landscape PDF is intentionally disabled.
