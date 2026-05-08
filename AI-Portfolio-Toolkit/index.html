@@ -1564,7 +1564,7 @@ Notes:
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
             const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
-            const data = { projectVersion: 'v44', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            const data = { projectVersion: 'v45', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
             StorageHandler.save(data); render(data); toggleModal();
         }
 
@@ -2525,17 +2525,11 @@ Notes:
                         let progress = (stickyTop - rect.top) / activeDistance;
                         progress = Math.max(0, Math.min(1, progress));
 
-                        const isInViewport = rect.bottom > stickyTop && rect.top < viewportHeight;
-                        const isActive = isInViewport && progress > 0.015 && progress < 0.985;
-
-                        if (imageWrapper) {
-                            imageWrapper.classList.toggle('cinematic-expanded', isActive);
-                            imageWrapper.classList.toggle('cinematic-collapsed', !isActive);
-                        }
-
                         const maxTranslate = measureTranslate(wrapper, track, imageWrapper);
                         const startMove = 0.045;
-                        const endMove = 0.90;
+                        const endMove = 0.86;
+                        const collapseAfter = 0.905;
+
                         let moveProgress = 0;
                         if (progress > startMove && progress < endMove) {
                             moveProgress = (progress - startMove) / (endMove - startMove);
@@ -2544,6 +2538,21 @@ Notes:
                         }
                         const currentTranslate = Math.max(0, Math.min(maxTranslate, moveProgress * maxTranslate));
                         track.style.setProperty('--scrolly-x', `-${currentTranslate}px`);
+
+                        // v45: Mobile/tablet end-collapse fix.
+                        // Keep the image rail open while it is actively moving, then collapse it
+                        // before the wrapper reaches its terminal sticky position. This prevents
+                        // the next project from starting with the previous image card still open.
+                        const isInViewport = rect.bottom > stickyTop && rect.top < viewportHeight;
+                        const isOpeningWindow = progress > 0.018;
+                        const isBeforeTerminalCollapse = progress < collapseAfter;
+                        const isActive = isInViewport && isOpeningWindow && isBeforeTerminalCollapse;
+
+                        if (imageWrapper) {
+                            imageWrapper.classList.toggle('cinematic-expanded', isActive);
+                            imageWrapper.classList.toggle('cinematic-collapsed', !isActive);
+                            wrapper.classList.toggle('scrolly-terminal-collapsed', !isActive && progress >= collapseAfter);
+                        }
                     });
                 };
 

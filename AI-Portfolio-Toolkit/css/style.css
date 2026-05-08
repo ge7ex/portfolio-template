@@ -4144,7 +4144,7 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
 /* ==================================
    v39 Cursor-local seamless tilt grid + full A4 resume layout
 ===================================== */
-:root{--project-version:'v44'}
+:root{--project-version:'v45'}
 #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4209,7 +4209,7 @@ body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;obje
    - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
 ===================================== */
 :root{
-  --project-version:'v44';
+  --project-version:'v45';
   --resume-a4-width:210mm;
   --resume-a4-height:297mm;
   --resume-left-col:64mm;
@@ -4571,7 +4571,7 @@ body.layout-resume .resume-cv-main .font-mono{
    v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
    The grid is intentionally above portfolio content but below the fixed nav.
 ===================================== */
-:root{--project-version:'v44'}
+:root{--project-version:'v45'}
 body.layout-portfolio #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4836,7 +4836,7 @@ body:not(.layout-portfolio) #cursor-local-grid{
 
 
 /* ==================================
-   v44 Mobile Scrollytelling Transform Fix
+   v45 Mobile Scrollytelling Transform + End Collapse Fix
    Reason: previous mobile CSS used transform: translate3d(0,0,0)!important;
    that overrides JS inline transform on touch devices. The scroll engine now writes
    --scrolly-x and CSS applies it with !important, so project images move again.
@@ -4855,5 +4855,22 @@ body.layout-portfolio .scrollytelling-track {
   }
   body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded {
     max-height: min(49vh, 420px) !important;
+  }
+}
+
+
+/* ==================================
+   v45 Mobile Scrollytelling End Collapse Fix
+   The image rail should collapse after its scroll-driven motion finishes,
+   before the next project starts.
+===================================== */
+@media (max-width: 1023px) {
+  body.layout-portfolio .experience-section .scrollytelling-wrapper.scrolly-terminal-collapsed .cinematic-image-wrapper {
+    max-height: 0 !important;
+    opacity: 0 !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-wrapper.scrolly-terminal-collapsed .cinematic-image-inner {
+    opacity: 0 !important;
+    transform: translate3d(0, 10px, 0) scale(.985) !important;
   }
 }
