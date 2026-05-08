@@ -1,0 +1,60 @@
+AI-Portfolio-Toolkit — Latest local package
+Version: V39 local-safe package
+Branch target: gpt/portfolio-working
+Main branch: do not modify until QA passes
+
+Summary
+- V39 integrates the previous PrintDesignerHotfix active-data resolver directly into PrintDesigner.js.
+- PrintDesignerHotfix.js is now a no-op compatibility stub. It can remain in the repo without changing behavior.
+- PDF Layout Studio is locked to A4 portrait. Landscape PDF orientation is no longer exposed in Studio and print is forced to @page A4 portrait.
+- Existing image fit controls remain available for portrait/landscape-shaped images: Crop, Resize/Contain, Fill, horizontal/vertical position, Fit Landscape image, Fit Portrait image.
+- Responsive QA guard is included: viewport meta, mobile/tablet navigation overflow safety, modal sizing, Studio mobile shell, and print pagination rules.
+- Pagination rules keep headings with content, avoid splitting cards/projects/images where possible, and force lazy/scrollytelling images visible during print.
+
+Important files
+- AI-Portfolio-Toolkit/index.html
+  - Adds viewport meta for mobile/tablet responsive behavior.
+  - Hides the old Landscape PDF button and forces handlePrint() to A4 portrait.
+- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
+  - Main V39 Studio engine.
+  - Includes integrated active-data resolver, production-themed print renderer, image crop/resize, portrait-only PDF, and V39 responsive/pagination CSS injection.
+- AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
+  - V39 compatibility stub only. The previous hotfix logic is integrated into PrintDesigner.js.
+- AI-Portfolio-Toolkit/js/storage.js
+  - Lazy-loads PrintDesigner.js with V39 cache-busting query.
+  - No longer needs to load PrintDesignerHotfix.js after PrintDesigner.js.
+- AI-Portfolio-Toolkit/_version_snapshots/PrintDesigner-v39.js
+  - Clear version snapshot of the latest PrintDesigner.js.
+- AI-Portfolio-Toolkit/_version_snapshots/PrintDesignerHotfix-v39-stub.js
+  - Clear snapshot of the compatibility stub.
+
+Upload / Git usage
+1. Checkout the working branch only:
+   git checkout gpt/portfolio-working
+   git pull origin gpt/portfolio-working
+
+2. Replace the local AI-Portfolio-Toolkit folder with this package version.
+
+3. Review before commit:
+   git status
+   git diff -- AI-Portfolio-Toolkit/index.html
+   git diff -- AI-Portfolio-Toolkit/js/storage.js
+   git diff -- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
+   git diff -- AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
+
+4. Commit to working branch only:
+   git add AI-Portfolio-Toolkit
+   git commit -m "V39 integrate print designer hotfix and lock portrait print"
+   git push origin gpt/portfolio-working
+
+QA checklist before merging to main
+- Open portfolio page on desktop.
+- Open portfolio page on mobile width.
+- Open edit modal on mobile width and verify it scrolls without horizontal overflow.
+- Open PDF Layout Studio.
+- Confirm Orientation shows Portrait only.
+- Confirm real profile data appears, not Your Name placeholder.
+- Confirm project/experience text is visible in Studio print.
+- Confirm images are visible even before scrolling the experience section.
+- Print PDF as A4 portrait.
+- Do not test or expose PDF landscape; landscape PDF is intentionally disabled.
