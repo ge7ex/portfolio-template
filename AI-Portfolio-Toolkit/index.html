@@ -1738,15 +1738,21 @@
                                 const rect = wrapper.getBoundingClientRect(); const mobileScrolly = window.innerWidth < 1024; if (mobileScrolly) { const imageCount = track.querySelectorAll('img').length || 1; const mobileHeight = Math.max(210, Math.min(380, 150 + imageCount * 48)); wrapper.style.setProperty('--mobile-scrolly-height', mobileHeight + 'vh'); wrapper.style.height = 'var(--mobile-scrolly-height)'; } const stickyTop = window.innerHeight * (mobileScrolly ? 0.14 : 0.1); const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
                                 let progress = 0; if (totalScrollDistance > 0) { progress = (stickyTop - rect.top) / totalScrollDistance; }
                                 progress = Math.max(0, Math.min(1, progress));
-                                let maxTranslate = track.getAttribute('data-max-translate');
-                                if (!maxTranslate) {
-                                    const isCol = imageWrapper.classList.contains('cinematic-collapsed'); if (isCol) { imageWrapper.classList.remove('cinematic-collapsed'); imageWrapper.classList.add('cinematic-expanded'); }
-                                    maxTranslate = track.scrollWidth - track.parentElement.clientWidth; track.setAttribute('data-max-translate', maxTranslate);
-                                    if (isCol) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
+                                let maxTranslate = 0;
+                                const wasCollapsed = imageWrapper && imageWrapper.classList.contains('cinematic-collapsed');
+                                if (wasCollapsed) { imageWrapper.classList.remove('cinematic-collapsed'); imageWrapper.classList.add('cinematic-expanded'); }
+                                const trackParentWidth = Math.max(1, track.parentElement ? track.parentElement.clientWidth : 1);
+                                // V44: always recalc on mobile because image decode/layout can finish after the first scroll tick.
+                                // Older cached values could be 0, causing the project images to stay still after expansion.
+                                maxTranslate = Math.max(0, track.scrollWidth - trackParentWidth);
+                                if (!mobileScrolly) {
+                                    const cached = parseFloat(track.getAttribute('data-max-translate') || '0') || 0;
+                                    if (cached > 0) maxTranslate = cached;
+                                    else track.setAttribute('data-max-translate', maxTranslate);
                                 }
-                                maxTranslate = parseFloat(maxTranslate) || 0;
+                                if (wasCollapsed) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
                                 if (imageWrapper) { const shouldCollapse = progress <= 0.01 || (!mobileScrolly && progress >= 0.98); if (shouldCollapse) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
-                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = mobileScrolly ? 0.08 : 0.05; const endMove = mobileScrolly ? 0.88 : 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; } else { track.style.transform = 'translate3d(0, 0, 0)'; }
+                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = mobileScrolly ? 0.08 : 0.05; const endMove = mobileScrolly ? 0.88 : 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; if (mobileScrolly) { track.style.setProperty('--mobile-scrolly-x', `-${currentTranslate}px`); track.style.transform = ''; } else { track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; } } else { track.style.setProperty('--mobile-scrolly-x', '0px'); track.style.transform = mobileScrolly ? '' : 'translate3d(0, 0, 0)'; }
                             }); isTicking = false;
                         }); isTicking = true;
                     }

@@ -65,7 +65,43 @@
     const text = String(value || '').trim();
     return /^(Your Portfolio|Portfolio Template|Your Name|hello@example\.com|\+66 00 000 0000|linkedin\.com\/in\/your-profile|Portfolio, Resume, Projects, Skills, Contact|Add your name, role, summary, skills, and project work to turn this template into a finished portfolio\.|Featured project placeholder|Your work or organization|Replace this block with your first project, responsibility, result, or achievement\.)$/i.test(text) ? '' : text;
   }
-  function localText(thValue, enValue) {
+  
+  const DEMO_PLACEHOLDER_RE = /^(Your Portfolio|Portfolio Template|Your Name|hello@example\.com|\+66 00 000 0000|linkedin\.com\/in\/your-profile|Portfolio, Resume, Projects, Skills, Contact|Add your name, role, summary, skills, and project work to turn this template into a finished portfolio\.|Featured project placeholder|Your work or organization|Replace this block with your first project, responsibility, result, or achievement\.|Project\s*\d*)$/i;
+
+  function scrubDemoFields(input) {
+    const data = clone(input || {});
+    ['name_th','name_en','role_th','role_en','bio_th','bio_en','skills_th','skills_en','email','phone','linkedin'].forEach(key => {
+      if (DEMO_PLACEHOLDER_RE.test(String(data[key] || '').trim())) data[key] = '';
+    });
+    if (Array.isArray(data.exp)) {
+      data.exp = data.exp.map((item, index) => {
+        const next = { ...(item || {}) };
+        ['title_th','title_en','company_th','company_en','desc_th','desc_en','title','company','desc'].forEach(key => {
+          if (DEMO_PLACEHOLDER_RE.test(String(next[key] || '').trim())) next[key] = '';
+        });
+        ['highlights_th','highlights_en','highlights'].forEach(key => {
+          if (Array.isArray(next[key])) next[key] = next[key].filter(line => !DEMO_PLACEHOLDER_RE.test(String(line || '').trim()));
+          else if (DEMO_PLACEHOLDER_RE.test(String(next[key] || '').trim())) next[key] = '';
+        });
+        next.images = Array.isArray(next.images) ? next.images.filter(Boolean) : [];
+        // If only images are real, keep a neutral editable studio label instead of demo copy.
+        if (!meaningfulText(next.title_th) && !meaningfulText(next.title_en) && next.images.length) {
+          next.title_th = `โปรเจกต์ ${index + 1}`;
+          next.title_en = `Project ${index + 1}`;
+        }
+        return next;
+      }).filter(item => {
+        const hasText = ['title_th','title_en','company_th','company_en','desc_th','desc_en','title','company','desc']
+          .some(key => meaningfulText(item[key]));
+        const hasImages = Array.isArray(item.images) && item.images.some(Boolean);
+        return hasText || hasImages;
+      });
+    }
+    data._isFirstRunDemo = false;
+    return data;
+  }
+
+function localText(thValue, enValue) {
     const th = meaningfulText(thValue);
     const en = meaningfulText(enValue);
     return state.data && state.data.lang === 'en' ? (en || th) : (th || en);
@@ -279,19 +315,19 @@
       stored
     ];
     const real = candidates
-      .map(item => item ? normalizeExpImages(clone(item)) : null)
+      .map(item => item ? scrubDemoFields(normalizeExpImages(clone(item))) : null)
       .filter(item => hasRealData(item) && !isDemoData(item));
     if (real.length) {
       return real.slice(1).reduce((acc, item) => mergeUsefulData(acc, item), real[0]);
     }
-    return normalizeExpImages(stored || {});
+    return scrubDemoFields(normalizeExpImages(stored || {}));
   }
 
   function shell() {
     injectCss();
     if (document.getElementById('print-designer-root')) return;
     const root = document.createElement('div'); root.id = 'print-designer-root'; root.className = 'print-designer-root hidden';
-    root.innerHTML = `<div class="pd-backdrop"></div><div class="pd-shell" role="dialog" aria-modal="true" aria-label="PDF Layout Studio"><div class="pd-topbar no-print"><div><div class="pd-kicker">V43 Print Template Studio</div><h2>PDF Layout Studio</h2></div><div class="pd-top-actions"><button id="pd-dup" type="button">Duplicate Profile</button><button id="pd-save" type="button">Save Print Profile</button><button id="pd-print" type="button">Print PDF</button><button id="pd-reset" class="pd-danger" type="button">Reset Layout</button><button id="pd-close" type="button">Exit</button></div></div><div class="pd-body"><aside class="pd-sidebar no-print"><div class="pd-panel"><h3>Mode</h3><div class="pd-toggle-row"><label><input type="radio" name="pd-mode" value="portfolio"> Portfolio</label><label><input type="radio" name="pd-mode" value="resume"> Resume</label></div><label>Profile<select id="pd-profile"></select></label><label>Orientation<select id="pd-orientation"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label><label>Page Scale <span id="pd-scale-label"></span><input id="pd-scale" type="range" min="70" max="130" step="5"></label><div class="pd-toggle-row"><label><input id="pd-snap" type="checkbox"> Snap</label><label><input id="pd-grid" type="checkbox"> Grid</label></div><p>Studio นี้แก้ layout บน print template พร้อมธีมปัจจุบัน ไม่สร้าง whiteboard ใหม่ และไม่แก้ข้อมูล Portfolio/Resume หลัก</p><p class="pd-template-note">ธีมจากหน้าเว็บจะถูกใช้กับพื้นหลัง/เส้น accent ตอน Preview และ Print</p></div><div class="pd-panel"><h3>Selected Object</h3><div class="pd-control-grid"><label>X<input id="pd-x" type="number"></label><label>Y<input id="pd-y" type="number"></label><label>W<input id="pd-w" type="number"></label><label>H<input id="pd-h" type="number"></label><label>Rotate<input id="pd-r" type="number"></label><label>Layer<input id="pd-z" type="number"></label></div><div class="pd-small-actions"><button id="pd-hide" type="button">Hide / Show</button><button id="pd-front" type="button">Bring Forward</button><button id="pd-back" type="button">Send Backward</button></div></div><div id="pd-image-panel" class="pd-panel pd-disabled"><h3>Image Crop / Resize</h3><label>Fit Mode<select id="pd-img-fit"><option value="cover">Crop เต็มกรอบ</option><option value="contain">Resize เห็นทั้งรูป</option><option value="fill">ยืดเต็มกรอบ</option></select></label><label>Horizontal Position <span id="pd-img-x-label"></span><input id="pd-img-x" type="range" min="0" max="100" step="1"></label><label>Vertical Position <span id="pd-img-y-label"></span><input id="pd-img-y" type="range" min="0" max="100" step="1"></label><div class="pd-small-actions"><button id="pd-img-landscape" type="button">Fit Landscape</button><button id="pd-img-portrait" type="button">Fit Portrait</button><button id="pd-img-reset" type="button">Reset Image Fit</button></div><p>ใช้ปรับรูปแนวนอน/แนวตั้งในกรอบก่อนสั่งพิมพ์ โดยไม่แก้ไฟล์รูปต้นฉบับ</p></div></aside><main class="pd-workspace"><div class="pd-stage"><div id="pd-page" class="pd-page"></div></div></main></div></div>`;
+    root.innerHTML = `<div class="pd-backdrop"></div><div class="pd-shell" role="dialog" aria-modal="true" aria-label="PDF Layout Studio"><div class="pd-topbar no-print"><div><div class="pd-kicker">V44 Print Template Studio</div><h2>PDF Layout Studio</h2></div><div class="pd-top-actions"><button id="pd-dup" type="button">Duplicate Profile</button><button id="pd-save" type="button">Save Print Profile</button><button id="pd-print" type="button">Print PDF</button><button id="pd-reset" class="pd-danger" type="button">Reset Layout</button><button id="pd-close" type="button">Exit</button></div></div><div class="pd-body"><aside class="pd-sidebar no-print"><div class="pd-panel"><h3>Mode</h3><div class="pd-toggle-row"><label><input type="radio" name="pd-mode" value="portfolio"> Portfolio</label><label><input type="radio" name="pd-mode" value="resume"> Resume</label></div><label>Profile<select id="pd-profile"></select></label><label>Orientation<select id="pd-orientation"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label><label>Page Scale <span id="pd-scale-label"></span><input id="pd-scale" type="range" min="70" max="130" step="5"></label><div class="pd-toggle-row"><label><input id="pd-snap" type="checkbox"> Snap</label><label><input id="pd-grid" type="checkbox"> Grid</label></div><p>Studio นี้แก้ layout บน print template พร้อมธีมปัจจุบัน ไม่สร้าง whiteboard ใหม่ และไม่แก้ข้อมูล Portfolio/Resume หลัก</p><p class="pd-template-note">ธีมจากหน้าเว็บจะถูกใช้กับพื้นหลัง/เส้น accent ตอน Preview และ Print</p></div><div class="pd-panel"><h3>Selected Object</h3><div class="pd-control-grid"><label>X<input id="pd-x" type="number"></label><label>Y<input id="pd-y" type="number"></label><label>W<input id="pd-w" type="number"></label><label>H<input id="pd-h" type="number"></label><label>Rotate<input id="pd-r" type="number"></label><label>Layer<input id="pd-z" type="number"></label></div><div class="pd-small-actions"><button id="pd-hide" type="button">Hide / Show</button><button id="pd-front" type="button">Bring Forward</button><button id="pd-back" type="button">Send Backward</button></div></div><div id="pd-image-panel" class="pd-panel pd-disabled"><h3>Image Crop / Resize</h3><label>Fit Mode<select id="pd-img-fit"><option value="cover">Crop เต็มกรอบ</option><option value="contain">Resize เห็นทั้งรูป</option><option value="fill">ยืดเต็มกรอบ</option></select></label><label>Horizontal Position <span id="pd-img-x-label"></span><input id="pd-img-x" type="range" min="0" max="100" step="1"></label><label>Vertical Position <span id="pd-img-y-label"></span><input id="pd-img-y" type="range" min="0" max="100" step="1"></label><div class="pd-small-actions"><button id="pd-img-landscape" type="button">Fit Landscape</button><button id="pd-img-portrait" type="button">Fit Portrait</button><button id="pd-img-reset" type="button">Reset Image Fit</button></div><p>ใช้ปรับรูปแนวนอน/แนวตั้งในกรอบก่อนสั่งพิมพ์ โดยไม่แก้ไฟล์รูปต้นฉบับ</p></div></aside><main class="pd-workspace"><div class="pd-stage"><div id="pd-page" class="pd-page"></div></div></main></div></div>`;
     document.body.appendChild(root);
     bindUi();
   }
@@ -419,7 +455,7 @@
       y += 17;
     }
     exp.forEach((e, i) => {
-      const title = text(e.title_th, e.title_en, e.title || 'Project');
+      const title = text(e.title_th, e.title_en, e.title || (images.length ? (th ? 'โปรเจกต์' : 'Project') : ''));
       const company = text(e.company_th, e.company_en, e.company || '');
       const desc = text(e.desc_th, e.desc_en, e.desc || '');
       const highlights = localArray(e, 'highlights');

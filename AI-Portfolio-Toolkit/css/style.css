@@ -4618,3 +4618,105 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
   overflow: visible !important;
 }
 /* V43 END */
+
+
+
+/* ================================
+   V44 Studio-only + Mobile Scrolly Final Guard
+   - Do not affect normal browser PDF export.
+   - Mobile/tablet: vertical page scroll drives project images; no horizontal touch gallery.
+   - Inline JS writes --mobile-scrolly-x; this selector beats older transform:none!important rules.
+================================ */
+@media screen and (max-width: 1023px) {
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper {
+    height: var(--mobile-scrolly-height, 260vh) !important;
+    min-height: 190vh !important;
+    max-height: 340vh !important;
+    margin-bottom: clamp(26px, 7vw, 52px) !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper .sticky {
+    position: sticky !important;
+    top: calc(env(safe-area-inset-top, 0px) + 70px) !important;
+    height: auto !important;
+    max-height: calc(100svh - 84px) !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper {
+    overflow: hidden !important;
+    transition: max-height .45s ease, opacity .28s ease, transform .28s ease !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper.cinematic-expanded {
+    max-height: min(54svh, 380px) !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper.cinematic-collapsed {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    transform: translateY(-8px) !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-inner {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: max-content !important;
+    max-width: none !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    touch-action: pan-y !important;
+    scroll-snap-type: none !important;
+    scrollbar-width: none !important;
+    will-change: transform !important;
+    transform: translate3d(var(--mobile-scrolly-x, 0px), 0, 0) !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-track img,
+  body.layout-portfolio:not(.print-designer-open) .scrolly-full-image {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: min(82vw, 360px) !important;
+    height: min(38svh, 260px) !important;
+    max-height: min(38svh, 260px) !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    scroll-snap-align: none !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper {
+    min-height: 180vh !important;
+    max-height: 320vh !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper.cinematic-expanded {
+    max-height: min(48svh, 310px) !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-track img,
+  body.layout-portfolio:not(.print-designer-open) .scrolly-full-image {
+    max-width: min(84vw, 330px) !important;
+    height: min(34svh, 230px) !important;
+    max-height: min(34svh, 230px) !important;
+  }
+}
+
+/* Studio-only text visibility. Does not apply to normal page print. */
+body.print-designer-open .pd-project .pd-object-content,
+body.print-designer-open .pd-section-heading .pd-object-content,
+body.print-designer-printing .pd-project .pd-object-content,
+body.print-designer-printing .pd-section-heading .pd-object-content {
+  overflow: visible !important;
+}

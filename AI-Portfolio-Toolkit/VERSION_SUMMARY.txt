@@ -1,14 +1,16 @@
-V43 mobile + studio final fix
+V44 Studio-only + Mobile Scrollytelling Final
+
+Scope:
+- Keep normal webpage PDF export outside Studio untouched.
+- Fix Studio data resolver so demo/placeholder text cannot override real stored or rendered data.
+- Keep image-only project entries editable in Studio using neutral labels instead of demo copy.
+- Fix mobile/tablet scrollytelling so vertical page scroll drives the image rail after expansion.
+- Use CSS variable --mobile-scrolly-x to beat older transform:none!important rules safely.
+- Keep PDF landscape disabled/hidden as prior production policy.
 
 Changed files:
-- index.html
-- css/style.css
-- js/storage.js
-- js/components/PrintDesigner.js
-- js/components/PrintDesignerHotfix.js
-
-Fix summary:
-1. PDF Layout Studio now prefers real saved portfolio data over injected/demo placeholders so header/project text is not replaced by Your Name/Project 1 when real data exists.
-2. Studio project text boxes keep full title/company/description/highlights visible and old saved layouts are isolated with a new v43 profile key.
-3. Mobile/tablet portfolio keeps vertical scroll behavior for scrollytelling image movement. It no longer becomes a horizontal swipe gallery and the long blank area after project images is reduced.
-4. Legacy landscape print button remains hidden through storage.js selectors.
+- AI-Portfolio-Toolkit/index.html
+- AI-Portfolio-Toolkit/css/style.css
+- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
+- AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
+- AI-Portfolio-Toolkit/VERSION_SUMMARY.txt
