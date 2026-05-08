@@ -227,19 +227,16 @@ const StorageHandler = {
     }
 
     function loadPrintDesignerScript() {
-        if (window.PrintDesigner || document.querySelector('script[data-print-designer-v33]')) {
+        if (window.PrintDesigner || document.querySelector('script[data-print-designer-v39]')) {
             addStudioButtons();
             return;
         }
         const script = document.createElement('script');
-        script.src = 'js/components/PrintDesigner.js?v=35-theme-imagefit';
+        script.src = 'js/components/PrintDesigner.js?v=39-integrated-portrait';
         script.defer = true;
-        script.dataset.printDesignerV33 = 'true';
+        script.dataset.printDesignerV39 = 'true';
         script.onload = () => {
-            const hotfix = document.createElement('script');
-            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=35-theme-imagefit';
-            hotfix.defer = true;
-            document.body.appendChild(hotfix);
+            // V39: active data resolver and pagination guard are integrated in PrintDesigner.js.
             addStudioButtons();
         };
         script.onerror = () => console.warn('PrintDesigner.js failed to load.');
