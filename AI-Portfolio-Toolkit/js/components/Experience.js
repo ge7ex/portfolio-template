@@ -109,7 +109,7 @@ const ExperienceComponent = {
                 if (hasImages) {
                     const scrollyHeight = (item.images.length * 85) + 250;
                     return `
-                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-32 scroll-reveal print-exp-item${firstPrintClass}" style="height: ${scrollyHeight}vh; ${printFitVars}">
+                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-32 scroll-reveal print-exp-item${firstPrintClass}" style="--scrolly-images: ${item.images.length}; height: ${scrollyHeight}vh; ${printFitVars}">
                         <div class="sticky top-[10vh] w-full z-10 px-4 md:px-0">
                             <div class="${cardCls}">
                                 <div class="p-10 md:p-14 text-center flex flex-col items-center">
