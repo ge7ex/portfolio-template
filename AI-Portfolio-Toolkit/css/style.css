@@ -4144,7 +4144,7 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
 /* ==================================
    v39 Cursor-local seamless tilt grid + full A4 resume layout
 ===================================== */
-:root{--project-version:'v41'}
+:root{--project-version:'v42'}
 #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4209,7 +4209,7 @@ body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;obje
    - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
 ===================================== */
 :root{
-  --project-version:'v41';
+  --project-version:'v42';
   --resume-a4-width:210mm;
   --resume-a4-height:297mm;
   --resume-left-col:64mm;
@@ -4571,7 +4571,7 @@ body.layout-resume .resume-cv-main .font-mono{
    v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
    The grid is intentionally above portfolio content but below the fixed nav.
 ===================================== */
-:root{--project-version:'v41'}
+:root{--project-version:'v42'}
 body.layout-portfolio #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4636,8 +4636,8 @@ body.layout-resume #mouse-grid-field .mouse-cell{display:none!important;opacity:
 
 
 /* ==================================
-   v41: true cursor-local seamless 3x3 tilt grid
-   Replaces legacy #mouse-grid-field that produced the unwanted static center tile.
+   v42: robust cursor-local seamless 3x3 tilt grid
+   Shows only 3x3 cells around the cursor. No static tile.
 ===================================== */
 #mouse-grid-field,
 #mouse-grid-field .mouse-cell{
@@ -4645,62 +4645,67 @@ body.layout-resume #mouse-grid-field .mouse-cell{display:none!important;opacity:
   opacity:0!important;
   visibility:hidden!important;
 }
-body.layout-portfolio #cursor-local-grid{
-  --cursor-grid-size:88px;
+#cursor-local-grid{
+  --cursor-grid-size:72px;
   position:fixed!important;
   inset:0!important;
-  z-index:8!important;
+  z-index:45!important;
   pointer-events:none!important;
   opacity:0!important;
-  transition:opacity .18s ease!important;
-  perspective:980px!important;
+  transition:opacity .12s ease!important;
+  perspective:1200px!important;
   transform-style:preserve-3d!important;
-  mix-blend-mode:screen!important;
   contain:layout paint style!important;
 }
 body.layout-portfolio #cursor-local-grid.is-active{
   opacity:1!important;
 }
-body.layout-portfolio .cursor-local-cell{
+.cursor-local-cell{
   position:fixed!important;
-  left:var(--cell-left, -9999px)!important;
-  top:var(--cell-top, -9999px)!important;
-  width:var(--cursor-grid-size,88px)!important;
-  height:var(--cursor-grid-size,88px)!important;
+  left:var(--cell-left,-9999px)!important;
+  top:var(--cell-top,-9999px)!important;
+  width:var(--cursor-grid-size,72px)!important;
+  height:var(--cursor-grid-size,72px)!important;
   display:block!important;
-  border-radius:12px!important;
+  border-radius:10px!important;
   transform:
-    translate(-50%,-50%)
-    perspective(820px)
+    translate3d(-50%,-50%,0)
+    perspective(760px)
     rotateX(var(--rx,0deg))
     rotateY(var(--ry,0deg))
-    translateZ(var(--z,0px))!important;
+    translateZ(var(--tz,0px))!important;
   transform-origin:center center!important;
   transform-style:preserve-3d!important;
-  opacity:var(--cell-opacity,.34)!important;
-  border:1px solid color-mix(in srgb,var(--theme-accent-2,#22d3ee) 36%,transparent)!important;
+  opacity:var(--cell-opacity,.5)!important;
+  border:1px solid rgba(236,72,253,.34)!important;
   background:
-    linear-gradient(90deg, color-mix(in srgb,var(--theme-accent-2,#22d3ee) 14%,transparent) 1px, transparent 1px),
-    linear-gradient(0deg, color-mix(in srgb,var(--theme-accent-2,#22d3ee) 14%,transparent) 1px, transparent 1px),
-    linear-gradient(135deg,rgba(255,255,255,.038),rgba(255,255,255,.006))!important;
-  background-size:calc(var(--cursor-grid-size,88px)/2) calc(var(--cursor-grid-size,88px)/2), calc(var(--cursor-grid-size,88px)/2) calc(var(--cursor-grid-size,88px)/2), auto!important;
-  box-shadow:0 0 18px color-mix(in srgb,var(--theme-accent,#a855f7) 18%,transparent), inset 0 0 16px rgba(255,255,255,.025)!important;
-  backdrop-filter:blur(.15px)!important;
+    linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,.18) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(236,72,253,.08), rgba(34,211,238,.035), transparent)!important;
+  background-size:50% 50%,50% 50%,auto!important;
+  box-shadow:
+    0 0 16px rgba(236,72,253,.22),
+    inset 0 0 14px rgba(255,255,255,.045)!important;
+  backdrop-filter:blur(.2px)!important;
   will-change:transform,opacity,left,top!important;
 }
-body.layout-portfolio .cursor-local-cell.is-center{
-  opacity:.16!important;
-  border-color:color-mix(in srgb,var(--theme-accent-2,#22d3ee) 24%,transparent)!important;
+.cursor-local-cell.is-center{
+  opacity:.22!important;
   border-style:dashed!important;
-  background:transparent!important;
-  box-shadow:0 0 12px color-mix(in srgb,var(--theme-accent-2,#22d3ee) 14%,transparent)!important;
+  border-color:rgba(34,211,238,.36)!important;
+  background:
+    linear-gradient(90deg, rgba(34,211,238,.14) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(34,211,238,.14) 1px, transparent 1px)!important;
+  background-size:50% 50%!important;
+  box-shadow:0 0 14px rgba(34,211,238,.18)!important;
 }
 body.layout-resume #cursor-local-grid,
-body.layout-resume .cursor-local-cell{
+body.layout-resume .cursor-local-cell,
+body:not(.layout-portfolio) #cursor-local-grid{
   display:none!important;
   opacity:0!important;
 }
-@media (hover:none),(pointer:coarse),(max-width:1023px),print{
+@media (hover:none),(pointer:coarse),(max-width:767px),print{
   #cursor-local-grid,.cursor-local-cell{
     display:none!important;
     opacity:0!important;
