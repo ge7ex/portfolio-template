@@ -4253,3 +4253,105 @@ body.layout-portfolio .mouse-cell {
   body.layout-portfolio #mouse-grid-field,
   body.layout-portfolio .mouse-cell { display: none !important; }
 }
+
+
+/* ==================================
+   v37 Seamless 3x3 cursor-local tilt grid
+   - Only 9 cells appear around the cursor
+   - Cursor is always cell 5 / center
+   - Cells 1,2,3,4,6,7,8,9 tilt inward toward cursor
+   - Low-noise seamless overlay, desktop only
+===================================== */
+body.layout-portfolio #mouse-grid-field {
+  --cursor-x: 50vw;
+  --cursor-y: 50vh;
+  --grid-cell: clamp(74px, 8.2vw, 118px);
+  --grid-gap: 0px;
+  display: grid !important;
+  position: fixed !important;
+  left: var(--cursor-x) !important;
+  top: var(--cursor-y) !important;
+  width: calc(var(--grid-cell) * 3) !important;
+  height: calc(var(--grid-cell) * 3) !important;
+  grid-template-columns: repeat(3, var(--grid-cell)) !important;
+  grid-template-rows: repeat(3, var(--grid-cell)) !important;
+  gap: var(--grid-gap) !important;
+  inset: auto !important;
+  transform: translate3d(-50%, -50%, 0) !important;
+  transform-style: preserve-3d !important;
+  perspective: 860px !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  opacity: 0 !important;
+  mix-blend-mode: screen !important;
+  contain: layout paint style !important;
+  transition: opacity .18s ease !important;
+}
+
+body.mode-light.layout-portfolio #mouse-grid-field {
+  mix-blend-mode: multiply !important;
+}
+
+body.layout-portfolio #mouse-grid-field.is-active {
+  opacity: .72 !important;
+}
+
+body.mode-light.layout-portfolio #mouse-grid-field.is-active {
+  opacity: .38 !important;
+}
+
+body.layout-portfolio #mouse-grid-field::before,
+body.layout-portfolio #mouse-grid-field::after {
+  display: none !important;
+  content: none !important;
+}
+
+body.layout-portfolio .mouse-cell {
+  --rx: 0deg;
+  --ry: 0deg;
+  --z: 0px;
+  --cell-alpha: .66;
+  position: relative !important;
+  display: block !important;
+  width: var(--grid-cell) !important;
+  height: var(--grid-cell) !important;
+  border-radius: 0 !important;
+  transform:
+    perspective(820px)
+    rotateX(var(--rx))
+    rotateY(var(--ry))
+    translateZ(var(--z)) !important;
+  transform-origin: center center !important;
+  transform-style: preserve-3d !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) 34%, transparent) !important;
+  border-right-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 18%, transparent) !important;
+  border-bottom-color: color-mix(in srgb, var(--theme-accent, #3b82f6) 20%, transparent) !important;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 8%, transparent), transparent 62%),
+    linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.012)) !important;
+  opacity: calc(var(--cell-alpha) * var(--grid-energy, .72)) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.035),
+    0 0 22px color-mix(in srgb, var(--theme-accent, #3b82f6) 14%, transparent) !important;
+  transition:
+    opacity .16s ease,
+    border-color .16s ease,
+    background .16s ease,
+    box-shadow .16s ease !important;
+  will-change: transform, opacity !important;
+}
+
+body.layout-portfolio .mouse-cell-5 {
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 17%, transparent), transparent 58%),
+    linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.016)) !important;
+  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 48%, transparent) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 0 30px color-mix(in srgb, var(--theme-accent-2, #38bdf8) 22%, transparent) !important;
+}
+
+@media (max-width: 1023px), print, (prefers-reduced-motion: reduce) {
+  body.layout-portfolio #mouse-grid-field,
+  body.layout-portfolio .mouse-cell { display: none !important; }
+}

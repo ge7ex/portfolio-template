@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>AI Portfolio Pro Generator v36</title>
+    <title>AI Portfolio Pro Generator v37</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -537,7 +537,7 @@
     <script src="js/exporter.js"></script>
 
     <script>
-        const PROJECT_VERSION = 'v36';
+        const PROJECT_VERSION = 'v37';
         const PROJECT_NAME = 'AI-Portfolio-Toolkit';
         const createPortfolioIcons = () => { if (window.lucide) lucide.createIcons(); };
         createPortfolioIcons();
@@ -1499,7 +1499,7 @@ Notes:
                     }
                 }
                 if (layout === 'portfolio') {
-                    const gridCells = Array.from({ length: 54 }, (_, i) => `<span class="mouse-cell" data-cell="${i}"></span>`).join('');
+                    const gridCells = Array.from({ length: 9 }, (_, i) => `<span class="mouse-cell mouse-cell-${i + 1}" data-cell="${i + 1}"></span>`).join('');
                     decorationContainer.innerHTML = `${decorationsHTML}<div id="mouse-grid-field" aria-hidden="true">${gridCells}</div>`;
                     requestAnimationFrame(initMicroInteractions);
                 } else {
@@ -1610,13 +1610,14 @@ Notes:
 
         function initMicroInteractions() {
             if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (window.matchMedia && !window.matchMedia('(min-width: 1024px)').matches) return;
+
             const grid = document.getElementById('mouse-grid-field');
             const cells = grid ? Array.from(grid.querySelectorAll('.mouse-cell')) : [];
-            if (!grid || cells.length === 0) return;
+            if (!grid || cells.length !== 9) return;
 
-            const cols = 9;
-            const rows = Math.ceil(cells.length / cols);
             let raf = null;
+            let visible = false;
             let targetX = window.innerWidth / 2;
             let targetY = window.innerHeight / 2;
             let currentX = targetX;
@@ -1625,22 +1626,31 @@ Notes:
             let vy = 0;
             let lastMove = performance.now();
 
-            cells.forEach((cell, i) => {
-                const col = i % cols;
-                const row = Math.floor(i / cols);
-                cell.style.setProperty('--cell-delay', `${col * 16 + row * 11}ms`);
-            });
-
             const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
             const lerp = (a, b, t) => a + (b - a) * t;
-            const ease = (x) => 1 - Math.pow(1 - x, 3);
+
+            const cellDefs = [
+                { n: 1, gx: -1, gy: -1 }, { n: 2, gx: 0, gy: -1 }, { n: 3, gx: 1, gy: -1 },
+                { n: 4, gx: -1, gy: 0 },  { n: 5, gx: 0, gy: 0 },  { n: 6, gx: 1, gy: 0 },
+                { n: 7, gx: -1, gy: 1 },  { n: 8, gx: 0, gy: 1 },  { n: 9, gx: 1, gy: 1 }
+            ];
+
+            cells.forEach((cell, i) => {
+                const def = cellDefs[i];
+                cell.dataset.cell = String(def.n);
+                cell.style.setProperty('--gx', def.gx);
+                cell.style.setProperty('--gy', def.gy);
+            });
 
             const update = () => {
                 raf = null;
-                currentX = lerp(currentX, targetX, 0.13);
-                currentY = lerp(currentY, targetY, 0.13);
-                const speed = clamp(Math.hypot(vx, vy) / 110, 0, 1);
-                grid.style.setProperty('--grid-energy', `${(0.18 + speed * 0.12).toFixed(3)}`);
+                currentX = lerp(currentX, targetX, 0.22);
+                currentY = lerp(currentY, targetY, 0.22);
+
+                const speed = clamp(Math.hypot(vx, vy) / 75, 0, 1);
+                grid.style.setProperty('--cursor-x', `${currentX.toFixed(2)}px`);
+                grid.style.setProperty('--cursor-y', `${currentY.toFixed(2)}px`);
+                grid.style.setProperty('--grid-energy', `${(0.62 + speed * 0.28).toFixed(3)}`);
 
                 const heroFrame = document.querySelector('.hero-frame');
                 if (heroFrame) {
@@ -1651,56 +1661,46 @@ Notes:
                     heroFrame.style.setProperty('--profile-light-y', `${clamp(localY, 0, 100).toFixed(1)}%`);
                 }
 
-                const cellW = window.innerWidth / cols;
-                const cellH = window.innerHeight / rows;
-                const activeCol = clamp(Math.floor(currentX / cellW), 0, cols - 1);
-                const activeRow = clamp(Math.floor(currentY / cellH), 0, rows - 1);
-
                 cells.forEach((cell, i) => {
-                    const col = i % cols;
-                    const row = Math.floor(i / cols);
-                    const centerX = (col + 0.5) * cellW;
-                    const centerY = (row + 0.5) * cellH;
-                    const dx = currentX - centerX;
-                    const dy = currentY - centerY;
-                    const gridDx = Math.abs(col - activeCol);
-                    const gridDy = Math.abs(row - activeRow);
-                    const inNineZone = gridDx <= 1 && gridDy <= 1;
+                    const def = cellDefs[i];
+                    const isCenter = def.n === 5;
+                    const dist = Math.hypot(def.gx, def.gy);
+                    const strength = isCenter ? 0 : (dist > 1 ? 0.72 : 1);
 
-                    // Only the 3x3 area around the cursor reacts.
-                    // The panel position remains locked; each panel tilts toward the cursor.
-                    const localDist = Math.hypot(dx / cellW, dy / cellH);
-                    const influence = inNineZone ? ease(clamp(1 - (localDist / 1.55), 0, 1)) : 0;
-                    const dxN = clamp(dx / (cellW * 0.58), -1, 1);
-                    const dyN = clamp(dy / (cellH * 0.58), -1, 1);
+                    // Cell 5 is always centered under the cursor. The other 8 cells tilt inward toward cell 5.
+                    const maxTilt = 17;
+                    const rx = isCenter ? 0 : clamp(def.gy * maxTilt * strength, -maxTilt, maxTilt);
+                    const ry = isCenter ? 0 : clamp(-def.gx * maxTilt * strength, -maxTilt, maxTilt);
+                    const z = isCenter ? 18 : 8 + (1.2 - Math.min(dist, 1.2)) * 9;
+                    const edgeFade = isCenter ? 1 : (dist > 1 ? 0.58 : 0.76);
 
-                    // Sign corrected: panels lean inward toward the mouse, not away from it.
-                    const maxTilt = 18;
-                    const rx = clamp(-dyN * maxTilt * influence, -maxTilt, maxTilt);
-                    const ry = clamp(dxN * maxTilt * influence, -maxTilt, maxTilt);
-                    const z = influence * 18;
-                    const shadowX = clamp(dxN * 12 * influence, -12, 12);
-                    const shadowY = clamp(dyN * 14 * influence, -14, 14);
-
-                    cell.style.setProperty('--cell-i', influence.toFixed(3));
                     cell.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
                     cell.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
                     cell.style.setProperty('--z', `${z.toFixed(2)}px`);
-                    cell.style.setProperty('--shadow-x', `${shadowX.toFixed(2)}px`);
-                    cell.style.setProperty('--shadow-y', `${shadowY.toFixed(2)}px`);
+                    cell.style.setProperty('--cell-alpha', `${edgeFade.toFixed(3)}`);
                 });
 
-                vx *= 0.80;
-                vy *= 0.80;
-                if (Math.abs(currentX - targetX) > 0.35 || Math.abs(currentY - targetY) > 0.35 || Math.hypot(vx, vy) > 0.35) {
+                vx *= 0.74;
+                vy *= 0.74;
+                if (Math.abs(currentX - targetX) > 0.22 || Math.abs(currentY - targetY) > 0.22 || Math.hypot(vx, vy) > 0.22) {
                     raf = requestAnimationFrame(update);
                 }
             };
 
+            const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+
             if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
             if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioPointerEnter) window.removeEventListener('pointerenter', window._portfolioPointerEnter);
+
+            window._portfolioPointerEnter = () => {
+                visible = true;
+                grid.classList.add('is-active');
+                schedule();
+            };
 
             window._portfolioPointerMove = (e) => {
+                if (e.pointerType && e.pointerType !== 'mouse') return;
                 const now = performance.now();
                 const dt = Math.max(16, now - lastMove);
                 vx = (e.clientX - targetX) / dt * 16;
@@ -1708,17 +1708,18 @@ Notes:
                 targetX = e.clientX;
                 targetY = e.clientY;
                 lastMove = now;
-                if (!raf) raf = requestAnimationFrame(update);
-            };
-            window._portfolioPointerLeave = () => {
-                targetX = window.innerWidth / 2;
-                targetY = window.innerHeight / 2;
-                if (!raf) raf = requestAnimationFrame(update);
+                if (!visible) window._portfolioPointerEnter();
+                schedule();
             };
 
+            window._portfolioPointerLeave = () => {
+                visible = false;
+                grid.classList.remove('is-active');
+            };
+
+            window.addEventListener('pointerenter', window._portfolioPointerEnter, { passive: true });
             window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
             window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
-            update();
         }
 
         function playThemeTransition(theme, fromTheme) {
