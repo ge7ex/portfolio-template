@@ -102,6 +102,8 @@ const StorageHandler = {
         }
 
         const defaultData = {
+            projectVersion: 'v40',
+            resumeVisibility: { profile:true, contact:true, skills:true, summary:true, experience:true, education:true, certifications:true, awards:true, services:true, clients:true, articles:true, caseStudies:true, testimonials:true },
             name_th: '', name_en: '',
             role_th: '', role_en: '',
             bio_th: '', bio_en: '',

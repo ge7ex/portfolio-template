@@ -1,22 +1,21 @@
-# AI-Portfolio-Toolkit v37
+# AI Portfolio Toolkit v40
 
-This package contains the full AI Portfolio Toolkit project.
+## What changed in v40
 
-## Version
-- Project version: v37
-- Canva AI pack is text-only for prompt safety. Base64 images are intentionally excluded from the Canva JSON snapshot.
-- The desktop portfolio includes a visible cursor-reactive 3x3 tilt grid micro-interaction.
+- Canva AI prompt package now detects the current mode before download.
+  - Portfolio mode downloads a Portfolio / Scrollytelling Website prompt.
+  - Resume mode downloads a Resume / A4 CV prompt.
+- Canva prompt filenames include the mode, for example:
+  - `canva_prompt_portfolio_en.txt`
+  - `canva_prompt_resume_en.txt`
+- The JSON snapshot records `prompt_mode` and can be opened with Notepad, VS Code, or a browser.
+- Cursor microinteraction grid has been strengthened for desktop Portfolio mode:
+  - 3x3 local grid only
+  - cursor is always the center cell
+  - surrounding 8 cells tilt toward the cursor
+  - hidden automatically on mobile/tablet and Resume mode
+- Resume remains a full A4 layout with fixed component positions and user-selectable component visibility.
 
-## Canva AI Pack
-Use the Canva AI Pack button in the web app to download a ZIP folder containing:
-- canva_prompt_en.txt
-- canva_prompt_th.txt
-- canva_instruction_en.txt
-- canva_instruction_th.txt
-- portfolio_data_snapshot.json
+## How to run
 
-Images should be uploaded manually into Canva after generation.
-
-
-## v37 update
-- Reworked cursor microinteraction into a seamless 3x3 grid overlay. Only the 9 cells around the cursor appear, with cell 5 fixed at the cursor center and surrounding cells tilting inward.
+Open `index.html` in a browser. For WEB export, deploy to a web host such as Vercel because browser security blocks full web export from `file://` pages.

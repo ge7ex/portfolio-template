@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>AI Portfolio Pro Generator v37</title>
+    <title>AI Portfolio Pro Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -201,6 +201,9 @@
                 <button onclick="switchTab('sections')" id="tab-sections"
                     class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
                         data-lucide="layout-template" class="w-4 h-4"></i> Extra Sections</button>
+                <button onclick="switchTab('resume')" id="tab-resume"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="file-user" class="w-4 h-4"></i> Resume Settings</button>
             </div>
 
             <div id="edit-modal-body" class="p-8 overflow-y-auto flex-1 custom-scrollbar">
@@ -343,6 +346,32 @@
                                 <label class="extra-label">Articles / Publications <span>Title | Description | URL</span></label>
                                 <textarea id="in-articles-en" class="extra-textarea"></textarea>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-resume" class="hidden space-y-6">
+                    <div class="bg-slate-900/50 border border-slate-700 rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="file-user" class="w-5 h-5 text-cyan-400"></i> Resume Component Visibility</h3>
+                        <p class="text-sm text-slate-400 mb-5">เลือกหัวข้อที่จะแสดงใน Resume Mode ได้ แต่ตำแหน่งของแต่ละหัวข้อจะถูกล็อกไว้ เพื่อให้ Resume ยังดูสวยและพิมพ์ A4 ได้เสถียร</p>
+                        <div class="resume-toggle-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <label><input type="checkbox" id="rv-profile" checked> Profile / รูป + ชื่อ</label>
+                            <label><input type="checkbox" id="rv-contact" checked> Contact / ติดต่อ</label>
+                            <label><input type="checkbox" id="rv-skills" checked> Skills / ทักษะ</label>
+                            <label><input type="checkbox" id="rv-summary" checked> Summary / ประวัติย่อ</label>
+                            <label><input type="checkbox" id="rv-experience" checked> Experience / ประสบการณ์</label>
+                            <label><input type="checkbox" id="rv-education" checked> Education / การศึกษา</label>
+                            <label><input type="checkbox" id="rv-certifications" checked> Certifications / ใบรับรอง</label>
+                            <label><input type="checkbox" id="rv-awards" checked> Awards / รางวัล</label>
+                            <label><input type="checkbox" id="rv-services" checked> Services / บริการ</label>
+                            <label><input type="checkbox" id="rv-clients" checked> Clients / หน่วยงาน</label>
+                            <label><input type="checkbox" id="rv-articles" checked> Articles / สื่อเผยแพร่</label>
+                            <label><input type="checkbox" id="rv-caseStudies" checked> Case Studies / กรณีศึกษา</label>
+                            <label><input type="checkbox" id="rv-testimonials" checked> Testimonials / คำรับรอง</label>
+                        </div>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <button type="button" onclick="setResumeVisibilityPreset('full')" class="px-4 py-2 rounded-xl bg-cyan-600/20 border border-cyan-400/30 text-cyan-200 font-bold text-sm">Show all</button>
+                            <button type="button" onclick="setResumeVisibilityPreset('official')" class="px-4 py-2 rounded-xl bg-emerald-600/20 border border-emerald-400/30 text-emerald-200 font-bold text-sm">Thai official concise</button>
                         </div>
                     </div>
                 </div>
@@ -537,8 +566,6 @@
     <script src="js/exporter.js"></script>
 
     <script>
-        const PROJECT_VERSION = 'v37';
-        const PROJECT_NAME = 'AI-Portfolio-Toolkit';
         const createPortfolioIcons = () => { if (window.lucide) lucide.createIcons(); };
         createPortfolioIcons();
         let currentAvatarBase64 = "";
@@ -660,24 +687,127 @@
             return labels.map(([key, label]) => `${label}: ${pickLang(data, key, lang) || '-'}`).join('\n');
         }
 
-        function buildCanvaPrompt(data = StorageHandler.load(), lang = 'en') {
+        
+        function getCanvaExportMode(data = StorageHandler.load()) {
+            return (data && data.layout === 'resume') ? 'resume' : 'portfolio';
+        }
+
+        function getCanvaModeLabel(mode = 'portfolio', lang = 'en') {
+            if (lang === 'th') return mode === 'resume' ? 'Resume / A4 CV' : 'Portfolio / Scrollytelling Website';
+            return mode === 'resume' ? 'Resume / A4 CV' : 'Portfolio / Scrollytelling Website';
+        }
+
+        function buildCanvaPrompt(data = StorageHandler.load(), lang = 'en', requestedMode = getCanvaExportMode(data)) {
             const isTh = lang === 'th';
+            const exportMode = requestedMode === 'resume' ? 'resume' : 'portfolio';
             const name = pickLang(data, 'name', lang) || (isTh ? 'เจ้าของพอร์ตโฟลิโอ' : 'Portfolio Owner');
             const role = pickLang(data, 'role', lang) || (isTh ? 'ผู้เชี่ยวชาญ' : 'Professional');
             const bio = pickLang(data, 'bio', lang);
             const skills = pickLang(data, 'skills', lang);
             const style = safeCanvaText(data.portfolioStyle || 'tech');
             const mode = safeCanvaText(data.colorMode || 'dark');
+            const resumeVis = { ...DEFAULT_RESUME_VISIBILITY, ...(data.resumeVisibility || {}) };
+            const visibleResumeComponents = Object.entries(resumeVis)
+                .filter(([, enabled]) => !!enabled)
+                .map(([key]) => key)
+                .join(', ') || 'profile, contact, skills, summary, experience';
             const contact = [
                 data.email ? `Email: ${safeCanvaText(data.email)}` : '',
                 data.phone ? `Phone: ${safeCanvaText(data.phone)}` : '',
                 data.linkedin ? `LinkedIn: ${safeCanvaText(data.linkedin)}` : ''
             ].filter(Boolean).join(' | ');
 
+            if (exportMode === 'resume') {
+                if (isTh) {
+                    return `สร้างดีไซน์ Resume / CV ขนาด A4 ใน Canva AI โดยอ้างอิงข้อมูลจาก Portfolio Mode ด้านล่างให้ครบถ้วน
+
+โหมดที่ผู้ใช้กดดาวน์โหลด: Resume / A4 CV
+
+เป้าหมายงานออกแบบ:
+- สร้างเป็น Resume / CV ขนาด A4 แนวตั้ง ไม่ใช่เว็บไซต์ scrollytelling และไม่ใช่โปสเตอร์ภาพนิ่ง
+- ให้เป็นเอกสารที่พร้อมพิมพ์ PDF บนกระดาษ A4 โดยใช้พื้นที่เต็มหน้าอย่างเหมาะสม
+- เว้น safe margin สำหรับการพิมพ์เอกสารราชการไทย อ่านง่าย ไม่ชิดขอบเกินไป
+- ใช้ข้อมูลจาก Portfolio เป็นหลัก แต่จัดใหม่ในรูปแบบ resume ที่กระชับ เป็นทางการ และมืออาชีพ
+- ห้ามใส่ปุ่ม Print, Export, Download, Theme selector, Dark/Light selector, Layout selector หรือปุ่มเปลี่ยนภาษาในตัว Resume A4
+- ห้ามเพิ่มข้อมูลที่ไม่มีอยู่จริง ถ้าข้อมูลบางส่วนไม่มี ให้เว้นส่วนหรือจัด layout ให้สวยโดยไม่แต่งเรื่องเพิ่ม
+
+สัดส่วน layout ที่ต้องการ:
+- ใช้ A4 portrait เต็มหน้า
+- แนะนำ 2 คอลัมน์แบบ resume: คอลัมน์ซ้ายสำหรับ Profile image, Name, Role, Contact, Skills และคอลัมน์ขวาสำหรับ Professional Summary, Experience/Projects, Education และส่วนเสริมที่เปิดไว้
+- ตำแหน่ง component ให้คงที่และสวยงาม ไม่ต้องทำให้ผู้ใช้ลากย้ายตำแหน่งเอง
+- Component ที่ควรแสดงตามค่าปัจจุบัน: ${visibleResumeComponents}
+- ให้คง hierarchy ชัดเจน มี section divider, timeline หรือ progress indicator ได้ตามความเหมาะสม
+
+Theme to adapt:
+${getThemeDescription(style, mode, 'th')}
+
+Profile data:
+ชื่อ: ${name}
+บทบาท/ตำแหน่ง: ${role}
+สรุปประวัติ: ${bio || 'สรุปประวัติจากข้อมูลที่มีให้กระชับและเป็นมืออาชีพ'}
+ทักษะ: ${skills || '-'}
+ติดต่อ: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'th')}
+
+Optional sections:
+${buildOptionalLines(data, 'th')}
+
+ข้อกำหนดเรื่องการแก้ไขใน Canva:
+- ข้อความทั้งหมดต้องเป็น editable Canva text boxes ไม่ใช่ภาพนิ่ง
+- ห้าม flatten, rasterize หรือ merge ข้อความเข้ากับภาพ
+- ชื่อ ตำแหน่ง ประวัติ ข้อมูลติดต่อ ทักษะ หัวข้อ section และข้อความทุกส่วนต้องแก้ไขได้ทีละส่วนใน Canva
+- ให้สร้างเป็นเลเยอร์/กลุ่มที่จัดระเบียบดี สามารถแก้ไข text และ section ได้ ไม่ใช่ภาพเดียวทั้งหน้า
+- หากมีรูปโปรไฟล์ ให้ใช้เป็น image placeholder ที่เปลี่ยนรูปได้ ไม่ฝังรวมกับพื้นหลัง`;
+                }
+
+                return `Create an editable A4 Resume / CV design in Canva AI using the current Portfolio Mode data below.
+
+Downloaded mode: Resume / A4 CV
+
+Design goal:
+- Build a portrait A4 resume/CV document, not a scrollytelling website and not a static poster.
+- Use the full A4 page area with print-safe spacing suitable for Thai official document printing.
+- Base the content on the portfolio data, but restructure it into a concise, formal, professional resume.
+- Do NOT include Print, Export, Download, Theme selector, Dark/Light selector, Layout selector, or Language switcher inside the A4 resume design.
+- Do not invent achievements, clients, certifications, references, or metrics that are not present in the data.
+
+Layout direction:
+- Use a full A4 portrait layout.
+- Prefer a clean two-column resume system: left column for profile image, name, role, contact, and skills; right column for professional summary, experience/projects, education, and enabled optional sections.
+- Component positions should remain fixed and visually balanced. Do not design it as a drag-and-drop builder.
+- Current visible resume components: ${visibleResumeComponents}
+- Use clear section dividers, timeline accents, or skill indicators when appropriate.
+
+Theme to adapt:
+${getThemeDescription(style, mode, 'en')}
+
+Profile data:
+Name: ${name}
+Role: ${role}
+Professional summary: ${bio || 'Create a concise professional summary from the available profile data.'}
+Skills: ${skills || '-'}
+Contact: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'en')}
+
+Optional sections:
+${buildOptionalLines(data, 'en')}
+
+Editability requirements for Canva:
+- All text must remain as editable Canva text boxes, not flattened images.
+- Do not flatten, rasterize, or merge text into graphics.
+- Name, role, summary, contact info, skills, section headings, and all body text must be individually editable in Canva.
+- Keep layers/groups organized so the resume can be edited section by section, not as one static full-page image.
+- If a profile photo is used, keep it as a replaceable image placeholder, not merged into the background.`;
+            }
+
             if (isTh) {
                 return `สร้างเว็บไซต์พอร์ตโฟลิโอแบบ scrollytelling ใน Canva AI โดยอ้างอิงข้อมูลและธีมต่อไปนี้ให้ครบถ้วน
 
-Project version: ${PROJECT_VERSION}
+โหมดที่ผู้ใช้กดดาวน์โหลด: Portfolio / Scrollytelling Website
 
 เป้าหมายงานออกแบบ:
 - สร้างเป็นหน้าเว็บพอร์ตโฟลิโอ ไม่ใช่เรซูเม่ธรรมดา และไม่ใช่ไฟล์สำหรับพิมพ์
@@ -687,7 +817,6 @@ Project version: ${PROJECT_VERSION}
 - ต้องมีความรู้สึกแบบ scrollytelling: เมื่อเลื่อนหน้าเว็บ ให้เนื้อหากับภาพผลงานค่อย ๆ เปิดเผยเป็นลำดับ มี section ของประสบการณ์/โปรเจกต์ที่เล่าเรื่องได้
 - หาก Canva AI ไม่สามารถทำ animation จริงได้ ให้จำลองด้วย long-form landing page ที่มีลำดับ section ชัดเจน, image gallery, timeline, card, และ visual rhythm แบบ scrollytelling
 - ต้องรักษาลักษณะธีม สี อารมณ์ และข้อมูลที่แสดงอยู่ในเว็บต้นฉบับให้ใกล้เคียงที่สุด
-- ไม่ต้องฝัง Base64 รูปภาพลงใน prompt หรือ JSON ให้ใช้ข้อความและโครงสร้างเป็นหลัก แล้วให้ผู้ใช้อัปโหลดรูปโปรเจกต์เข้า Canva เองภายหลัง
 
 Theme to duplicate:
 ${getThemeDescription(style, mode, 'th')}
@@ -723,17 +852,16 @@ ${buildOptionalLines(data, 'th')}
 
             return `Create a Canva AI website portfolio that duplicates the current portfolio theme, visual direction, and visible content as completely as possible.
 
-Project version: ${PROJECT_VERSION}
+Downloaded mode: Portfolio / Scrollytelling Website
 
 Design goal:
 - Build a public-facing portfolio website, not a printable document and not a generic resume.
 - The hero section MUST keep interactive website controls such as the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher.
 - Do NOT include Print, Export, Download, or file-download controls in the hero section or in the Canva-generated website.
-- Keep it as a smooth vertical scrolling website.
+- Create a smooth vertical scrolling website.
 - Use a scrollytelling feeling: as visitors scroll, content and project visuals should be revealed in a cinematic sequence. Experience/project sections should feel like story cards with image galleries, timelines, and strong visual rhythm.
 - If Canva AI cannot create real scroll animation, simulate the scrollytelling experience with a long-form landing page, clearly staged sections, timeline blocks, image galleries, and cinematic spacing.
 - Duplicate the original theme mood, color system, spacing, and portfolio identity as closely as Canva allows.
-- Do not embed Base64 images in the prompt or JSON. Use the text and structure first, then let the user manually upload the project images into Canva afterward.
 
 Theme to duplicate:
 ${getThemeDescription(style, mode, 'en')}
@@ -767,25 +895,51 @@ Editability requirements for Canva:
 - Keep the layout modular with editable sections/cards rather than one static poster image.`;
         }
 
-        function buildCanvaInstruction(lang = 'en') {
+
+                function buildCanvaInstruction(lang = 'en', requestedMode = getCanvaExportMode(StorageHandler.load())) {
+            const exportMode = requestedMode === 'resume' ? 'resume' : 'portfolio';
             if (lang === 'th') {
-                return `วิธีนำไฟล์ไปใช้กับ Canva AI / Magic Design
-Project version: ${PROJECT_VERSION}
+                if (exportMode === 'resume') {
+                    return `วิธีนำไฟล์ Resume Prompt ไปใช้กับ Canva AI / Magic Design
+
+โหมดไฟล์ชุดนี้: Resume / A4 CV
+
+ขั้นตอนสำคัญมาก:
+1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
+2. หากมีตัวเลือก ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Design from prompt, Document design หรือ AI ที่สร้าง A4 document ได้
+3. เปิดไฟล์ canva_prompt_resume_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางใน Canva AI
+4. ย้ำว่าให้ Canva สร้างเป็น A4 Resume / CV แบบ editable ไม่ใช่เว็บไซต์ ไม่ใช่ poster และไม่ใช่ภาพนิ่งเต็มหน้า
+5. หลังสร้างแล้ว ตรวจสอบว่า text ทุกจุดแก้ไขได้จริง เช่น ชื่อ ตำแหน่ง ประวัติ ประสบการณ์ ทักษะ และข้อมูลติดต่อ
+6. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษ แล้วเติมเฉพาะข้อมูลที่จำเป็นจาก portfolio_data_snapshot.json
+7. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_resume_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน
+8. ตรวจสอบ safe margin ก่อน export PDF เพื่อพิมพ์ A4
+
+ไฟล์ข้อมูล:
+- portfolio_data_snapshot.json คือข้อมูลทั้งหมด ณ เวลาที่กดดาวน์โหลด ใช้สำรองข้อมูลและคัดลอกข้อมูลเพิ่มเข้า Canva ได้
+- ไฟล์ .json สามารถเปิดด้วย Notepad ได้ โดยคลิกขวา > Open with > Notepad หรือเปิดด้วย VS Code / browser ก็ได้
+- ถ้าเห็นตัวอักษรติดกันเยอะ ให้ใช้ Notepad แบบ Word Wrap หรือเปิดผ่าน VS Code จะอ่านง่ายกว่า
+
+หมายเหตุ:
+- ชุดไฟล์นี้ไม่ใช้ Canva API และไม่ใช้ Canva SDK จึงไม่มีค่า API
+- โหมด Resume จะไม่ใส่ Theme selector, Mode selector, Language switcher, Print หรือ Export controls ลงในเอกสาร A4
+- ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
+                }
+                return `วิธีนำไฟล์ Portfolio Prompt ไปใช้กับ Canva AI / Magic Design
+
+โหมดไฟล์ชุดนี้: Portfolio / Scrollytelling Website
 
 ขั้นตอนสำคัญมาก:
 1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
 2. ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Website Code, Code for website, หรือช่องสร้างเว็บด้วย AI ที่รองรับการสร้างหน้าเว็บจากคำสั่ง
 3. ห้ามเริ่มจาก template presentation / poster / document ทั่วไปก่อน เพราะ Canva มักจะไม่ทำ layout ให้เหมือนเว็บ scrollytelling
-4. เปิดไฟล์ canva_prompt_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
+4. เปิดไฟล์ canva_prompt_portfolio_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
 5. ตรวจสอบว่า prompt ระบุให้คง Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษาไว้ แต่ไม่ใส่ Print/Export/Download
-6. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน เพราะ Canva เข้าใจ prompt ภาษาอังกฤษได้แม่นกว่า
-7. หาก Canva จำกัดความยาว prompt ให้เริ่มจาก canva_prompt_en.txt แล้วเติมข้อมูลสำคัญจาก portfolio_data_snapshot.json เฉพาะส่วนที่จำเป็น
+6. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_portfolio_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน เพราะ Canva เข้าใจ prompt ภาษาอังกฤษได้แม่นกว่า
+7. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษ แล้วเติมข้อมูลสำคัญจาก portfolio_data_snapshot.json เฉพาะส่วนที่จำเป็น
 8. หลัง Canva สร้างดีไซน์แล้ว ให้ตรวจสอบชื่อ ตำแหน่ง ประสบการณ์ รูปภาพ และข้อมูลติดต่ออีกครั้งก่อนเผยแพร่
 
 ไฟล์ข้อมูล:
 - portfolio_data_snapshot.json คือข้อมูลทั้งหมด ณ เวลาที่กดดาวน์โหลด ใช้สำรองข้อมูลและคัดลอกข้อมูลเพิ่มเข้า Canva ได้
-- ไฟล์ JSON นี้เป็น text-only snapshot: ไม่ฝังรูป Base64 เพื่อไม่ให้ชนข้อจำกัดตัวอักษรของ Canva AI ประมาณ 50K characters และเพื่อให้เปิดอ่านง่ายขึ้น
-- หากมีรูปโปรเจกต์ ให้ upload รูปจริงเข้า Canva ด้วยตัวเอง แล้วนำไปวางใน section/project card ที่ Canva สร้างให้
 - ไฟล์ .json สามารถเปิดด้วย Notepad ได้ โดยคลิกขวา > Open with > Notepad หรือเปิดด้วย VS Code / browser ก็ได้
 - ถ้าเห็นตัวอักษรติดกันเยอะ ให้ใช้ Notepad แบบ Word Wrap หรือเปิดผ่าน VS Code จะอ่านง่ายกว่า
 
@@ -794,23 +948,47 @@ Project version: ${PROJECT_VERSION}
 - Canva AI อาจไม่รองรับ animation แบบ scrollytelling เต็มรูปแบบ ให้ใช้ prompt เพื่อให้ Canva สร้าง layout ที่จำลองประสบการณ์การเลื่อนหน้าเว็บแทน
 - ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
             }
-            return `How to use these files with Canva AI / Magic Design
-Project version: ${PROJECT_VERSION}
+            if (exportMode === 'resume') {
+                return `How to use this Resume Prompt package with Canva AI / Magic Design
+
+Package mode: Resume / A4 CV
+
+Very important steps:
+1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
+2. If available, choose a function related to Code, Design from prompt, Document design, or an AI tool that can create an A4 document.
+3. Open canva_prompt_resume_en.txt and paste the full prompt into Canva AI.
+4. Make sure Canva generates an editable A4 Resume / CV, not a website, not a poster, and not one flattened full-page image.
+5. After generation, verify that every text area is editable: name, role, summary, experience, skills, and contact details.
+6. If Canva limits prompt length, start with the English prompt, then add only important missing details from portfolio_data_snapshot.json.
+7. canva_prompt_resume_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
+8. Check print-safe margins before exporting the resume as PDF.
+
+Data files:
+- portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
+- .json files can be opened with Notepad: right click > Open with > Notepad. You can also open them with VS Code or a browser.
+- If the JSON appears as a long block of text, enable Word Wrap in Notepad or open it in VS Code for easier reading.
+
+Notes:
+- This package does not use Canva API or Canva SDK, so there is no API cost.
+- Resume mode does not include Theme selector, Mode selector, Language switcher, Print, or Export controls inside the A4 document.
+- Review privacy and team sharing settings before pasting sensitive personal data into Canva.`;
+            }
+            return `How to use this Portfolio Prompt package with Canva AI / Magic Design
+
+Package mode: Portfolio / Scrollytelling Website
 
 Very important steps:
 1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
 2. Choose the Code, Website Code, Code for website, or AI website creation function that can generate a web page from a prompt.
 3. Do not start from a normal presentation / poster / document template, because Canva will usually not recreate the scrollytelling website layout correctly.
-4. Open canva_prompt_en.txt and paste the full prompt into Canva's Code/Website AI function.
+4. Open canva_prompt_portfolio_en.txt and paste the full prompt into Canva's Code/Website AI function.
 5. Confirm that the prompt keeps the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher, but removes Print/Export/Download controls.
-6. canva_prompt_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
-7. If Canva limits prompt length, start with canva_prompt_en.txt, then add only the most important missing details from portfolio_data_snapshot.json.
+6. canva_prompt_portfolio_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
+7. If Canva limits prompt length, start with the English prompt, then add only the most important missing details from portfolio_data_snapshot.json.
 8. After Canva generates the design, carefully review the name, role, experience, images, and contact information before publishing.
 
 Data files:
 - portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
-- This JSON is a text-only snapshot: Base64 images are not embedded, to avoid Canva AI character limits around 50K characters and to keep the file readable.
-- If you have project images, upload the real image files to Canva manually, then place them in the matching generated section/project card.
 - .json files can be opened with Notepad: right click > Open with > Notepad. You can also open them with VS Code or a browser.
 - If the JSON appears as a long block of text, enable Word Wrap in Notepad or open it in VS Code for easier reading.
 
@@ -820,61 +998,21 @@ Notes:
 - Review privacy and team sharing settings before pasting sensitive personal data into Canva.`;
         }
 
-        function buildCanvaDataSnapshot(data = StorageHandler.load()) {
+
+        function buildCanvaDataSnapshot(data = StorageHandler.load(), requestedMode = getCanvaExportMode(data)) {
             const clean = JSON.parse(JSON.stringify(data || {}));
             delete clean._isFirstRunDemo;
             delete clean._hasStoredCache;
-
-            const imageManifest = [];
-            const looksLikeBase64Image = (value) => typeof value === 'string' && /^data:image\//i.test(value);
-
-            if (looksLikeBase64Image(clean.avatar)) {
-                imageManifest.push({ scope: 'profile', field: 'avatar', note: 'Profile image was available in the live portfolio but is intentionally not embedded in this Canva AI JSON.' });
-                clean.avatar = '';
-                clean.avatar_note = 'Image removed from Canva AI snapshot to stay below Canva prompt/character limits. Upload the profile image manually in Canva if needed.';
-            }
-
-            if (Array.isArray(clean.exp)) {
-                clean.exp = clean.exp.map((item, index) => {
-                    const cloned = { ...item };
-                    const images = Array.isArray(cloned.images) ? cloned.images : [];
-                    const count = images.length;
-                    if (count > 0) {
-                        imageManifest.push({
-                            scope: 'experience',
-                            index,
-                            title_th: cloned.title_th || cloned.title || '',
-                            title_en: cloned.title_en || cloned.title || '',
-                            image_count: count,
-                            note: 'Project images were available in the live portfolio but are intentionally not embedded in this Canva AI JSON.'
-                        });
-                    }
-                    cloned.images = [];
-                    cloned.image_count = count;
-                    cloned.image_note = count > 0
-                        ? 'Images removed from Canva AI snapshot to avoid Canva AI character limits. Upload the original project images manually in Canva and place them in this project section.'
-                        : 'No project image stored for this item.';
-                    return cloned;
-                });
-            }
-
             return {
-                project_name: PROJECT_NAME,
-                project_version: PROJECT_VERSION,
                 exported_at: new Date().toISOString(),
-                export_type: 'canva_ai_prompt_package_no_api_no_sdk_text_only_snapshot',
-                app_note: 'Snapshot of portfolio data at download time. Generated locally in the browser. Base64 images are intentionally excluded for Canva AI character-limit safety.',
-                image_policy: {
-                    embedded_base64_images: false,
-                    reason: 'Canva AI prompt/code input may be limited. Base64 images can exceed the limit and are not reliably reconstructed by Canva AI.',
-                    user_action: 'Upload profile/project images manually into Canva, then place them in the generated sections.'
-                },
-                image_manifest: imageManifest,
+                export_type: `canva_ai_${requestedMode === 'resume' ? 'resume_a4' : 'portfolio_website'}_prompt_package_no_api_no_sdk`,
+                prompt_mode: requestedMode,
+                app_note: 'Snapshot of portfolio data at download time. This file is generated locally in the browser.',
                 canva_package_files: [
-                    'canva_prompt_en.txt',
-                    'canva_prompt_th.txt',
-                    'canva_instruction_en.txt',
-                    'canva_instruction_th.txt',
+                    `canva_prompt_${requestedMode}_en.txt`,
+                    `canva_prompt_${requestedMode}_th.txt`,
+                    `canva_instruction_${requestedMode}_en.txt`,
+                    `canva_instruction_${requestedMode}_th.txt`,
                     'portfolio_data_snapshot.json'
                 ],
                 data: clean
@@ -897,13 +1035,14 @@ Notes:
         async function downloadCanvaPackage() {
             const data = StorageHandler.load();
             const stamp = getCanvaTimestamp();
-            const folderName = `canva-ai-pack-${PROJECT_VERSION}-${stamp}`;
+            const exportMode = getCanvaExportMode(data);
+            const folderName = `canva-ai-pack-${exportMode}-${stamp}`;
             const files = {
-                'canva_prompt_en.txt': buildCanvaPrompt(data, 'en'),
-                'canva_prompt_th.txt': buildCanvaPrompt(data, 'th'),
-                'canva_instruction_en.txt': buildCanvaInstruction('en'),
-                'canva_instruction_th.txt': buildCanvaInstruction('th'),
-                'portfolio_data_snapshot.json': JSON.stringify(buildCanvaDataSnapshot(data), null, 2)
+                [`canva_prompt_${exportMode}_en.txt`]: buildCanvaPrompt(data, 'en', exportMode),
+                [`canva_prompt_${exportMode}_th.txt`]: buildCanvaPrompt(data, 'th', exportMode),
+                [`canva_instruction_${exportMode}_en.txt`]: buildCanvaInstruction('en', exportMode),
+                [`canva_instruction_${exportMode}_th.txt`]: buildCanvaInstruction('th', exportMode),
+                'portfolio_data_snapshot.json': JSON.stringify(buildCanvaDataSnapshot(data, exportMode), null, 2)
             };
 
             if (!window.JSZip) {
@@ -927,14 +1066,16 @@ Notes:
             a.click();
             a.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1500);
-            showCanvaToast('Canva AI Pack ZIP downloaded');
+            showCanvaToast(`${getCanvaModeLabel(exportMode, 'en')} Canva Pack ZIP downloaded`);
         }
 
         async function copyCanvaPrompt(lang = 'en') {
-            const prompt = buildCanvaPrompt(StorageHandler.load(), lang === 'th' ? 'th' : 'en');
+            const data = StorageHandler.load();
+            const exportMode = getCanvaExportMode(data);
+            const prompt = buildCanvaPrompt(data, lang === 'th' ? 'th' : 'en', exportMode);
             try {
                 await navigator.clipboard.writeText(prompt);
-                showCanvaToast(lang === 'th' ? 'Thai Canva prompt copied' : 'English Canva prompt copied');
+                showCanvaToast(lang === 'th' ? `Thai ${getCanvaModeLabel(exportMode, 'en')} prompt copied` : `English ${getCanvaModeLabel(exportMode, 'en')} prompt copied`);
             } catch (err) {
                 const textarea = document.createElement('textarea');
                 textarea.value = prompt;
@@ -945,7 +1086,7 @@ Notes:
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                showCanvaToast(lang === 'th' ? 'Thai Canva prompt copied' : 'English Canva prompt copied');
+                showCanvaToast(lang === 'th' ? `Thai ${getCanvaModeLabel(exportMode, 'en')} prompt copied` : `English ${getCanvaModeLabel(exportMode, 'en')} prompt copied`);
             }
         }
 
@@ -1159,8 +1300,28 @@ Notes:
             setTimeout(() => { themeWheelLock = false; setDirectTheme(next.dataset.theme, { skipScroll: true }); }, 260);
         }
 
+        const RESUME_VIS_KEYS = ['profile','contact','skills','summary','experience','education','certifications','awards','services','clients','articles','caseStudies','testimonials'];
+        const DEFAULT_RESUME_VISIBILITY = Object.fromEntries(RESUME_VIS_KEYS.map(k => [k, true]));
+        function getResumeVisibilityFromUI(fallback = DEFAULT_RESUME_VISIBILITY) {
+            const out = { ...DEFAULT_RESUME_VISIBILITY, ...(fallback || {}) };
+            RESUME_VIS_KEYS.forEach(k => { const el = document.getElementById('rv-' + k); if (el) out[k] = !!el.checked; });
+            return out;
+        }
+        function applyResumeVisibilityToUI(data = StorageHandler.load()) {
+            const vis = { ...DEFAULT_RESUME_VISIBILITY, ...(data.resumeVisibility || {}) };
+            RESUME_VIS_KEYS.forEach(k => { const el = document.getElementById('rv-' + k); if (el) el.checked = vis[k] !== false; });
+        }
+        function setResumeVisibilityPreset(type) {
+            const presets = {
+                full: DEFAULT_RESUME_VISIBILITY,
+                official: { profile:true, contact:true, skills:true, summary:true, experience:true, education:true, certifications:true, awards:true, services:false, clients:false, articles:false, caseStudies:false, testimonials:false }
+            };
+            const selected = presets[type] || DEFAULT_RESUME_VISIBILITY;
+            RESUME_VIS_KEYS.forEach(k => { const el = document.getElementById('rv-' + k); if (el) el.checked = selected[k] !== false; });
+        }
+
         function switchTab(tabId) {
-            ['basic', 'contact', 'experience', 'sections'].forEach(t => {
+            ['basic', 'contact', 'experience', 'sections', 'resume'].forEach(t => {
                 document.getElementById('content-' + t).classList.add('hidden');
                 document.getElementById('content-' + t).classList.remove('block');
                 document.getElementById('tab-' + t).classList.replace('tab-active', 'tab-inactive');
@@ -1175,7 +1336,7 @@ Notes:
             const modal = document.getElementById('edit-modal');
             modal.classList.toggle('hidden');
             modal.classList.toggle('flex');
-            if (!modal.classList.contains('hidden')) refreshExpPreview();
+            if (!modal.classList.contains('hidden')) { refreshExpPreview(); applyResumeVisibilityToUI(); }
         }
 
         function openExperienceEditor(index = -1) {
@@ -1403,7 +1564,7 @@ Notes:
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
             const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
-            const data = { layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            const data = { projectVersion: 'v40', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
             StorageHandler.save(data); render(data); toggleModal();
         }
 
@@ -1477,6 +1638,7 @@ Notes:
                 wheelLight.classList.toggle('active', colorMode === 'light');
             }
             document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active')); if (document.getElementById(`swatch-${pStyle}`)) document.getElementById(`swatch-${pStyle}`).classList.add('active');
+            const resumeVis = { ...DEFAULT_RESUME_VISIBILITY, ...(displayData.resumeVisibility || {}) };
             const localizedData = { name: displayData[`name_${lang}`] || displayData.name_th || '', role: displayData[`role_${lang}`] || displayData.role_th || '', bio: displayData[`bio_${lang}`] || displayData.bio_th || '', skills: displayData[`skills_${lang}`] || displayData.skills_th || '', education: displayData[`education_${lang}`] || '', certifications: displayData[`certifications_${lang}`] || '', awards: displayData[`awards_${lang}`] || '', caseStudies: displayData[`caseStudies_${lang}`] || '', services: displayData[`services_${lang}`] || '', testimonials: displayData[`testimonials_${lang}`] || '', clients: displayData[`clients_${lang}`] || '', cta: displayData[`cta_${lang}`] || '', articles: displayData[`articles_${lang}`] || '', exp: (displayData.exp || []).map(e => ({ ...e, company: e[`company_${lang}`] || e.company_th || e.company || '', title: e[`title_${lang}`] || e.title_th || e.title || '', desc: e[`desc_${lang}`] || e.desc_th || e.desc || '', highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || [] })) };
             const themeBGs = { tech: { dark: 'bg-[#020617]', light: 'bg-slate-50' }, educ: { dark: 'bg-[#022c22]', light: 'bg-emerald-50' }, gov: { dark: 'bg-[#0f172a]', light: 'bg-slate-100' }, creative: { dark: 'bg-[#2e1065]', light: 'bg-fuchsia-50' }, minimal: { dark: 'bg-black', light: 'bg-white' }, eco: { dark: 'bg-[#042f2e]', light: 'bg-teal-50' }, bold: { dark: 'bg-[#450a0a]', light: 'bg-rose-50' }, luxury: { dark: 'bg-[#1e1b4b]', light: 'bg-indigo-50' }, health: { dark: 'bg-[#062b33]', light: 'bg-cyan-50' }, esports: { dark: 'bg-[#160b35]', light: 'bg-violet-50' } };
             const currentBg = themeBGs[pStyle] ? themeBGs[pStyle][colorMode] : themeBGs['tech'][colorMode];
@@ -1498,48 +1660,49 @@ Notes:
                         case 'esports': decorationsHTML = `<div class="absolute inset-0 opacity-45"><div class="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,transparent_46%,rgba(139,92,246,.16)_48%,rgba(34,211,238,.12)_52%,transparent_56%,transparent_100%)] animate-[esports-sweep_5s_ease-in-out_infinite] will-change-transform"></div><div class="absolute left-[8%] top-[18%] w-[36vw] h-[36vw] bg-[conic-gradient(from_90deg,transparent,rgba(34,211,238,.16),transparent,rgba(139,92,246,.14),transparent)] blur-2xl animate-[esports-spin_14s_linear_infinite] will-change-transform"></div></div>`; break;
                     }
                 }
+                const oldMouseGrid = document.getElementById('mouse-grid-field');
+                if (oldMouseGrid) oldMouseGrid.remove();
                 if (layout === 'portfolio') {
-                    const gridCells = Array.from({ length: 9 }, (_, i) => `<span class="mouse-cell mouse-cell-${i + 1}" data-cell="${i + 1}"></span>`).join('');
-                    decorationContainer.innerHTML = `${decorationsHTML}<div id="mouse-grid-field" aria-hidden="true">${gridCells}</div>`;
+                    decorationContainer.innerHTML = decorationsHTML;
+                    const gridCells = Array.from({ length: 9 }, (_, i) => `<span class="mouse-cell" data-cell="${i + 1}"></span>`).join('');
+                    const gridRoot = document.createElement('div');
+                    gridRoot.id = 'mouse-grid-field';
+                    gridRoot.setAttribute('aria-hidden', 'true');
+                    gridRoot.innerHTML = gridCells;
+                    document.body.appendChild(gridRoot);
                     requestAnimationFrame(initMicroInteractions);
                 } else {
                     decorationContainer.innerHTML = decorationsHTML;
                 }
             }
 
-            if (layout === 'resume') { app.className = `container mx-auto py-12 px-10 max-w-4xl shadow-2xl border my-10 min-h-[1000px] rounded-sm fade-in ${colorMode === 'dark' ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200'}`; } else { app.className = "container mx-auto py-24 px-6 fade-in w-full max-w-full"; }
+            if (layout === 'resume') { app.className = `resume-a4-preview fade-in`; } else { app.className = "container mx-auto py-24 px-6 fade-in w-full max-w-full"; }
 
             let appContent = '';
             if (layout === 'resume') {
+                const sideProfile = resumeVis.profile ? `<div id="header-section" class="print-order-1">${HeaderComponent.render(localizedData.name, localizedData.role, layout, displayData.avatar, colorMode, pStyle, lang)}</div>` : '';
+                const sideContact = resumeVis.contact ? `<div class="resume-sidebar-block print-order-2">${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}</div>` : '';
+                const sideSkills = resumeVis.skills ? `<div class="resume-sidebar-block print-order-3">${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}</div>` : '';
+                const mainTop = [
+                    resumeVis.summary ? BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.education ? EducationComponent.render(localizedData.education, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.certifications ? CertificationComponent.render(localizedData.certifications, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.awards ? AwardsComponent.render(localizedData.awards, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.services ? ServicesComponent.render(localizedData.services, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.clients ? ClientsComponent.render(localizedData.clients, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.articles ? ArticlesComponent.render(localizedData.articles, layout, colorMode, pStyle, lang) : ''
+                ].join('');
+                const mainWork = [
+                    resumeVis.experience ? ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.caseStudies ? CaseStudyComponent.render(localizedData.caseStudies, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.testimonials ? TestimonialsComponent.render(localizedData.testimonials, layout, colorMode, pStyle, lang) : ''
+                ].join('');
                 appContent = `
-                    <div class="resume-cv-shell print-layout-wrapper">
-                        <aside class="resume-cv-sidebar">
-                            <div id="header-section" class="print-order-1">
-                                ${HeaderComponent.render(localizedData.name, localizedData.role, layout, displayData.avatar, colorMode, pStyle, lang)}
-                            </div>
-                            <div class="resume-sidebar-block print-order-2">
-                                ${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}
-                            </div>
-                            <div class="resume-sidebar-block print-order-3">
-                                ${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}
-                            </div>
-                        </aside>
+                    <div class="resume-cv-shell print-layout-wrapper resume-fixed-map resume-a4-sheet">
+                        <aside class="resume-cv-sidebar">${sideProfile}${sideContact}${sideSkills}</aside>
                         <main class="resume-cv-main">
-                            <div class="print-order-4 resume-section-card">
-                                ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
-
-                                ${EducationComponent.render(localizedData.education, layout, colorMode, pStyle, lang)}
-                                ${CertificationComponent.render(localizedData.certifications, layout, colorMode, pStyle, lang)}
-                                ${AwardsComponent.render(localizedData.awards, layout, colorMode, pStyle, lang)}
-                                ${ServicesComponent.render(localizedData.services, layout, colorMode, pStyle, lang)}
-                                ${ClientsComponent.render(localizedData.clients, layout, colorMode, pStyle, lang)}
-                                ${ArticlesComponent.render(localizedData.articles, layout, colorMode, pStyle, lang)}
-                            </div>
-                            <div class="print-order-5 resume-section-card">
-                                ${ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang)}
-                                ${CaseStudyComponent.render(localizedData.caseStudies, layout, colorMode, pStyle, lang)}
-                                ${TestimonialsComponent.render(localizedData.testimonials, layout, colorMode, pStyle, lang)}
-                            </div>
+                            <div class="print-order-4 resume-section-card">${mainTop}</div>
+                            <div class="print-order-5 resume-section-card">${mainWork}</div>
                         </main>
                     </div>
                 `;
@@ -1608,119 +1771,75 @@ Notes:
         }
 
 
-        function initMicroInteractions() {
+                function initMicroInteractions() {
             if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            if (window.matchMedia && !window.matchMedia('(min-width: 1024px)').matches) return;
-
             const grid = document.getElementById('mouse-grid-field');
             const cells = grid ? Array.from(grid.querySelectorAll('.mouse-cell')) : [];
             if (!grid || cells.length !== 9) return;
 
+            if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+            if (window._portfolioMouseMove) window.removeEventListener('mousemove', window._portfolioMouseMove);
+            if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioMouseLeave) document.removeEventListener('mouseleave', window._portfolioMouseLeave);
+
             let raf = null;
-            let visible = false;
-            let targetX = window.innerWidth / 2;
-            let targetY = window.innerHeight / 2;
-            let currentX = targetX;
-            let currentY = targetY;
-            let vx = 0;
-            let vy = 0;
-            let lastMove = performance.now();
-
-            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-            const lerp = (a, b, t) => a + (b - a) * t;
-
-            const cellDefs = [
-                { n: 1, gx: -1, gy: -1 }, { n: 2, gx: 0, gy: -1 }, { n: 3, gx: 1, gy: -1 },
-                { n: 4, gx: -1, gy: 0 },  { n: 5, gx: 0, gy: 0 },  { n: 6, gx: 1, gy: 0 },
-                { n: 7, gx: -1, gy: 1 },  { n: 8, gx: 0, gy: 1 },  { n: 9, gx: 1, gy: 1 }
-            ];
-
-            cells.forEach((cell, i) => {
-                const def = cellDefs[i];
-                cell.dataset.cell = String(def.n);
-                cell.style.setProperty('--gx', def.gx);
-                cell.style.setProperty('--gy', def.gy);
-            });
+            let tx = window.innerWidth / 2, ty = Math.max(160, window.innerHeight / 2);
+            let cx = tx, cy = ty;
+            const layoutCells = [[-1,-1],[0,-1],[1,-1],[-1,0],[0,0],[1,0],[-1,1],[0,1],[1,1]];
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const lerp = (a,b,t) => a + (b-a)*t;
 
             const update = () => {
                 raf = null;
-                currentX = lerp(currentX, targetX, 0.22);
-                currentY = lerp(currentY, targetY, 0.22);
-
-                const speed = clamp(Math.hypot(vx, vy) / 75, 0, 1);
-                grid.style.setProperty('--cursor-x', `${currentX.toFixed(2)}px`);
-                grid.style.setProperty('--cursor-y', `${currentY.toFixed(2)}px`);
-                grid.style.setProperty('--grid-energy', `${(0.62 + speed * 0.28).toFixed(3)}`);
-
-                const heroFrame = document.querySelector('.hero-frame');
-                if (heroFrame) {
-                    const rect = heroFrame.getBoundingClientRect();
-                    const localX = ((currentX - rect.left) / Math.max(1, rect.width)) * 100;
-                    const localY = ((currentY - rect.top) / Math.max(1, rect.height)) * 100;
-                    heroFrame.style.setProperty('--profile-light-x', `${clamp(localX, 0, 100).toFixed(1)}%`);
-                    heroFrame.style.setProperty('--profile-light-y', `${clamp(localY, 0, 100).toFixed(1)}%`);
+                if (!document.body.classList.contains('layout-portfolio')) {
+                    grid.style.opacity = '0';
+                    return;
                 }
-
+                cx = lerp(cx, tx, .28);
+                cy = lerp(cy, ty, .28);
+                const size = clamp(Math.min(window.innerWidth, window.innerHeight) * .118, 86, 132);
+                grid.style.setProperty('--grid-x', `${cx}px`);
+                grid.style.setProperty('--grid-y', `${cy}px`);
+                grid.style.setProperty('--grid-size', `${size}px`);
+                grid.style.opacity = '1';
                 cells.forEach((cell, i) => {
-                    const def = cellDefs[i];
-                    const isCenter = def.n === 5;
-                    const dist = Math.hypot(def.gx, def.gy);
-                    const strength = isCenter ? 0 : (dist > 1 ? 0.72 : 1);
-
-                    // Cell 5 is always centered under the cursor. The other 8 cells tilt inward toward cell 5.
-                    const maxTilt = 17;
-                    const rx = isCenter ? 0 : clamp(def.gy * maxTilt * strength, -maxTilt, maxTilt);
-                    const ry = isCenter ? 0 : clamp(-def.gx * maxTilt * strength, -maxTilt, maxTilt);
-                    const z = isCenter ? 18 : 8 + (1.2 - Math.min(dist, 1.2)) * 9;
-                    const edgeFade = isCenter ? 1 : (dist > 1 ? 0.58 : 0.76);
-
+                    const [gx, gy] = layoutCells[i];
+                    const isCenter = i === 4;
+                    const dist = Math.hypot(gx, gy) || 1;
+                    // Cell 5 is the cursor anchor. Neighbor cells tilt toward the cursor.
+                    const rx = isCenter ? 0 : clamp(gy * -10.5 / dist, -11, 11);
+                    const ry = isCenter ? 0 : clamp(gx * 10.5 / dist, -11, 11);
+                    cell.style.setProperty('--cell-x', `${gx * size}px`);
+                    cell.style.setProperty('--cell-y', `${gy * size}px`);
                     cell.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
                     cell.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
-                    cell.style.setProperty('--z', `${z.toFixed(2)}px`);
-                    cell.style.setProperty('--cell-alpha', `${edgeFade.toFixed(3)}`);
+                    cell.style.setProperty('--cell-opacity', isCenter ? .34 : .56);
+                    cell.classList.toggle('is-center', isCenter);
                 });
+                if (Math.abs(cx - tx) > .45 || Math.abs(cy - ty) > .45) raf = requestAnimationFrame(update);
+            };
 
-                vx *= 0.74;
-                vy *= 0.74;
-                if (Math.abs(currentX - targetX) > 0.22 || Math.abs(currentY - targetY) > 0.22 || Math.hypot(vx, vy) > 0.22) {
-                    raf = requestAnimationFrame(update);
+            const move = (e) => {
+                if (e && typeof e.clientX === 'number') {
+                    tx = e.clientX;
+                    ty = e.clientY;
                 }
+                grid.style.opacity = '1';
+                if (!raf) raf = requestAnimationFrame(update);
             };
+            const leave = () => { grid.style.opacity = '0'; };
 
-            const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
-
-            if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
-            if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
-            if (window._portfolioPointerEnter) window.removeEventListener('pointerenter', window._portfolioPointerEnter);
-
-            window._portfolioPointerEnter = () => {
-                visible = true;
-                grid.classList.add('is-active');
-                schedule();
-            };
-
-            window._portfolioPointerMove = (e) => {
-                if (e.pointerType && e.pointerType !== 'mouse') return;
-                const now = performance.now();
-                const dt = Math.max(16, now - lastMove);
-                vx = (e.clientX - targetX) / dt * 16;
-                vy = (e.clientY - targetY) / dt * 16;
-                targetX = e.clientX;
-                targetY = e.clientY;
-                lastMove = now;
-                if (!visible) window._portfolioPointerEnter();
-                schedule();
-            };
-
-            window._portfolioPointerLeave = () => {
-                visible = false;
-                grid.classList.remove('is-active');
-            };
-
-            window.addEventListener('pointerenter', window._portfolioPointerEnter, { passive: true });
+            window._portfolioPointerMove = move;
+            window._portfolioMouseMove = move;
+            window._portfolioPointerLeave = leave;
+            window._portfolioMouseLeave = leave;
             window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+            window.addEventListener('mousemove', window._portfolioMouseMove, { passive: true });
             window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+            document.addEventListener('mouseleave', window._portfolioMouseLeave, { passive: true });
+            update();
         }
+
 
         function playThemeTransition(theme, fromTheme) {
             if (document.body.classList.contains('is-downloaded')) return;

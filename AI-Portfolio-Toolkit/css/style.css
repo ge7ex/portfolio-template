@@ -4141,217 +4141,495 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
   }
 }
 
-
 /* ==================================
-   v36 Project version + visible cursor tilt grid
-   - Shows the current project version in the navbar
-   - Makes the 3x3 cursor tilt grid clearly visible on desktop
-   - Keeps mobile/tablet clean by disabling heavy pointer effects below 1024px
+   v39 Cursor-local seamless tilt grid + full A4 resume layout
 ===================================== */
-.project-version-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) 55%, rgba(255,255,255,.12));
-  background: rgba(15, 23, 42, .72);
-  color: #e0f2fe;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .08em;
-  line-height: 1;
-  box-shadow: 0 10px 30px rgba(0,0,0,.22), 0 0 22px color-mix(in srgb, var(--theme-accent, #3b82f6) 22%, transparent);
-  user-select: none;
+:root{--project-version:'v40'}
+#mouse-grid-field{
+  position:fixed!important;
+  inset:0!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  perspective:900px!important;
+  opacity:0!important;
+  transition:opacity .24s ease!important;
+  contain:layout paint style!important;
 }
-
-#theme-decorations {
-  z-index: 1 !important;
+body.layout-portfolio #mouse-grid-field{display:block!important;}
+.mouse-cell{
+  position:fixed!important;
+  left:var(--grid-x,50vw)!important;
+  top:var(--grid-y,50vh)!important;
+  width:var(--grid-size,96px)!important;
+  height:var(--grid-size,96px)!important;
+  display:block!important;
+  opacity:var(--cell-opacity,.25)!important;
+  transform:translate3d(calc(-50% + var(--cell-x,0px)),calc(-50% + var(--cell-y,0px)),0) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important;
+  transform-style:preserve-3d!important;
+  border:1px solid color-mix(in srgb,var(--print-accent,#8b5cf6) 58%,transparent)!important;
+  border-radius:14px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.01))!important;
+  box-shadow:0 0 18px color-mix(in srgb,var(--print-accent,#8b5cf6) 18%,transparent), inset 0 0 18px rgba(255,255,255,.025)!important;
+  backdrop-filter:blur(.6px)!important;
+  transition:opacity .18s ease, border-color .18s ease, transform .08s linear!important;
+  will-change:transform,opacity!important;
 }
-
-#app {
-  position: relative !important;
-  z-index: 2 !important;
+.mouse-cell.is-center{
+  border-style:dashed!important;
+  background:transparent!important;
+  box-shadow:0 0 10px color-mix(in srgb,var(--print-accent-2,#22d3ee) 16%,transparent)!important;
 }
-
-body > nav.fixed,
-#theme-panel,
-#public-canva-branch,
-#public-export-branch,
-#canva-copy-toast {
-  z-index: 60 !important;
+@media (hover:none),(pointer:coarse),(max-width:1023px){#mouse-grid-field,.mouse-cell{display:none!important}}
+.resume-toggle-grid label{
+  display:flex;align-items:center;gap:.65rem;padding:.85rem 1rem;border:1px solid rgba(148,163,184,.22);border-radius:1rem;background:rgba(15,23,42,.72);color:#e2e8f0;font-weight:800;font-size:.9rem
 }
-
-body.layout-portfolio #mouse-grid-field {
-  display: grid !important;
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  grid-template-columns: repeat(9, 1fr) !important;
-  grid-template-rows: repeat(6, 1fr) !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
-  opacity: .54 !important;
-  perspective: 1050px !important;
-  transform-style: preserve-3d !important;
-  mix-blend-mode: screen;
-  contain: layout paint !important;
-}
-
-body.mode-light.layout-portfolio #mouse-grid-field {
-  opacity: .32 !important;
-  mix-blend-mode: multiply;
-}
-
-body.layout-portfolio #mouse-grid-field::after {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  pointer-events: none !important;
-  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) 25%, transparent) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04) !important;
-}
-
-body.layout-portfolio .mouse-cell {
-  --cell-i: 0;
-  --rx: 0deg;
-  --ry: 0deg;
-  --z: 0px;
-  --shadow-x: 0px;
-  --shadow-y: 0px;
-  position: relative !important;
-  transform:
-    perspective(760px)
-    rotateX(var(--rx))
-    rotateY(var(--ry))
-    translateZ(var(--z))
-    scale(calc(1 + (var(--cell-i) * .025))) !important;
-  transform-origin: center center !important;
-  transform-style: preserve-3d !important;
-  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(9% + (var(--cell-i) * 55%)), transparent) !important;
-  background:
-    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(4% + (var(--cell-i) * 18%)), transparent), transparent 56%),
-    linear-gradient(135deg, rgba(255,255,255, calc(.018 + (var(--cell-i) * .09))), transparent 62%) !important;
-  opacity: calc(.055 + (var(--cell-i) * .46)) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255, calc(.008 + (var(--cell-i) * .055))),
-    var(--shadow-x) var(--shadow-y) calc(18px + (var(--cell-i) * 34px)) rgba(0,0,0, calc(.04 + (var(--cell-i) * .18))),
-    0 0 calc(8px + (var(--cell-i) * 22px)) color-mix(in srgb, var(--theme-accent, #3b82f6) calc(var(--cell-i) * 34%), transparent) !important;
-  transition:
-    border-color .32s cubic-bezier(.2,.8,.2,1),
-    opacity .32s cubic-bezier(.2,.8,.2,1),
-    background .32s cubic-bezier(.2,.8,.2,1),
-    box-shadow .32s cubic-bezier(.2,.8,.2,1) !important;
-  will-change: transform, opacity, box-shadow !important;
-}
-
-@media (max-width: 1023px), print, (prefers-reduced-motion: reduce) {
-  .project-version-badge { display: none !important; }
-  body.layout-portfolio #mouse-grid-field,
-  body.layout-portfolio .mouse-cell { display: none !important; }
+.resume-toggle-grid input{width:1rem;height:1rem;accent-color:#22d3ee}
+body.layout-resume #app{max-width:1120px!important;width:min(1120px,calc(100vw - 32px))!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+body.layout-resume .resume-fixed-map.resume-cv-shell{width:100%!important;min-height:1120px;grid-template-columns:minmax(260px,31%) 1fr!important;border-radius:0!important;box-shadow:0 30px 100px rgba(0,0,0,.22)!important}
+body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;object-position:center!important;aspect-ratio:1/1!important}
+@media print{
+  body.layout-resume #app{width:210mm!important;max-width:210mm!important;margin:0 auto!important;padding:0!important}
+  body.layout-resume .resume-fixed-map.resume-cv-shell{width:210mm!important;min-height:297mm!important;grid-template-columns:68mm 142mm!important;border:0!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important}
+  body.layout-resume .resume-cv-sidebar{padding:12mm 7mm!important;min-height:297mm!important}
+  body.layout-resume .resume-cv-main{padding:12mm 11mm!important;min-height:297mm!important}
+  body.layout-resume .resume-cv-sidebar header img{width:30mm!important;height:30mm!important;margin:0 0 6mm 0!important;border-radius:8mm!important;object-fit:cover!important;object-position:center!important}
+  body.layout-resume .resume-cv-sidebar header h1{font-size:18pt!important;line-height:1.14!important}
+  body.layout-resume .resume-cv-sidebar header p{font-size:9pt!important;line-height:1.35!important}
+  body.layout-resume .resume-cv-main section{margin-bottom:5mm!important;break-inside:avoid!important}
+  body.layout-resume .resume-cv-main h3{font-size:13pt!important;margin:0 0 4mm 0!important;padding-bottom:2mm!important}
+  body.layout-resume .resume-cv-main h4{font-size:11pt!important;line-height:1.3!important}
+  body.layout-resume .resume-cv-main p,body.layout-resume .resume-cv-main li,body.layout-resume .resume-cv-main span{font-size:9.5pt!important;line-height:1.45!important}
+  body.layout-resume .extra-card{padding:3mm!important;margin-bottom:3mm!important;break-inside:avoid!important}
 }
 
 
 /* ==================================
-   v37 Seamless 3x3 cursor-local tilt grid
-   - Only 9 cells appear around the cursor
-   - Cursor is always cell 5 / center
-   - Cells 1,2,3,4,6,7,8,9 tilt inward toward cursor
-   - Low-noise seamless overlay, desktop only
+   v39 final override: true full-sheet A4 resume + visible seamless cursor grid
+   - Resume mode uses the whole 210mm x 297mm sheet, not a cropped card.
+   - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
 ===================================== */
-body.layout-portfolio #mouse-grid-field {
-  --cursor-x: 50vw;
-  --cursor-y: 50vh;
-  --grid-cell: clamp(74px, 8.2vw, 118px);
-  --grid-gap: 0px;
-  display: grid !important;
-  position: fixed !important;
-  left: var(--cursor-x) !important;
-  top: var(--cursor-y) !important;
-  width: calc(var(--grid-cell) * 3) !important;
-  height: calc(var(--grid-cell) * 3) !important;
-  grid-template-columns: repeat(3, var(--grid-cell)) !important;
-  grid-template-rows: repeat(3, var(--grid-cell)) !important;
-  gap: var(--grid-gap) !important;
-  inset: auto !important;
-  transform: translate3d(-50%, -50%, 0) !important;
-  transform-style: preserve-3d !important;
-  perspective: 860px !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
-  opacity: 0 !important;
-  mix-blend-mode: screen !important;
-  contain: layout paint style !important;
-  transition: opacity .18s ease !important;
+:root{
+  --project-version:'v40';
+  --resume-a4-width:210mm;
+  --resume-a4-height:297mm;
+  --resume-left-col:64mm;
+  --resume-right-col:146mm;
+  --resume-screen-shadow:0 32px 110px rgba(0,0,0,.34);
 }
 
-body.mode-light.layout-portfolio #mouse-grid-field {
-  mix-blend-mode: multiply !important;
+/* Put the cursor grid above the background but below nav/modals. */
+body.layout-portfolio #mouse-grid-field{
+  position:fixed!important;
+  inset:0!important;
+  z-index:18!important;
+  pointer-events:none!important;
+  perspective:920px!important;
+  opacity:1!important;
+  display:block!important;
+  transition:opacity .18s ease!important;
+  contain:layout paint style!important;
+}
+body.layout-portfolio .mouse-cell{
+  position:fixed!important;
+  left:var(--grid-x,50vw)!important;
+  top:var(--grid-y,50vh)!important;
+  width:var(--grid-size,96px)!important;
+  height:var(--grid-size,96px)!important;
+  display:block!important;
+  opacity:var(--cell-opacity,.38)!important;
+  transform:translate3d(calc(-50% + var(--cell-x,0px)),calc(-50% + var(--cell-y,0px)),0) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important;
+  transform-style:preserve-3d!important;
+  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 72%,transparent)!important;
+  border-radius:16px!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.060),rgba(255,255,255,.012))!important;
+  box-shadow:0 0 22px color-mix(in srgb,var(--print-accent,#a855f7) 24%,transparent), inset 0 0 22px rgba(255,255,255,.035)!important;
+  backdrop-filter:blur(.4px)!important;
+  transition:opacity .16s ease, transform .08s linear!important;
+  will-change:transform,opacity!important;
+}
+body.layout-portfolio .mouse-cell.is-center{
+  opacity:.24!important;
+  border-style:dashed!important;
+  background:rgba(255,255,255,.012)!important;
+  box-shadow:0 0 14px color-mix(in srgb,var(--print-accent-2,#22d3ee) 22%,transparent)!important;
+}
+body.layout-resume #mouse-grid-field,
+body.layout-resume .mouse-cell{display:none!important;}
+@media (hover:none),(pointer:coarse),(max-width:1023px){
+  #mouse-grid-field,.mouse-cell{display:none!important;}
 }
 
-body.layout-portfolio #mouse-grid-field.is-active {
-  opacity: .72 !important;
+/* Resume page preview: a real A4 sheet, not a container card. */
+body.layout-resume{
+  background:#101827!important;
+  overflow-x:auto!important;
+}
+body.layout-resume #app,
+body.layout-resume .resume-a4-preview{
+  width:var(--resume-a4-width)!important;
+  max-width:none!important;
+  min-width:var(--resume-a4-width)!important;
+  min-height:var(--resume-a4-height)!important;
+  margin:6.8rem auto 3rem!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#ffffff!important;
+  box-shadow:var(--resume-screen-shadow)!important;
+  overflow:visible!important;
+}
+body.layout-resume .resume-fixed-map.resume-cv-shell,
+body.layout-resume .resume-a4-sheet{
+  width:var(--resume-a4-width)!important;
+  min-width:var(--resume-a4-width)!important;
+  min-height:var(--resume-a4-height)!important;
+  display:grid!important;
+  grid-template-columns:var(--resume-left-col) var(--resume-right-col)!important;
+  align-items:stretch!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+  background:#ffffff!important;
+}
+body.layout-resume .resume-cv-sidebar{
+  min-height:var(--resume-a4-height)!important;
+  padding:14mm 7mm 13mm!important;
+  background:linear-gradient(160deg,var(--resume-sidebar-1,#0f766e) 0%,var(--resume-sidebar-2,#134e4a) 45%,var(--resume-sidebar-3,#0f172a) 100%)!important;
+  color:#ffffff!important;
+  display:block!important;
+}
+body.layout-resume .resume-cv-main{
+  min-height:var(--resume-a4-height)!important;
+  padding:13mm 13mm 13mm 12mm!important;
+  background:#ffffff!important;
+  color:#0f172a!important;
+  display:block!important;
+}
+body.layout-resume .resume-section-card,
+body.layout-resume .resume-cv-main > div,
+body.layout-resume .resume-cv-main section,
+body.layout-resume .resume-cv-sidebar section,
+body.layout-resume .resume-sidebar-block{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  padding:0!important;
 }
 
-body.mode-light.layout-portfolio #mouse-grid-field.is-active {
-  opacity: .38 !important;
+/* Sidebar: compact, full-height CV column similar to standard A4 resume templates. */
+body.layout-resume .resume-cv-sidebar header{
+  display:block!important;
+  text-align:left!important;
+  padding:0 0 8mm!important;
+  margin:0 0 8mm!important;
+  border:0!important;
+  border-bottom:1px solid rgba(255,255,255,.32)!important;
+}
+body.layout-resume .resume-cv-sidebar header img{
+  width:34mm!important;
+  height:34mm!important;
+  min-width:34mm!important;
+  min-height:34mm!important;
+  margin:0 0 5.5mm!important;
+  border-radius:999px!important;
+  border:2mm solid rgba(255,255,255,.90)!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  box-shadow:none!important;
+}
+body.layout-resume .resume-cv-sidebar header h1{
+  font-size:20pt!important;
+  line-height:1.04!important;
+  letter-spacing:.04em!important;
+  margin:0!important;
+  color:#ffffff!important;
+  word-break:break-word!important;
+}
+body.layout-resume .resume-cv-sidebar header p{
+  font-size:9.3pt!important;
+  line-height:1.35!important;
+  letter-spacing:.10em!important;
+  margin:3mm 0 0!important;
+  color:rgba(255,255,255,.86)!important;
+}
+body.layout-resume .resume-cv-sidebar h3{
+  font-size:10.5pt!important;
+  line-height:1.25!important;
+  margin:0 0 4mm!important;
+  padding:0 0 2mm!important;
+  border-left:0!important;
+  border-bottom:1px solid rgba(255,255,255,.36)!important;
+  background:transparent!important;
+  color:#ffffff!important;
+  letter-spacing:.08em!important;
+}
+body.layout-resume .resume-cv-sidebar .contact-section,
+body.layout-resume .resume-cv-sidebar .skills-section{
+  margin:0 0 8mm!important;
+}
+body.layout-resume .resume-cv-sidebar p,
+body.layout-resume .resume-cv-sidebar li,
+body.layout-resume .resume-cv-sidebar span,
+body.layout-resume .resume-cv-sidebar a,
+body.layout-resume .resume-cv-sidebar div{
+  font-size:8.5pt!important;
+  line-height:1.42!important;
+  color:rgba(255,255,255,.90)!important;
+}
+body.layout-resume .resume-cv-sidebar .flex.flex-wrap{
+  gap:2.2mm!important;
+}
+body.layout-resume .resume-cv-sidebar .flex.flex-wrap span{
+  border:1px solid rgba(255,255,255,.28)!important;
+  background:rgba(255,255,255,.08)!important;
+  color:#ffffff!important;
+  box-shadow:none!important;
+  border-radius:999px!important;
+  padding:1.4mm 2.4mm!important;
+  font-size:7.6pt!important;
+  line-height:1.25!important;
 }
 
-body.layout-portfolio #mouse-grid-field::before,
-body.layout-portfolio #mouse-grid-field::after {
-  display: none !important;
-  content: none !important;
+/* Main column: use available area with smaller spacing and a professional A4 rhythm. */
+body.layout-resume .resume-cv-main section{
+  margin:0 0 6.2mm!important;
+  break-inside:avoid!important;
+  page-break-inside:avoid!important;
+}
+body.layout-resume .resume-cv-main h3{
+  display:flex!important;
+  align-items:center!important;
+  min-height:auto!important;
+  font-size:12.5pt!important;
+  line-height:1.18!important;
+  margin:0 0 4mm!important;
+  padding:0 0 2mm!important;
+  border-left:0!important;
+  border-bottom:1.2pt solid var(--resume-accent,#0f766e)!important;
+  background:transparent!important;
+  color:var(--resume-accent,#0f766e)!important;
+  letter-spacing:.055em!important;
+}
+body.layout-resume .resume-cv-main p,
+body.layout-resume .resume-cv-main li,
+body.layout-resume .resume-cv-main span,
+body.layout-resume .resume-cv-main div:not(.glow-point){
+  font-size:9pt!important;
+  line-height:1.44!important;
+  color:#334155!important;
+}
+body.layout-resume .resume-cv-main h4{
+  font-size:11.2pt!important;
+  line-height:1.24!important;
+  margin:1mm 0 .6mm!important;
+  color:#0f172a!important;
+}
+body.layout-resume .resume-cv-main h5{
+  font-size:9.2pt!important;
+  line-height:1.28!important;
+  margin:.6mm 0 1.4mm!important;
+  color:var(--resume-accent,#0f766e)!important;
+}
+body.layout-resume .resume-cv-main ul{
+  margin-top:2mm!important;
+  padding-left:5.5mm!important;
+  gap:0!important;
+}
+body.layout-resume .resume-cv-main li{
+  margin:0 0 1.2mm!important;
+  padding-left:0!important;
+}
+body.layout-resume .resume-cv-main .resume-card,
+body.layout-resume .resume-cv-main .print-exp-item{
+  margin:0 0 5.6mm!important;
+  padding:1mm 0 1mm 7mm!important;
+  border-left:1.2pt solid var(--resume-accent,#0f766e)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  break-inside:avoid!important;
+  page-break-inside:avoid!important;
+}
+body.layout-resume .resume-cv-main .glow-point{
+  width:2.8mm!important;
+  height:2.8mm!important;
+  left:-1.55mm!important;
+  top:2.6mm!important;
+  border-radius:999px!important;
+  box-shadow:none!important;
+  ring:0!important;
+  background:var(--resume-accent-2,#14b8a6)!important;
+}
+body.layout-resume .resume-cv-main .resume-card > span,
+body.layout-resume .resume-cv-main .print-exp-item > span,
+body.layout-resume .resume-cv-main .font-mono{
+  font-size:8.2pt!important;
+  letter-spacing:.02em!important;
+  color:var(--resume-accent,#0f766e)!important;
 }
 
-body.layout-portfolio .mouse-cell {
-  --rx: 0deg;
-  --ry: 0deg;
-  --z: 0px;
-  --cell-alpha: .66;
-  position: relative !important;
-  display: block !important;
-  width: var(--grid-cell) !important;
-  height: var(--grid-cell) !important;
-  border-radius: 0 !important;
-  transform:
-    perspective(820px)
-    rotateX(var(--rx))
-    rotateY(var(--ry))
-    translateZ(var(--z)) !important;
-  transform-origin: center center !important;
-  transform-style: preserve-3d !important;
-  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) 34%, transparent) !important;
-  border-right-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 18%, transparent) !important;
-  border-bottom-color: color-mix(in srgb, var(--theme-accent, #3b82f6) 20%, transparent) !important;
+/* Screen fallback: keep A4 proportions but allow mobile users to inspect it without broken columns. */
+@media screen and (max-width: 900px){
+  body.layout-resume #app,
+  body.layout-resume .resume-a4-preview{
+    width:calc(100vw - 24px)!important;
+    min-width:0!important;
+    margin:5.5rem 12px 2rem!important;
+  }
+  body.layout-resume .resume-fixed-map.resume-cv-shell,
+  body.layout-resume .resume-a4-sheet{
+    width:100%!important;
+    min-width:0!important;
+    grid-template-columns:1fr!important;
+  }
+  body.layout-resume .resume-cv-sidebar,
+  body.layout-resume .resume-cv-main{
+    min-height:auto!important;
+    padding:24px 20px!important;
+  }
+  body.layout-resume .resume-cv-sidebar header img{
+    width:92px!important;
+    height:92px!important;
+    min-width:92px!important;
+    min-height:92px!important;
+  }
+}
+
+@page{
+  size:A4 portrait;
+  margin:0;
+}
+@media print{
+  html,body{
+    width:210mm!important;
+    min-height:297mm!important;
+    margin:0!important;
+    padding:0!important;
+    background:#ffffff!important;
+    -webkit-print-color-adjust:exact!important;
+    print-color-adjust:exact!important;
+  }
+  body.layout-resume #app,
+  body.layout-resume .resume-a4-preview{
+    width:210mm!important;
+    max-width:210mm!important;
+    min-width:210mm!important;
+    min-height:297mm!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    box-shadow:none!important;
+    background:#ffffff!important;
+  }
+  body.layout-resume .resume-fixed-map.resume-cv-shell,
+  body.layout-resume .resume-a4-sheet{
+    width:210mm!important;
+    min-width:210mm!important;
+    min-height:297mm!important;
+    grid-template-columns:64mm 146mm!important;
+    box-shadow:none!important;
+    border:0!important;
+    border-radius:0!important;
+  }
+  body.layout-resume .resume-cv-sidebar{
+    min-height:297mm!important;
+    padding:14mm 7mm 13mm!important;
+  }
+  body.layout-resume .resume-cv-main{
+    min-height:297mm!important;
+    padding:13mm 13mm 13mm 12mm!important;
+  }
+  body.layout-resume .resume-section-card,
+  body.layout-resume .resume-cv-main section,
+  body.layout-resume .resume-cv-sidebar section,
+  body.layout-resume .resume-sidebar-block{
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+  }
+  body.layout-resume .resume-cv-sidebar header,
+  body.layout-resume .resume-cv-main > .resume-section-card:first-child,
+  body.layout-resume .resume-cv-main > section:first-child{
+    break-after:auto!important;
+    page-break-after:auto!important;
+  }
+  body.layout-resume nav,
+  body.layout-resume #export-panel,
+  body.layout-resume #canva-panel,
+  body.layout-resume #theme-panel,
+  body.layout-resume #scroll-progress,
+  body.layout-resume #theme-decorations,
+  body.layout-resume #mouse-grid-field,
+  body.layout-resume .no-print{
+    display:none!important;
+  }
+}
+
+
+/* ==================================
+   v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
+   The grid is intentionally above portfolio content but below the fixed nav.
+===================================== */
+:root{--project-version:'v40'}
+body.layout-portfolio #mouse-grid-field{
+  position:fixed!important;
+  inset:0!important;
+  z-index:49!important;
+  pointer-events:none!important;
+  display:block!important;
+  opacity:1!important;
+  perspective:1000px!important;
+  transform-style:preserve-3d!important;
+  contain:layout paint style!important;
+  mix-blend-mode:screen!important;
+}
+body.layout-portfolio #mouse-grid-field::before{
+  content:''!important;
+  position:fixed!important;
+  left:var(--grid-x,50vw)!important;
+  top:var(--grid-y,50vh)!important;
+  width:calc(var(--grid-size,104px) * 3.18)!important;
+  height:calc(var(--grid-size,104px) * 3.18)!important;
+  transform:translate(-50%,-50%)!important;
+  border-radius:22px!important;
+  background:radial-gradient(circle at center, color-mix(in srgb,var(--print-accent-2,#22d3ee) 18%,transparent) 0%, transparent 58%)!important;
+  opacity:.42!important;
+  filter:blur(10px)!important;
+}
+body.layout-portfolio #mouse-grid-field .mouse-cell{
+  position:fixed!important;
+  left:var(--grid-x,50vw)!important;
+  top:var(--grid-y,50vh)!important;
+  width:var(--grid-size,104px)!important;
+  height:var(--grid-size,104px)!important;
+  display:block!important;
+  opacity:var(--cell-opacity,.52)!important;
+  transform:translate3d(calc(-50% + var(--cell-x,0px)),calc(-50% + var(--cell-y,0px)),0) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important;
+  transform-style:preserve-3d!important;
+  transform-origin:center center!important;
+  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 78%,transparent)!important;
+  border-radius:14px!important;
   background:
-    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 8%, transparent), transparent 62%),
-    linear-gradient(135deg, rgba(255,255,255,.055), rgba(255,255,255,.012)) !important;
-  opacity: calc(var(--cell-alpha) * var(--grid-energy, .72)) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.035),
-    0 0 22px color-mix(in srgb, var(--theme-accent, #3b82f6) 14%, transparent) !important;
-  transition:
-    opacity .16s ease,
-    border-color .16s ease,
-    background .16s ease,
-    box-shadow .16s ease !important;
-  will-change: transform, opacity !important;
+    linear-gradient(90deg, color-mix(in srgb,var(--print-accent-2,#22d3ee) 15%,transparent) 1px, transparent 1px),
+    linear-gradient(0deg, color-mix(in srgb,var(--print-accent-2,#22d3ee) 15%,transparent) 1px, transparent 1px),
+    linear-gradient(135deg,rgba(255,255,255,.070),rgba(255,255,255,.012))!important;
+  background-size:calc(var(--grid-size,104px) / 2) calc(var(--grid-size,104px) / 2), calc(var(--grid-size,104px) / 2) calc(var(--grid-size,104px) / 2), auto!important;
+  box-shadow:0 0 22px color-mix(in srgb,var(--print-accent,#a855f7) 30%,transparent), inset 0 0 22px rgba(255,255,255,.045)!important;
+  backdrop-filter:blur(.3px)!important;
+  transition:opacity .12s ease, transform .045s linear!important;
+  will-change:transform,opacity!important;
 }
-
-body.layout-portfolio .mouse-cell-5 {
-  background:
-    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 17%, transparent), transparent 58%),
-    linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.016)) !important;
-  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 48%, transparent) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,.06),
-    0 0 30px color-mix(in srgb, var(--theme-accent-2, #38bdf8) 22%, transparent) !important;
+body.layout-portfolio #mouse-grid-field .mouse-cell.is-center{
+  opacity:.34!important;
+  border-style:dashed!important;
+  border-color:color-mix(in srgb,var(--print-accent-2,#22d3ee) 80%,transparent)!important;
+  background:transparent!important;
+  box-shadow:0 0 18px color-mix(in srgb,var(--print-accent-2,#22d3ee) 30%,transparent)!important;
 }
-
-@media (max-width: 1023px), print, (prefers-reduced-motion: reduce) {
-  body.layout-portfolio #mouse-grid-field,
-  body.layout-portfolio .mouse-cell { display: none !important; }
+body.layout-resume #mouse-grid-field,
+body.layout-resume #mouse-grid-field .mouse-cell{display:none!important;opacity:0!important;}
+@media (hover:none),(pointer:coarse),(max-width:1023px){
+  #mouse-grid-field,#mouse-grid-field .mouse-cell{display:none!important;opacity:0!important;}
 }
+@media print{#mouse-grid-field,#mouse-grid-field .mouse-cell{display:none!important;}}
