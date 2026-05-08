@@ -1564,7 +1564,7 @@ Notes:
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
             const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
-            const data = { projectVersion: 'v40', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            const data = { projectVersion: 'v41', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
             StorageHandler.save(data); render(data); toggleModal();
         }
 
@@ -2277,6 +2277,130 @@ Notes:
                 btn.innerHTML = originalHtml;
                 createPortfolioIcons();
             }
+        }
+
+
+
+        /* v41: True cursor-local seamless 3x3 tilt grid
+           - Hidden until the mouse actually moves
+           - Center cell (#5) is always anchored to the cursor
+           - Neighbor cells tilt toward the cursor
+           - Uses a new ID to avoid legacy #mouse-grid-field CSS collisions
+        */
+        function ensureCursorLocalGrid() {
+            const legacy = document.getElementById('mouse-grid-field');
+            if (legacy) legacy.remove();
+            let grid = document.getElementById('cursor-local-grid');
+            if (!document.body.classList.contains('layout-portfolio')) {
+                if (grid) grid.remove();
+                return null;
+            }
+            if (!grid) {
+                grid = document.createElement('div');
+                grid.id = 'cursor-local-grid';
+                grid.setAttribute('aria-hidden', 'true');
+                grid.innerHTML = Array.from({ length: 9 }, (_, i) => `<span class="cursor-local-cell" data-cell="${i + 1}"></span>`).join('');
+                document.body.appendChild(grid);
+            }
+            return grid;
+        }
+
+        function initMicroInteractions() {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse), (max-width: 1023px)').matches) return;
+
+            const grid = ensureCursorLocalGrid();
+            const cells = grid ? Array.from(grid.querySelectorAll('.cursor-local-cell')) : [];
+            if (!grid || cells.length !== 9) return;
+
+            if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+            if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioDocLeave) document.removeEventListener('mouseleave', window._portfolioDocLeave);
+
+            let raf = null;
+            let targetX = 0, targetY = 0, currentX = 0, currentY = 0;
+            let hasPointer = false;
+            const layoutCells = [
+                [-1, -1], [0, -1], [1, -1],
+                [-1,  0], [0,  0], [1,  0],
+                [-1,  1], [0,  1], [1,  1]
+            ];
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const lerp = (a, b, t) => a + (b - a) * t;
+
+            const paint = () => {
+                raf = null;
+                if (!document.body.classList.contains('layout-portfolio')) {
+                    grid.classList.remove('is-active');
+                    return;
+                }
+                if (!hasPointer) return;
+
+                currentX = lerp(currentX, targetX, 0.34);
+                currentY = lerp(currentY, targetY, 0.34);
+
+                const size = clamp(Math.min(window.innerWidth, window.innerHeight) * 0.095, 72, 116);
+                grid.style.setProperty('--cursor-grid-size', `${size}px`);
+
+                cells.forEach((cell, i) => {
+                    const [gx, gy] = layoutCells[i];
+                    const isCenter = i === 4;
+                    const cellX = currentX + gx * size;
+                    const cellY = currentY + gy * size;
+                    const toCursorX = currentX - cellX;
+                    const toCursorY = currentY - cellY;
+                    const distance = Math.max(1, Math.hypot(toCursorX, toCursorY));
+                    const pullX = toCursorX / distance;
+                    const pullY = toCursorY / distance;
+                    const strength = isCenter ? 0 : (Math.abs(gx) + Math.abs(gy) === 2 ? 9.5 : 7.25);
+
+                    cell.style.setProperty('--cell-left', `${cellX}px`);
+                    cell.style.setProperty('--cell-top', `${cellY}px`);
+                    cell.style.setProperty('--rx', `${(-pullY * strength).toFixed(2)}deg`);
+                    cell.style.setProperty('--ry', `${(pullX * strength).toFixed(2)}deg`);
+                    cell.style.setProperty('--z', `${isCenter ? 0 : 10}px`);
+                    cell.style.setProperty('--cell-opacity', `${isCenter ? 0.18 : 0.36}`);
+                    cell.classList.toggle('is-center', isCenter);
+                });
+
+                grid.classList.add('is-active');
+                if (Math.abs(currentX - targetX) > 0.25 || Math.abs(currentY - targetY) > 0.25) {
+                    raf = requestAnimationFrame(paint);
+                }
+            };
+
+            const move = (ev) => {
+                if (!ev || typeof ev.clientX !== 'number') return;
+                const nav = document.querySelector('nav');
+                if (nav && nav.contains(ev.target)) {
+                    grid.classList.remove('is-active');
+                    return;
+                }
+                targetX = ev.clientX;
+                targetY = ev.clientY;
+                if (!hasPointer) {
+                    currentX = targetX;
+                    currentY = targetY;
+                    hasPointer = true;
+                }
+                if (!raf) raf = requestAnimationFrame(paint);
+            };
+
+            const leave = () => {
+                hasPointer = false;
+                grid.classList.remove('is-active');
+                if (raf) {
+                    cancelAnimationFrame(raf);
+                    raf = null;
+                }
+            };
+
+            window._portfolioPointerMove = move;
+            window._portfolioPointerLeave = leave;
+            window._portfolioDocLeave = leave;
+            window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+            window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+            document.addEventListener('mouseleave', window._portfolioDocLeave, { passive: true });
         }
 
         let hasBootedPortfolioApp = false;

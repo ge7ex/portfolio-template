@@ -4144,7 +4144,7 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
 /* ==================================
    v39 Cursor-local seamless tilt grid + full A4 resume layout
 ===================================== */
-:root{--project-version:'v40'}
+:root{--project-version:'v41'}
 #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4209,7 +4209,7 @@ body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;obje
    - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
 ===================================== */
 :root{
-  --project-version:'v40';
+  --project-version:'v41';
   --resume-a4-width:210mm;
   --resume-a4-height:297mm;
   --resume-left-col:64mm;
@@ -4571,7 +4571,7 @@ body.layout-resume .resume-cv-main .font-mono{
    v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
    The grid is intentionally above portfolio content but below the fixed nav.
 ===================================== */
-:root{--project-version:'v40'}
+:root{--project-version:'v41'}
 body.layout-portfolio #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4633,3 +4633,76 @@ body.layout-resume #mouse-grid-field .mouse-cell{display:none!important;opacity:
   #mouse-grid-field,#mouse-grid-field .mouse-cell{display:none!important;opacity:0!important;}
 }
 @media print{#mouse-grid-field,#mouse-grid-field .mouse-cell{display:none!important;}}
+
+
+/* ==================================
+   v41: true cursor-local seamless 3x3 tilt grid
+   Replaces legacy #mouse-grid-field that produced the unwanted static center tile.
+===================================== */
+#mouse-grid-field,
+#mouse-grid-field .mouse-cell{
+  display:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+}
+body.layout-portfolio #cursor-local-grid{
+  --cursor-grid-size:88px;
+  position:fixed!important;
+  inset:0!important;
+  z-index:8!important;
+  pointer-events:none!important;
+  opacity:0!important;
+  transition:opacity .18s ease!important;
+  perspective:980px!important;
+  transform-style:preserve-3d!important;
+  mix-blend-mode:screen!important;
+  contain:layout paint style!important;
+}
+body.layout-portfolio #cursor-local-grid.is-active{
+  opacity:1!important;
+}
+body.layout-portfolio .cursor-local-cell{
+  position:fixed!important;
+  left:var(--cell-left, -9999px)!important;
+  top:var(--cell-top, -9999px)!important;
+  width:var(--cursor-grid-size,88px)!important;
+  height:var(--cursor-grid-size,88px)!important;
+  display:block!important;
+  border-radius:12px!important;
+  transform:
+    translate(-50%,-50%)
+    perspective(820px)
+    rotateX(var(--rx,0deg))
+    rotateY(var(--ry,0deg))
+    translateZ(var(--z,0px))!important;
+  transform-origin:center center!important;
+  transform-style:preserve-3d!important;
+  opacity:var(--cell-opacity,.34)!important;
+  border:1px solid color-mix(in srgb,var(--theme-accent-2,#22d3ee) 36%,transparent)!important;
+  background:
+    linear-gradient(90deg, color-mix(in srgb,var(--theme-accent-2,#22d3ee) 14%,transparent) 1px, transparent 1px),
+    linear-gradient(0deg, color-mix(in srgb,var(--theme-accent-2,#22d3ee) 14%,transparent) 1px, transparent 1px),
+    linear-gradient(135deg,rgba(255,255,255,.038),rgba(255,255,255,.006))!important;
+  background-size:calc(var(--cursor-grid-size,88px)/2) calc(var(--cursor-grid-size,88px)/2), calc(var(--cursor-grid-size,88px)/2) calc(var(--cursor-grid-size,88px)/2), auto!important;
+  box-shadow:0 0 18px color-mix(in srgb,var(--theme-accent,#a855f7) 18%,transparent), inset 0 0 16px rgba(255,255,255,.025)!important;
+  backdrop-filter:blur(.15px)!important;
+  will-change:transform,opacity,left,top!important;
+}
+body.layout-portfolio .cursor-local-cell.is-center{
+  opacity:.16!important;
+  border-color:color-mix(in srgb,var(--theme-accent-2,#22d3ee) 24%,transparent)!important;
+  border-style:dashed!important;
+  background:transparent!important;
+  box-shadow:0 0 12px color-mix(in srgb,var(--theme-accent-2,#22d3ee) 14%,transparent)!important;
+}
+body.layout-resume #cursor-local-grid,
+body.layout-resume .cursor-local-cell{
+  display:none!important;
+  opacity:0!important;
+}
+@media (hover:none),(pointer:coarse),(max-width:1023px),print{
+  #cursor-local-grid,.cursor-local-cell{
+    display:none!important;
+    opacity:0!important;
+  }
+}
