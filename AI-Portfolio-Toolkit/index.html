@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AI Portfolio Pro Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -82,20 +81,14 @@
 
     <div id="watermark">Web Portfolio by Kasidech "Ge7ex" Settavanit</div>
 
-    <nav class="fixed top-6 right-6 z-50 flex items-center gap-3" aria-label="Primary portfolio controls">
-        <button type="button" onclick="toggleMobileControls(event)" id="btn-mobile-menu"
-            class="bg-slate-900/85 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-12 h-12 rounded-full shadow-lg transition-all font-bold uppercase text-sm hidden items-center justify-center"
-            aria-expanded="false" aria-controls="mobile-control-panel" title="Menu">
-            <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
-
+    <nav class="fixed top-6 right-6 z-50 flex items-center gap-3">
         <button onclick="toggleLang()" id="btn-lang"
             class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all font-bold uppercase text-sm flex items-center justify-center">
             EN
         </button>
 
         <div
-            class="layout-pill-switcher bg-slate-900/80 backdrop-blur-xl border border-white/10 p-1 rounded-full flex shadow-lg items-center relative">
+            class="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-1 rounded-full flex shadow-lg items-center relative">
             <button onclick="setDirectLayout('portfolio')" id="btn-pill-portfolio"
                 class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md">Portfolio</button>
             <button onclick="setDirectLayout('resume')" id="btn-pill-resume"
@@ -113,28 +106,12 @@
             <i data-lucide="printer" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
         </button>
 
-        <button onclick="toggleModal()" id="btn-edit-main"
+        <button onclick="toggleModal()"
             class="bg-emerald-600/90 hover:bg-emerald-500 text-white backdrop-blur-xl border border-emerald-400/30 px-5 h-11 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 group">
             <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
             <span class="text-sm">Edit</span>
         </button>
     </nav>
-
-    <div id="mobile-control-panel" class="hidden mobile-control-panel" aria-label="Mobile quick controls">
-        <div class="mobile-control-head">
-            <span>Quick Controls</span>
-            <button type="button" onclick="closeMobileControls()" aria-label="Close mobile menu"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-        <div class="mobile-control-grid">
-            <button type="button" onclick="toggleLang(); closeMobileControls();" id="mobile-btn-lang" class="mobile-control-button">EN</button>
-            <button type="button" onclick="setDirectLayout('portfolio'); closeMobileControls();" id="mobile-pill-portfolio" class="mobile-control-button">Portfolio</button>
-            <button type="button" onclick="setDirectLayout('resume'); closeMobileControls();" id="mobile-pill-resume" class="mobile-control-button">Resume</button>
-            <button type="button" onclick="toggleThemePanel(); closeMobileControls();" id="mobile-btn-appearance" class="mobile-control-button"><i data-lucide="palette" class="w-4 h-4"></i><span>Theme</span></button>
-            <button type="button" onclick="handlePrint('portrait'); closeMobileControls();" id="mobile-btn-pdf" class="mobile-control-button"><i data-lucide="file-down" class="w-4 h-4"></i><span>PDF</span></button>
-            <button type="button" onclick="handleExportPPTX(); closeMobileControls();" id="mobile-btn-pptx" class="mobile-control-button"><i data-lucide="file-presentation" class="w-4 h-4"></i><span>PPTX</span></button>
-            <button type="button" onclick="toggleModal(); closeMobileControls();" id="mobile-btn-edit" class="mobile-control-button mobile-control-primary"><i data-lucide="settings" class="w-4 h-4"></i><span>Edit</span></button>
-        </div>
-    </div>
 
     <div id="public-export-branch" class="hidden public-export-branch" aria-label="Quick export actions">
         <button type="button" onclick="handleExportWeb()" title="Download WEB"><i data-lucide="download" class="w-4 h-4"></i><span>WEB</span></button>
@@ -490,8 +467,8 @@
                     class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 border border-emerald-500">
                     <i data-lucide="printer" class="w-4 h-4"></i> <span class="text-sm">PDF Portrait</span>
                 </button>
-                <button id="btn-export-pdf-landscape" onclick="handlePrint('portrait')" aria-hidden="true" tabindex="-1" disabled
-                    class="hidden !hidden flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-teal-600 hover:bg-teal-500 shadow-lg shadow-teal-600/30 transition-all flex items-center justify-center gap-2 border border-teal-500">
+                <button id="btn-export-pdf-landscape" onclick="handlePrint('landscape')"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-teal-600 hover:bg-teal-500 shadow-lg shadow-teal-600/30 transition-all flex items-center justify-center gap-2 border border-teal-500">
                     <i data-lucide="panel-top" class="w-4 h-4"></i> <span class="text-sm">PDF Landscape</span>
                 </button>
                 <button id="btn-export-docx" onclick="handleExportDOCX()" aria-hidden="true" tabindex="-1" disabled
@@ -601,56 +578,6 @@
                 }, true);
             }
         });
-        function closeMobileControls() {
-            const panel = document.getElementById('mobile-control-panel');
-            const btn = document.getElementById('btn-mobile-menu');
-            if (panel) panel.classList.add('hidden');
-            if (btn) btn.setAttribute('aria-expanded', 'false');
-        }
-
-        function toggleMobileControls(event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            const panel = document.getElementById('mobile-control-panel');
-            const btn = document.getElementById('btn-mobile-menu');
-            if (!panel) return;
-            const willOpen = panel.classList.contains('hidden');
-            panel.classList.toggle('hidden', !willOpen);
-            if (btn) btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-            if (willOpen) {
-                const exportPanel = document.getElementById('public-export-branch');
-                if (exportPanel) exportPanel.classList.add('hidden');
-                createPortfolioIcons();
-            }
-        }
-
-        function syncMobileControls(data = StorageHandler.load()) {
-            const lang = data.lang || 'th';
-            const layout = data.layout || 'portfolio';
-            const colorMode = data.colorMode || 'dark';
-            const langBtn = document.getElementById('mobile-btn-lang');
-            if (langBtn) langBtn.textContent = lang === 'th' ? 'TH' : 'EN';
-            ['portfolio', 'resume'].forEach(mode => {
-                const btn = document.getElementById(`mobile-pill-${mode}`);
-                if (btn) btn.classList.toggle('is-active', layout === mode);
-            });
-            document.body.dataset.mobileColorMode = colorMode;
-            const mobilePptx = document.getElementById('mobile-btn-pptx');
-            if (mobilePptx) mobilePptx.classList.toggle('hidden', layout === 'resume');
-            const mobileEdit = document.getElementById('mobile-btn-edit');
-            if (mobileEdit) mobileEdit.classList.toggle('hidden', document.body.classList.contains('is-downloaded'));
-        }
-
-        document.addEventListener('click', (event) => {
-            const panel = document.getElementById('mobile-control-panel');
-            const btn = document.getElementById('btn-mobile-menu');
-            if (!panel || panel.classList.contains('hidden')) return;
-            if (panel.contains(event.target) || (btn && btn.contains(event.target))) return;
-            closeMobileControls();
-        }, true);
-
         function setDirectLayout(mode) { const data = StorageHandler.load(); data.layout = mode; StorageHandler.save(data); render(data); }
         function setDirectColorMode(mode) { const data = StorageHandler.load(); data.colorMode = mode; StorageHandler.save(data); render(data); }
         function setDirectTheme(theme, opts = {}) {
@@ -1125,7 +1052,6 @@
                     images: []
                 }]
             } : data;
-            if (typeof window !== 'undefined') window.__AI_PORTFOLIO_ACTIVE_DATA = JSON.parse(JSON.stringify(displayData));
 
             if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) { document.body.classList.add('is-downloaded'); }
 
@@ -1251,7 +1177,6 @@
             app.innerHTML = appContent;
 
             if (document.getElementById('btn-lang')) document.getElementById('btn-lang').innerText = lang === 'th' ? 'TH' : 'EN';
-            syncMobileControls({ layout, colorMode, lang });
             setTimeout(() => { createPortfolioIcons(); initThemeCarousel(); if (layout === 'portfolio') { initScrollEffects(); initMicroInteractions(); } initQuickEditHotspots(); }, 50);
         }
 
@@ -1731,88 +1656,45 @@
                         heroFrame.style.setProperty('--profile-scroll-angle', `${Math.round(pageProgress * 720)}deg`);
                         heroFrame.style.setProperty('--profile-scroll-glow', `${0.45 + pageProgress * 0.45}`);
                     }
+                    if (window.innerWidth < 1024) return;
                     if (!isTicking) {
                         window.requestAnimationFrame(() => {
                             scrollyWrappers.forEach(wrapper => {
                                 const track = wrapper.querySelector('.scrollytelling-track'); const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper'); const stickyBox = wrapper.querySelector('.sticky'); if (!track || !stickyBox) return;
-                                const rect = wrapper.getBoundingClientRect(); const mobileScrolly = window.innerWidth < 1024; if (mobileScrolly) { const imageCount = track.querySelectorAll('img').length || 1; const mobileHeight = Math.max(210, Math.min(380, 150 + imageCount * 48)); wrapper.style.setProperty('--mobile-scrolly-height', mobileHeight + 'vh'); wrapper.style.height = 'var(--mobile-scrolly-height)'; } const stickyTop = window.innerHeight * (mobileScrolly ? 0.14 : 0.1); const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
+                                const rect = wrapper.getBoundingClientRect(); const stickyTop = window.innerHeight * 0.1; const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
                                 let progress = 0; if (totalScrollDistance > 0) { progress = (stickyTop - rect.top) / totalScrollDistance; }
                                 progress = Math.max(0, Math.min(1, progress));
-                                let maxTranslate = 0;
-                                const wasCollapsed = imageWrapper && imageWrapper.classList.contains('cinematic-collapsed');
-                                if (wasCollapsed) { imageWrapper.classList.remove('cinematic-collapsed'); imageWrapper.classList.add('cinematic-expanded'); }
-                                const trackParentWidth = Math.max(1, track.parentElement ? track.parentElement.clientWidth : 1);
-                                // V44: always recalc on mobile because image decode/layout can finish after the first scroll tick.
-                                // Older cached values could be 0, causing the project images to stay still after expansion.
-                                maxTranslate = Math.max(0, track.scrollWidth - trackParentWidth);
-                                if (!mobileScrolly) {
-                                    const cached = parseFloat(track.getAttribute('data-max-translate') || '0') || 0;
-                                    if (cached > 0) maxTranslate = cached;
-                                    else track.setAttribute('data-max-translate', maxTranslate);
+                                let maxTranslate = track.getAttribute('data-max-translate');
+                                if (!maxTranslate) {
+                                    const isCol = imageWrapper.classList.contains('cinematic-collapsed'); if (isCol) { imageWrapper.classList.remove('cinematic-collapsed'); imageWrapper.classList.add('cinematic-expanded'); }
+                                    maxTranslate = track.scrollWidth - track.parentElement.clientWidth; track.setAttribute('data-max-translate', maxTranslate);
+                                    if (isCol) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
                                 }
-                                if (wasCollapsed) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
-                                if (imageWrapper) { const shouldCollapse = progress <= 0.01 || (!mobileScrolly && progress >= 0.98); if (shouldCollapse) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
-                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = mobileScrolly ? 0.08 : 0.05; const endMove = mobileScrolly ? 0.88 : 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; if (mobileScrolly) { track.style.setProperty('--mobile-scrolly-x', `-${currentTranslate}px`); track.style.transform = ''; } else { track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; } } else { track.style.setProperty('--mobile-scrolly-x', '0px'); track.style.transform = mobileScrolly ? '' : 'translate3d(0, 0, 0)'; }
+                                maxTranslate = parseFloat(maxTranslate) || 0;
+                                if (imageWrapper) { if (progress <= 0.01 || progress >= 0.98) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
+                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = 0.05; const endMove = 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; }
                             }); isTicking = false;
                         }); isTicking = true;
                     }
                 };
-                if (window._scrollyResizeHandler) window.removeEventListener('resize', window._scrollyResizeHandler);
-                window._scrollyResizeHandler = () => { scrollyWrappers.forEach(w => { const t = w.querySelector('.scrollytelling-track'); if (t) t.removeAttribute('data-max-translate'); }); if (window._scrollHandler) window._scrollHandler(); };
-                window.addEventListener('resize', window._scrollyResizeHandler, { passive: true });
                 window.addEventListener('scroll', window._scrollHandler, { passive: true });
-                window._scrollHandler();
             }
         }
 
-        function preparePrintImages() {
-            const imgs = Array.from(document.querySelectorAll('.print-layout-wrapper img, .print-exp-item img, .scrollytelling-track img, #app img'));
-            imgs.forEach(img => {
-                const src = img.currentSrc || img.src || img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('data-full-src') || '';
-                img.loading = 'eager';
-                img.decoding = 'sync';
-                if (src && img.getAttribute('src') !== src) img.setAttribute('src', src);
-            });
-            return Promise.all(imgs.map(img => {
-                if (img.complete && img.naturalWidth) return Promise.resolve();
-                if (img.decode) return img.decode().catch(() => {});
-                return new Promise(resolve => { img.onload = img.onerror = resolve; setTimeout(resolve, 1500); });
-            }));
-        }
-
-        async function handlePrint(orientation = 'portrait') {
-            orientation = 'portrait'; // V39: PDF export is portrait-only for production-safe pagination.
+        function handlePrint(orientation = 'portrait') {
             const modal = document.getElementById("edit-modal");
             const wasOpen = modal && !modal.classList.contains("hidden");
             if (wasOpen) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
-            document.querySelectorAll('.scroll-reveal').forEach(el => el.classList.add('show'));
-            document.querySelectorAll('.cinematic-image-wrapper').forEach(el => {
-                el.classList.remove('cinematic-collapsed');
-                el.classList.add('cinematic-expanded');
-                el.style.maxHeight = 'none';
-                el.style.overflow = 'visible';
-            });
-            document.querySelectorAll('.cinematic-image-inner').forEach(el => {
-                el.style.opacity = '1';
-                el.style.transform = 'none';
-                el.style.overflow = 'visible';
-            });
-            document.querySelectorAll('.scrollytelling-track').forEach(track => {
-                track.style.transform = 'none';
-                track.removeAttribute('data-max-translate');
-                track.style.overflow = 'visible';
-            });
 
             const oldPrintStyle = document.getElementById('dynamic-print-page-size');
             if (oldPrintStyle) oldPrintStyle.remove();
             const printStyle = document.createElement('style');
             printStyle.id = 'dynamic-print-page-size';
-            printStyle.textContent = `@media print { @page { size: A4 portrait; margin: 0; } body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } .scroll-reveal { opacity: 1 !important; transform: none !important; } .scrollytelling-track { transform: none !important; overflow: visible !important; } }`;
+            printStyle.textContent = `@media print { @page { size: A4 ${orientation === 'landscape' ? 'landscape' : 'portrait'}; margin: 0; } body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }`;
             document.head.appendChild(printStyle);
 
-            document.body.classList.remove('print-landscape');
-            document.body.classList.add('print-portrait');
-            await preparePrintImages();
+            document.body.classList.toggle('print-landscape', orientation === 'landscape');
+            document.body.classList.toggle('print-portrait', orientation !== 'landscape');
             setTimeout(() => { window.print(); }, 120);
         }
 
