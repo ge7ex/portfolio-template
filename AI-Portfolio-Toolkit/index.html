@@ -1564,7 +1564,7 @@ Notes:
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
             const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
-            const data = { projectVersion: 'v42', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            const data = { projectVersion: 'v43', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
             StorageHandler.save(data); render(data); toggleModal();
         }
 
@@ -2269,7 +2269,7 @@ Notes:
             }
         }
 
-        /* v42: robust cursor-local seamless 3x3 tilt grid
+        /* v43: robust cursor-local seamless 3x3 tilt grid
            - No static center tile
            - Shows only after pointer/mouse movement in Portfolio mode
            - 9 cells follow the pointer; cell #5 is the cursor anchor
@@ -2423,6 +2423,159 @@ Notes:
             initializePortfolioApp();
         }
         window.addEventListener('load', initializePortfolioApp, { once: true });
+    </script>
+
+    <script>
+        /* v43: robust mobile/tablet scrollytelling fallback.
+           The Experience section must stay vertical-scroll driven on touch devices. */
+        (function () {
+            const rafThrottle = (fn) => {
+                let ticking = false;
+                return function throttled() {
+                    if (ticking) return;
+                    ticking = true;
+                    requestAnimationFrame(() => {
+                        ticking = false;
+                        fn();
+                    });
+                };
+            };
+
+            window.initScrollEffects = initScrollEffects = function initScrollEffectsV43() {
+                if (window._revealObserver && typeof window._revealObserver.disconnect === 'function') {
+                    window._revealObserver.disconnect();
+                }
+                window._revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('show');
+                    });
+                }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+                document.querySelectorAll('.scroll-reveal').forEach(el => window._revealObserver.observe(el));
+
+                if (window._scrollHandler) window.removeEventListener('scroll', window._scrollHandler);
+                if (window._scrollResizeHandler) window.removeEventListener('resize', window._scrollResizeHandler);
+                if (window._orientationScrollHandler) window.removeEventListener('orientationchange', window._orientationScrollHandler);
+                if (window.visualViewport && window._vvScrollHandler) {
+                    window.visualViewport.removeEventListener('resize', window._vvScrollHandler);
+                    window.visualViewport.removeEventListener('scroll', window._vvScrollHandler);
+                }
+
+                const wrappers = Array.from(document.querySelectorAll('body.layout-portfolio .experience-section .scrollytelling-wrapper'));
+                const progressBar = document.getElementById('scroll-progress');
+                const heroFrame = document.querySelector('.hero-frame');
+
+                const invalidateMeasurements = () => {
+                    wrappers.forEach(wrapper => {
+                        const track = wrapper.querySelector('.scrollytelling-track');
+                        if (track) track.removeAttribute('data-max-translate');
+                    });
+                };
+
+                const measureTranslate = (wrapper, track, imageWrapper) => {
+                    let cached = parseFloat(track.getAttribute('data-max-translate'));
+                    if (Number.isFinite(cached) && cached >= 0) return cached;
+
+                    const wasCollapsed = imageWrapper && imageWrapper.classList.contains('cinematic-collapsed');
+                    if (imageWrapper && wasCollapsed) {
+                        imageWrapper.classList.remove('cinematic-collapsed');
+                        imageWrapper.classList.add('cinematic-expanded');
+                    }
+
+                    // Use viewport width as fallback because collapsed parents can report 0px on some mobile browsers.
+                    const parentWidth = Math.max(
+                        1,
+                        track.parentElement ? track.parentElement.clientWidth : 0,
+                        wrapper.clientWidth || 0,
+                        window.innerWidth || 0
+                    );
+                    const maxTranslate = Math.max(0, Math.ceil(track.scrollWidth - parentWidth));
+                    track.setAttribute('data-max-translate', String(maxTranslate));
+
+                    if (imageWrapper && wasCollapsed) {
+                        imageWrapper.classList.add('cinematic-collapsed');
+                        imageWrapper.classList.remove('cinematic-expanded');
+                    }
+                    return maxTranslate;
+                };
+
+                const update = () => {
+                    const doc = document.documentElement;
+                    const viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight || 1;
+                    const maxDoc = Math.max(1, doc.scrollHeight - viewportHeight);
+                    const pageProgress = Math.min(1, Math.max(0, window.scrollY / maxDoc));
+
+                    if (progressBar) progressBar.style.width = `${pageProgress * 100}%`;
+                    if (heroFrame) {
+                        heroFrame.style.setProperty('--profile-scroll-angle', `${Math.round(pageProgress * 720)}deg`);
+                        heroFrame.style.setProperty('--profile-scroll-glow', `${0.45 + pageProgress * 0.45}`);
+                    }
+
+                    wrappers.forEach(wrapper => {
+                        const track = wrapper.querySelector('.scrollytelling-track');
+                        const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
+                        const stickyBox = wrapper.querySelector('.sticky');
+                        if (!track || !stickyBox) return;
+
+                        const rect = wrapper.getBoundingClientRect();
+                        const stickyStyle = window.getComputedStyle(stickyBox);
+                        const stickyTop = Number.parseFloat(stickyStyle.top) || Math.min(96, viewportHeight * 0.12);
+                        const stickyHeight = Math.max(1, stickyBox.offsetHeight || stickyBox.getBoundingClientRect().height || 1);
+                        const activeDistance = Math.max(1, rect.height - stickyHeight);
+
+                        let progress = (stickyTop - rect.top) / activeDistance;
+                        progress = Math.max(0, Math.min(1, progress));
+
+                        const isInViewport = rect.bottom > stickyTop && rect.top < viewportHeight;
+                        const isActive = isInViewport && progress > 0.015 && progress < 0.985;
+
+                        if (imageWrapper) {
+                            imageWrapper.classList.toggle('cinematic-expanded', isActive);
+                            imageWrapper.classList.toggle('cinematic-collapsed', !isActive);
+                        }
+
+                        const maxTranslate = measureTranslate(wrapper, track, imageWrapper);
+                        const startMove = 0.045;
+                        const endMove = 0.90;
+                        let moveProgress = 0;
+                        if (progress > startMove && progress < endMove) {
+                            moveProgress = (progress - startMove) / (endMove - startMove);
+                        } else if (progress >= endMove) {
+                            moveProgress = 1;
+                        }
+                        const currentTranslate = Math.max(0, Math.min(maxTranslate, moveProgress * maxTranslate));
+                        track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`;
+                    });
+                };
+
+                const throttledUpdate = rafThrottle(update);
+                window._scrollHandler = throttledUpdate;
+                window._scrollResizeHandler = () => { invalidateMeasurements(); throttledUpdate(); setTimeout(throttledUpdate, 160); };
+                window._orientationScrollHandler = () => { invalidateMeasurements(); setTimeout(throttledUpdate, 240); setTimeout(throttledUpdate, 620); };
+                window._vvScrollHandler = window._scrollResizeHandler;
+
+                window.addEventListener('scroll', window._scrollHandler, { passive: true });
+                window.addEventListener('resize', window._scrollResizeHandler, { passive: true });
+                window.addEventListener('orientationchange', window._orientationScrollHandler, { passive: true });
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener('resize', window._vvScrollHandler, { passive: true });
+                    window.visualViewport.addEventListener('scroll', window._vvScrollHandler, { passive: true });
+                }
+
+                wrappers.forEach(wrapper => {
+                    wrapper.querySelectorAll('img').forEach(img => {
+                        if (!img.complete) {
+                            img.addEventListener('load', () => { invalidateMeasurements(); throttledUpdate(); }, { once: true });
+                            img.addEventListener('error', () => { invalidateMeasurements(); throttledUpdate(); }, { once: true });
+                        }
+                    });
+                });
+
+                invalidateMeasurements();
+                throttledUpdate();
+                setTimeout(throttledUpdate, 80);
+                setTimeout(() => { invalidateMeasurements(); throttledUpdate(); }, 320);
+            };
+        })();
     </script>
 </body>
 

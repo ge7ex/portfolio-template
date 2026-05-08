@@ -4144,7 +4144,7 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
 /* ==================================
    v39 Cursor-local seamless tilt grid + full A4 resume layout
 ===================================== */
-:root{--project-version:'v42'}
+:root{--project-version:'v43'}
 #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4209,7 +4209,7 @@ body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;obje
    - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
 ===================================== */
 :root{
-  --project-version:'v42';
+  --project-version:'v43';
   --resume-a4-width:210mm;
   --resume-a4-height:297mm;
   --resume-left-col:64mm;
@@ -4571,7 +4571,7 @@ body.layout-resume .resume-cv-main .font-mono{
    v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
    The grid is intentionally above portfolio content but below the fixed nav.
 ===================================== */
-:root{--project-version:'v42'}
+:root{--project-version:'v43'}
 body.layout-portfolio #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4636,7 +4636,7 @@ body.layout-resume #mouse-grid-field .mouse-cell{display:none!important;opacity:
 
 
 /* ==================================
-   v42: robust cursor-local seamless 3x3 tilt grid
+   v43: robust cursor-local seamless 3x3 tilt grid
    Shows only 3x3 cells around the cursor. No static tile.
 ===================================== */
 #mouse-grid-field,
@@ -4709,5 +4709,127 @@ body:not(.layout-portfolio) #cursor-local-grid{
   #cursor-local-grid,.cursor-local-cell{
     display:none!important;
     opacity:0!important;
+  }
+}
+
+/* ==================================
+   v43 mobile/tablet scrollytelling hardening
+   Fix: keep Experience project visuals driven by vertical page scroll on touch devices.
+===================================== */
+@media screen and (max-width: 1023px) {
+  body.layout-portfolio .experience-section {
+    overflow: visible !important;
+    touch-action: pan-y !important;
+  }
+  body.layout-portfolio .experience-section .experience-rows,
+  body.layout-portfolio .experience-section .quick-edit-zone {
+    overflow: visible !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-wrapper {
+    position: relative !important;
+    overflow: visible !important;
+    contain: none !important;
+    height: max(158vh, calc((var(--scrolly-images, 1) * 44vh) + 112vh)) !important;
+    min-height: 158vh !important;
+    margin-bottom: clamp(2.25rem, 8vh, 5.5rem) !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio .experience-section .scrollytelling-wrapper .sticky {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: calc(env(safe-area-inset-top, 0px) + 5.25rem) !important;
+    z-index: 12 !important;
+    width: 100% !important;
+    overflow: visible !important;
+    transform: translateZ(0) !important;
+  }
+  body.layout-portfolio .experience-section .cinematic-image-wrapper {
+    display: block !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    transition: max-height .22s ease, opacity .18s ease !important;
+  }
+  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-collapsed {
+    max-height: 0 !important;
+    opacity: 0 !important;
+  }
+  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded {
+    max-height: 49vh !important;
+    opacity: 1 !important;
+  }
+  body.layout-portfolio .experience-section .cinematic-image-inner {
+    width: 100% !important;
+    overflow: visible !important;
+    opacity: 0 !important;
+    transform: translate3d(0, 10px, 0) scale(.985) !important;
+    transition: opacity .2s ease, transform .2s ease !important;
+  }
+  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded .cinematic-image-inner {
+    opacity: 1 !important;
+    transform: translate3d(0, 0, 0) scale(1) !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: max-content !important;
+    max-width: none !important;
+    min-width: 100% !important;
+    overflow: visible !important;
+    scroll-snap-type: none !important;
+    transform: translate3d(0,0,0) !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    gap: clamp(.75rem, 3vw, 1.15rem) !important;
+    padding: .9rem .65rem 1.05rem !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-track img,
+  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: 82vw !important;
+    height: clamp(172px, 30vh, 270px) !important;
+    max-height: 31vh !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+  body.layout-portfolio .experience-section .scrolly-spacer {
+    display: block !important;
+    flex: 0 0 10vw !important;
+    width: 10vw !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-spacer:last-child {
+    flex-basis: 160vw !important;
+    width: 160vw !important;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  body.layout-portfolio .experience-section .scrollytelling-wrapper {
+    height: max(190vh, calc((var(--scrolly-images, 1) * 54vh) + 136vh)) !important;
+    min-height: 190vh !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio .experience-section .scrollytelling-wrapper .sticky {
+    top: calc(env(safe-area-inset-top, 0px) + 6.1rem) !important;
+  }
+  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded {
+    max-height: 58vh !important;
+  }
+  body.layout-portfolio .experience-section .scrollytelling-track img,
+  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
+    max-width: 64vw !important;
+    height: clamp(240px, 36vh, 370px) !important;
+    max-height: 38vh !important;
+  }
+}
+
+@media print {
+  body.layout-portfolio .experience-section .scrollytelling-wrapper,
+  body.layout-portfolio .experience-section .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio .experience-section .scrollytelling-wrapper .sticky {
+    height: auto !important;
+    min-height: 0 !important;
+    position: static !important;
+    top: auto !important;
   }
 }
