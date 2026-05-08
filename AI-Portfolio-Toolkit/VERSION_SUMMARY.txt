@@ -1,4 +1,4 @@
-V42 Mobile Scroll + Studio Data Fix
+V43 mobile + studio final fix
 
 Changed files:
 - index.html
@@ -7,12 +7,8 @@ Changed files:
 - js/components/PrintDesigner.js
 - js/components/PrintDesignerHotfix.js
 
-Fixes:
-1. Mobile/tablet scrollytelling now uses vertical page scroll to expand/collapse the project image rail and move images, matching desktop behavior. It is no longer a static grid or manual horizontal swipe gallery.
-2. PDF Layout Studio no longer treats a portfolio as demo-only just because name fields still contain placeholders. Real project text/images are preserved.
-3. Studio header preview uses a transparent header layer on the themed PDF header, so text is not hidden by a white object box.
-4. PrintDesigner script cache version bumped to V42.
-5. Print PDF landscape remains hidden/disabled by the existing PrintDesigner/export guard.
-
-Install:
-Replace the files above in AI-Portfolio-Toolkit, or upload the complete package.
+Fix summary:
+1. PDF Layout Studio now prefers real saved portfolio data over injected/demo placeholders so header/project text is not replaced by Your Name/Project 1 when real data exists.
+2. Studio project text boxes keep full title/company/description/highlights visible and old saved layouts are isolated with a new v43 profile key.
+3. Mobile/tablet portfolio keeps vertical scroll behavior for scrollytelling image movement. It no longer becomes a horizontal swipe gallery and the long blank area after project images is reduced.
+4. Legacy landscape print button remains hidden through storage.js selectors.

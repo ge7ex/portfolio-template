@@ -4522,3 +4522,99 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
   }
 }
 /* V42 END */
+
+
+/* ================================
+   V43 Final Mobile + Studio Guards
+   - Mobile/tablet: vertical page scroll controls the project image rail; no touch horizontal gallery.
+   - Prevent the long blank gap after the image rail finishes.
+   - Studio keeps full project header text visible for editing/printing.
+================================ */
+@media (max-width: 1023px) {
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper {
+    height: var(--mobile-scrolly-height, 300vh) !important;
+    min-height: 210vh !important;
+    max-height: 390vh !important;
+    margin-bottom: clamp(34px, 9vw, 64px) !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper > .sticky,
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper .sticky {
+    position: sticky !important;
+    top: calc(env(safe-area-inset-top, 0px) + 64px) !important;
+    max-height: calc(100svh - 76px) !important;
+    overflow: visible !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper {
+    overflow: hidden !important;
+    transition: max-height .48s ease, opacity .32s ease, transform .32s ease !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper.cinematic-expanded {
+    max-height: min(52svh, 360px) !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper.cinematic-collapsed {
+    max-height: 0 !important;
+    opacity: .18 !important;
+    transform: translateY(-8px) !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-inner {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    width: max-content !important;
+    max-width: none !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    touch-action: pan-y !important;
+    scroll-snap-type: none !important;
+    scrollbar-width: none !important;
+    will-change: transform !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-track img,
+  body.layout-portfolio:not(.print-designer-open) .scrolly-full-image {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    max-width: min(82vw, 360px) !important;
+    height: min(38svh, 260px) !important;
+    max-height: min(38svh, 260px) !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-wrapper {
+    min-height: 205vh !important;
+    max-height: 360vh !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .cinematic-image-wrapper.cinematic-expanded {
+    max-height: min(46svh, 300px) !important;
+  }
+
+  body.layout-portfolio:not(.print-designer-open) .scrollytelling-track img,
+  body.layout-portfolio:not(.print-designer-open) .scrolly-full-image {
+    max-width: min(84vw, 330px) !important;
+    height: min(34svh, 230px) !important;
+    max-height: min(34svh, 230px) !important;
+  }
+}
+
+.print-designer-open .pd-project .pd-object-content,
+.print-designer-open .pd-section-heading .pd-object-content {
+  overflow: visible !important;
+}
+/* V43 END */

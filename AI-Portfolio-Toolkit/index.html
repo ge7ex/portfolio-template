@@ -1735,7 +1735,7 @@
                         window.requestAnimationFrame(() => {
                             scrollyWrappers.forEach(wrapper => {
                                 const track = wrapper.querySelector('.scrollytelling-track'); const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper'); const stickyBox = wrapper.querySelector('.sticky'); if (!track || !stickyBox) return;
-                                const rect = wrapper.getBoundingClientRect(); const mobileScrolly = window.innerWidth < 1024; if (mobileScrolly) { const imageCount = track.querySelectorAll('img').length || 1; const mobileHeight = Math.max(260, Math.min(520, 180 + imageCount * 70)); wrapper.style.setProperty('--mobile-scrolly-height', mobileHeight + 'vh'); wrapper.style.height = 'var(--mobile-scrolly-height)'; } const stickyTop = window.innerHeight * (mobileScrolly ? 0.16 : 0.1); const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
+                                const rect = wrapper.getBoundingClientRect(); const mobileScrolly = window.innerWidth < 1024; if (mobileScrolly) { const imageCount = track.querySelectorAll('img').length || 1; const mobileHeight = Math.max(210, Math.min(380, 150 + imageCount * 48)); wrapper.style.setProperty('--mobile-scrolly-height', mobileHeight + 'vh'); wrapper.style.height = 'var(--mobile-scrolly-height)'; } const stickyTop = window.innerHeight * (mobileScrolly ? 0.14 : 0.1); const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
                                 let progress = 0; if (totalScrollDistance > 0) { progress = (stickyTop - rect.top) / totalScrollDistance; }
                                 progress = Math.max(0, Math.min(1, progress));
                                 let maxTranslate = track.getAttribute('data-max-translate');
@@ -1745,7 +1745,7 @@
                                     if (isCol) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
                                 }
                                 maxTranslate = parseFloat(maxTranslate) || 0;
-                                if (imageWrapper) { if (progress <= 0.01 || progress >= 0.98) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
+                                if (imageWrapper) { const shouldCollapse = progress <= 0.01 || (!mobileScrolly && progress >= 0.98); if (shouldCollapse) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
                                 if (maxTranslate > 0) { let scrollProgress = 0; const startMove = mobileScrolly ? 0.08 : 0.05; const endMove = mobileScrolly ? 0.88 : 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; } else { track.style.transform = 'translate3d(0, 0, 0)'; }
                             }); isTicking = false;
                         }); isTicking = true;

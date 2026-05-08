@@ -165,6 +165,74 @@ const StorageHandler = {
     }
 };
 
+
+
+// V43 guard: when a downloaded/template file has injected placeholder data, prefer the user's real local cache.
+// This prevents PDF Layout Studio from falling back to "Your Name" / demo data while project images or real fields already exist.
+(function () {
+    'use strict';
+    if (!window.StorageHandler || StorageHandler.__v43RealDataGuard) return;
+
+    const originalLoad = StorageHandler.load.bind(StorageHandler);
+    const originalSave = StorageHandler.save.bind(StorageHandler);
+    const placeholderRx = /^(Your Portfolio|Portfolio Template|Your Name|hello@example\.com|\+66 00 000 0000|linkedin\.com\/in\/your-profile|Portfolio, Resume, Projects, Skills, Contact|Add your name, role, summary, skills, and project work to turn this template into a finished portfolio\.|Featured project placeholder|Your work or organization|Replace this block with your first project, responsibility, result, or achievement\.)$/i;
+    const text = value => String(value || '').replace(/\s+/g, ' ').trim();
+    const meaningful = value => {
+        const t = text(value);
+        return t && !placeholderRx.test(t) ? t : '';
+    };
+    const clone = value => {
+        try { return JSON.parse(JSON.stringify(value || {})); } catch (_) { return value || {}; }
+    };
+    const parseCache = () => {
+        try {
+            const raw = localStorage.getItem('ai-portfolio-pro-cache');
+            return raw ? JSON.parse(raw) : null;
+        } catch (_) { return null; }
+    };
+    const hasUsefulProject = item => {
+        if (!item) return false;
+        const fields = ['title_th','title_en','company_th','company_en','desc_th','desc_en','title','company','desc'];
+        return fields.some(key => meaningful(item[key])) || (Array.isArray(item.images) && item.images.some(Boolean));
+    };
+    const hasUsefulData = data => {
+        if (!data || typeof data !== 'object') return false;
+        const fields = ['name_th','name_en','role_th','role_en','bio_th','bio_en','skills_th','skills_en','education_th','education_en','email','phone','linkedin','avatar'];
+        return fields.some(key => meaningful(data[key])) || (Array.isArray(data.exp) && data.exp.some(hasUsefulProject));
+    };
+    const mergeUseful = (primary, fallback) => {
+        const base = clone(fallback || {});
+        const next = clone(primary || {});
+        Object.keys(next).forEach(key => {
+            const value = next[key];
+            if (Array.isArray(value)) {
+                if (value.length) base[key] = value;
+            } else if (value && typeof value === 'object') {
+                base[key] = { ...(base[key] || {}), ...value };
+            } else if (value !== undefined && value !== null && String(value).length) {
+                base[key] = value;
+            }
+        });
+        return base;
+    };
+
+    StorageHandler.load = function loadWithRealCachePreference() {
+        const loaded = originalLoad();
+        const cache = parseCache();
+        const result = hasUsefulData(cache) ? mergeUseful(cache, loaded) : loaded;
+        try { window.__AI_PORTFOLIO_ACTIVE_DATA = clone(result); } catch (_) {}
+        return result;
+    };
+
+    StorageHandler.save = function saveAndExposeActiveData(data) {
+        const next = { ...(data || {}), _updatedAt: new Date().toISOString() };
+        try { window.__AI_PORTFOLIO_ACTIVE_DATA = clone(next); } catch (_) {}
+        return originalSave(next);
+    };
+
+    StorageHandler.__v43RealDataGuard = true;
+})();
+
 // V35 bootstrap: load PDF Layout Studio without mutating portfolio/resume data.
 (function () {
     'use strict';
@@ -227,17 +295,17 @@ const StorageHandler = {
     }
 
     function loadPrintDesignerScript() {
-        if (window.PrintDesigner || document.querySelector('script[data-print-designer-v42]')) {
+        if (window.PrintDesigner || document.querySelector('script[data-print-designer-v43]')) {
             addStudioButtons();
             return;
         }
         const script = document.createElement('script');
-        script.src = 'js/components/PrintDesigner.js?v=42-studio-data-fix';
+        script.src = 'js/components/PrintDesigner.js?v=43-mobile-studio-final';
         script.defer = true;
-        script.dataset.printDesignerV42 = 'true';
+        script.dataset.printDesignerV43 = 'true';
         script.onload = () => {
             const hotfix = document.createElement('script');
-            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=42-active-data';
+            hotfix.src = 'js/components/PrintDesignerHotfix.js?v=43-active-data';
             hotfix.defer = true;
             document.body.appendChild(hotfix);
             addStudioButtons();
