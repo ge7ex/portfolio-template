@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>AI Portfolio Pro Generator</title>
+    <title>AI Portfolio Pro Generator v36</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -537,6 +537,8 @@
     <script src="js/exporter.js"></script>
 
     <script>
+        const PROJECT_VERSION = 'v36';
+        const PROJECT_NAME = 'AI-Portfolio-Toolkit';
         const createPortfolioIcons = () => { if (window.lucide) lucide.createIcons(); };
         createPortfolioIcons();
         let currentAvatarBase64 = "";
@@ -675,23 +677,17 @@
             if (isTh) {
                 return `สร้างเว็บไซต์พอร์ตโฟลิโอแบบ scrollytelling ใน Canva AI โดยอ้างอิงข้อมูลและธีมต่อไปนี้ให้ครบถ้วน
 
+Project version: ${PROJECT_VERSION}
+
 เป้าหมายงานออกแบบ:
 - สร้างเป็นหน้าเว็บพอร์ตโฟลิโอ ไม่ใช่เรซูเม่ธรรมดา และไม่ใช่ไฟล์สำหรับพิมพ์
-- Hero section ต้องไม่มีปุ่ม Print, ไม่มี Theme selector, ไม่มี Mode selector, และไม่มีปุ่มเปลี่ยนภาษา
+- Hero section ต้องคงส่วนควบคุมแบบ Interactive Website ไว้ ได้แก่ Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษา
+- ไม่ต้องมีปุ่ม Print, Export, Download หรือปุ่มดาวน์โหลดไฟล์ใด ๆ ใน hero section หรือหน้าเว็บที่ Canva สร้าง
 - ให้ทำเป็น public-facing portfolio website ที่ผู้ชมเลื่อนขึ้นลงได้อย่างลื่นไหล
 - ต้องมีความรู้สึกแบบ scrollytelling: เมื่อเลื่อนหน้าเว็บ ให้เนื้อหากับภาพผลงานค่อย ๆ เปิดเผยเป็นลำดับ มี section ของประสบการณ์/โปรเจกต์ที่เล่าเรื่องได้
 - หาก Canva AI ไม่สามารถทำ animation จริงได้ ให้จำลองด้วย long-form landing page ที่มีลำดับ section ชัดเจน, image gallery, timeline, card, และ visual rhythm แบบ scrollytelling
 - ต้องรักษาลักษณะธีม สี อารมณ์ และข้อมูลที่แสดงอยู่ในเว็บต้นฉบับให้ใกล้เคียงที่สุด
-
-ข้อกำหนดสำคัญเรื่องการแก้ไขบน Canva:
-- ทุกข้อความต้องเป็น editable native Canva text boxes เท่านั้น
-- ห้าม flatten ข้อความเป็นรูปภาพ
-- ห้าม rasterize ตัวอักษรหรือรวมข้อความเข้าไปในภาพพื้นหลัง
-- ห้ามสร้างชื่อ ตำแหน่ง ประวัติ ทักษะ ปุ่ม หัวข้อ หรือรายละเอียดโปรเจกต์เป็นภาพเดียวที่แก้ไม่ได้
-- ให้แยก layer เป็นองค์ประกอบที่แก้ไขได้ เช่น heading, paragraph, button label, card title, project description, timeline date, contact text
-- การ์ด section timeline gallery และปุ่มต้องเป็น editable layout objects ไม่ใช่โปสเตอร์หรือ artwork แบบแบน
-- ให้เน้นโครงสร้าง UI/UX ที่แก้ไขต่อได้ มากกว่าการทำเป็นภาพสวยแบบ poster
-- หลังสร้างแล้ว ผู้ใช้ต้องสามารถคลิกแก้ชื่อ บทบาท ประวัติ ทักษะ รายละเอียดโปรเจกต์ และข้อมูลติดต่อใน Canva ได้โดยตรง
+- ไม่ต้องฝัง Base64 รูปภาพลงใน prompt หรือ JSON ให้ใช้ข้อความและโครงสร้างเป็นหลัก แล้วให้ผู้ใช้อัปโหลดรูปโปรเจกต์เข้า Canva เองภายหลัง
 
 Theme to duplicate:
 ${getThemeDescription(style, mode, 'th')}
@@ -712,32 +708,32 @@ ${buildOptionalLines(data, 'th')}
 ข้อกำหนดการออกแบบ:
 - ใช้ภาษาไทยจากข้อมูลนี้เป็นหลัก แต่สามารถใช้หัวข้อภาษาอังกฤษสั้น ๆ ได้ถ้าทำให้ดีไซน์ดูเป็นสากล
 - เน้น hierarchy ชัดเจน อ่านง่าย และดูพรีเมียม
-- Hero ต้องมีชื่อ บทบาท สรุปสั้น และภาพ/visual centerpiece แต่ไม่ต้องมีปุ่มควบคุมระบบของเว็บต้นฉบับ
+- Hero ต้องมีชื่อ บทบาท สรุปสั้น ภาพ/visual centerpiece และปุ่มควบคุม interactive ได้แก่ Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษา
+- ห้ามใส่ปุ่ม Print, Export, Download หรือปุ่มดาวน์โหลดไฟล์ใด ๆ ในเว็บที่ Canva สร้าง
 - สร้าง section ต่อเนื่อง: About, Skills, Experience/Projects, Optional sections, Contact
 - ทำให้เว็บไซต์เหมาะกับ desktop และ mobile โดยยังให้ผู้ใช้เลื่อนขึ้นลงเป็นหลัก
 - ห้ามเพิ่มข้อมูลที่ไม่มีอยู่จริง ถ้าข้อมูลบางส่วนไม่มี ให้จัด layout ให้สวยโดยไม่แต่งเรื่องเพิ่ม
-- ตรวจสอบอีกครั้งว่าข้อความทั้งหมดแก้ไขได้ใน Canva ไม่ใช่ภาพแบน`;
+
+ข้อกำหนดเรื่องการแก้ไขใน Canva:
+- ข้อความทั้งหมดต้องเป็น editable Canva text boxes ไม่ใช่ภาพนิ่ง
+- ห้าม flatten, rasterize หรือ merge ข้อความเข้ากับภาพ
+- ชื่อ ตำแหน่ง ประวัติ ปุ่ม หัวข้อ ทักษะ และข้อความใน project cards ต้องแก้ไขได้ทีละส่วนใน Canva
+- จัดโครงสร้างเป็น section/card ที่แก้ไขแยกกันได้ ไม่ใช่โปสเตอร์ภาพเดียว`;
             }
 
             return `Create a Canva AI website portfolio that duplicates the current portfolio theme, visual direction, and visible content as completely as possible.
 
+Project version: ${PROJECT_VERSION}
+
 Design goal:
 - Build a public-facing portfolio website, not a printable document and not a generic resume.
-- The hero section must NOT include Print, Theme selector, Mode selector, or Language switch controls.
+- The hero section MUST keep interactive website controls such as the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher.
+- Do NOT include Print, Export, Download, or file-download controls in the hero section or in the Canva-generated website.
 - Keep it as a smooth vertical scrolling website.
 - Use a scrollytelling feeling: as visitors scroll, content and project visuals should be revealed in a cinematic sequence. Experience/project sections should feel like story cards with image galleries, timelines, and strong visual rhythm.
 - If Canva AI cannot create real scroll animation, simulate the scrollytelling experience with a long-form landing page, clearly staged sections, timeline blocks, image galleries, and cinematic spacing.
 - Duplicate the original theme mood, color system, spacing, and portfolio identity as closely as Canva allows.
-
-Critical Canva editability requirements:
-- All text must remain fully editable as native Canva text boxes.
-- Do NOT flatten text into images.
-- Do NOT rasterize typography or merge text into background artwork.
-- Do NOT generate names, roles, bio, skills, button labels, headings, or project details as one static image.
-- Keep every content item as a separate editable layer: heading, paragraph, button label, card title, project description, timeline date, and contact text.
-- Cards, sections, timelines, galleries, and buttons must remain editable layout objects, not a flattened poster or static artwork.
-- Prioritize editable UI/UX structure over decorative poster-style rendering.
-- The final Canva result must allow the user to click and edit the name, role, bio, skills, project details, and contact information directly inside Canva.
+- Do not embed Base64 images in the prompt or JSON. Use the text and structure first, then let the user manually upload the project images into Canva afterward.
 
 Theme to duplicate:
 ${getThemeDescription(style, mode, 'en')}
@@ -758,32 +754,38 @@ ${buildOptionalLines(data, 'en')}
 Design requirements:
 - Use English text only unless the provided content exists only in Thai.
 - Use a premium modern hierarchy, strong typography, readable spacing, glass/card surfaces when appropriate, and theme-matched accent colors.
-- Hero section should include name, role, short summary, and a visual centerpiece, but no system controls from the original app.
+- Hero section should include name, role, short summary, a visual centerpiece, and interactive controls: Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher.
+- Do not include Print, Export, Download, or file-download buttons in the Canva-generated website.
 - Include sections in this order when data exists: About, Skills, Experience/Projects, Optional sections, Contact.
 - Make it responsive for desktop and mobile while keeping vertical scrolling as the main interaction.
 - Do not invent achievements, clients, certifications, or metrics that are not present in the data.
-- Verify that all text remains editable in Canva and is not flattened into images.`;
+
+Editability requirements for Canva:
+- All text must remain as editable Canva text boxes, not flattened images.
+- Do not flatten, rasterize, or merge text into graphics.
+- Name, role, summary, buttons, headings, skills, and project-card text must be individually editable in Canva.
+- Keep the layout modular with editable sections/cards rather than one static poster image.`;
         }
 
         function buildCanvaInstruction(lang = 'en') {
             if (lang === 'th') {
                 return `วิธีนำไฟล์ไปใช้กับ Canva AI / Magic Design
+Project version: ${PROJECT_VERSION}
 
 ขั้นตอนสำคัญมาก:
 1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
 2. ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Website Code, Code for website, หรือช่องสร้างเว็บด้วย AI ที่รองรับการสร้างหน้าเว็บจากคำสั่ง
-3. จุดนี้สำคัญมาก: ให้ใช้โหมด Code/Website เพราะมีโอกาสได้โครงสร้างที่แก้ไขได้มากกว่า หากเลือก poster / presentation / document ทั่วไป Canva อาจรวมข้อความเป็น artwork ทำให้แก้ชื่อ ประวัติ หรือรายละเอียดไม่ได้
-4. ห้ามเริ่มจาก template presentation / poster / document ทั่วไปก่อน เพราะ Canva มักจะไม่ทำ layout ให้เหมือนเว็บ scrollytelling
-5. เปิดไฟล์ canva_prompt_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
+3. ห้ามเริ่มจาก template presentation / poster / document ทั่วไปก่อน เพราะ Canva มักจะไม่ทำ layout ให้เหมือนเว็บ scrollytelling
+4. เปิดไฟล์ canva_prompt_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
+5. ตรวจสอบว่า prompt ระบุให้คง Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษาไว้ แต่ไม่ใส่ Print/Export/Download
 6. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน เพราะ Canva เข้าใจ prompt ภาษาอังกฤษได้แม่นกว่า
 7. หาก Canva จำกัดความยาว prompt ให้เริ่มจาก canva_prompt_en.txt แล้วเติมข้อมูลสำคัญจาก portfolio_data_snapshot.json เฉพาะส่วนที่จำเป็น
 8. หลัง Canva สร้างดีไซน์แล้ว ให้ตรวจสอบชื่อ ตำแหน่ง ประสบการณ์ รูปภาพ และข้อมูลติดต่ออีกครั้งก่อนเผยแพร่
 
 ไฟล์ข้อมูล:
 - portfolio_data_snapshot.json คือข้อมูลทั้งหมด ณ เวลาที่กดดาวน์โหลด ใช้สำรองข้อมูลและคัดลอกข้อมูลเพิ่มเข้า Canva ได้
-- รูปโปรเจกต์ใน JSON จะถูกเก็บเป็น Base64 data URL ภายใน data.exp[].images ถ้ามีการอัปโหลดรูปไว้ในเว็บก่อนดาวน์โหลด
-- Canva AI โดยทั่วไปไม่ได้นำรูปจาก Base64 ใน JSON ไปวางให้อัตโนมัติ ควรอัปโหลดรูปจริงเข้า Canva แล้วจัดวางตาม prompt อีกครั้ง
-- หาก Canva สร้างดีไซน์แล้วแก้ข้อความไม่ได้ ให้สร้างใหม่โดยใช้ canva_prompt_en.txt เวอร์ชันนี้ และย้ำว่า All text must remain editable native Canva text boxes
+- ไฟล์ JSON นี้เป็น text-only snapshot: ไม่ฝังรูป Base64 เพื่อไม่ให้ชนข้อจำกัดตัวอักษรของ Canva AI ประมาณ 50K characters และเพื่อให้เปิดอ่านง่ายขึ้น
+- หากมีรูปโปรเจกต์ ให้ upload รูปจริงเข้า Canva ด้วยตัวเอง แล้วนำไปวางใน section/project card ที่ Canva สร้างให้
 - ไฟล์ .json สามารถเปิดด้วย Notepad ได้ โดยคลิกขวา > Open with > Notepad หรือเปิดด้วย VS Code / browser ก็ได้
 - ถ้าเห็นตัวอักษรติดกันเยอะ ให้ใช้ Notepad แบบ Word Wrap หรือเปิดผ่าน VS Code จะอ่านง่ายกว่า
 
@@ -793,22 +795,22 @@ Design requirements:
 - ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
             }
             return `How to use these files with Canva AI / Magic Design
+Project version: ${PROJECT_VERSION}
 
 Very important steps:
 1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
 2. Choose the Code, Website Code, Code for website, or AI website creation function that can generate a web page from a prompt.
-3. This is very important: use Code/Website mode because it is more likely to create an editable structure. If you choose a normal poster / presentation / document mode, Canva may merge text into artwork, making names, bio, and project details difficult or impossible to edit.
-4. Do not start from a normal presentation / poster / document template, because Canva will usually not recreate the scrollytelling website layout correctly.
-5. Open canva_prompt_en.txt and paste the full prompt into Canva's Code/Website AI function.
+3. Do not start from a normal presentation / poster / document template, because Canva will usually not recreate the scrollytelling website layout correctly.
+4. Open canva_prompt_en.txt and paste the full prompt into Canva's Code/Website AI function.
+5. Confirm that the prompt keeps the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher, but removes Print/Export/Download controls.
 6. canva_prompt_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
 7. If Canva limits prompt length, start with canva_prompt_en.txt, then add only the most important missing details from portfolio_data_snapshot.json.
 8. After Canva generates the design, carefully review the name, role, experience, images, and contact information before publishing.
 
 Data files:
 - portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
-- Project images are stored in JSON as Base64 data URLs inside data.exp[].images when images were uploaded before download.
-- Canva AI usually will not automatically place images from Base64 JSON. Upload the original images to Canva and place them according to the prompt.
-- If Canva generates a design where text cannot be edited, regenerate it using this canva_prompt_en.txt and explicitly keep: All text must remain editable native Canva text boxes.
+- This JSON is a text-only snapshot: Base64 images are not embedded, to avoid Canva AI character limits around 50K characters and to keep the file readable.
+- If you have project images, upload the real image files to Canva manually, then place them in the matching generated section/project card.
 - .json files can be opened with Notepad: right click > Open with > Notepad. You can also open them with VS Code or a browser.
 - If the JSON appears as a long block of text, enable Word Wrap in Notepad or open it in VS Code for easier reading.
 
@@ -822,10 +824,52 @@ Notes:
             const clean = JSON.parse(JSON.stringify(data || {}));
             delete clean._isFirstRunDemo;
             delete clean._hasStoredCache;
+
+            const imageManifest = [];
+            const looksLikeBase64Image = (value) => typeof value === 'string' && /^data:image\//i.test(value);
+
+            if (looksLikeBase64Image(clean.avatar)) {
+                imageManifest.push({ scope: 'profile', field: 'avatar', note: 'Profile image was available in the live portfolio but is intentionally not embedded in this Canva AI JSON.' });
+                clean.avatar = '';
+                clean.avatar_note = 'Image removed from Canva AI snapshot to stay below Canva prompt/character limits. Upload the profile image manually in Canva if needed.';
+            }
+
+            if (Array.isArray(clean.exp)) {
+                clean.exp = clean.exp.map((item, index) => {
+                    const cloned = { ...item };
+                    const images = Array.isArray(cloned.images) ? cloned.images : [];
+                    const count = images.length;
+                    if (count > 0) {
+                        imageManifest.push({
+                            scope: 'experience',
+                            index,
+                            title_th: cloned.title_th || cloned.title || '',
+                            title_en: cloned.title_en || cloned.title || '',
+                            image_count: count,
+                            note: 'Project images were available in the live portfolio but are intentionally not embedded in this Canva AI JSON.'
+                        });
+                    }
+                    cloned.images = [];
+                    cloned.image_count = count;
+                    cloned.image_note = count > 0
+                        ? 'Images removed from Canva AI snapshot to avoid Canva AI character limits. Upload the original project images manually in Canva and place them in this project section.'
+                        : 'No project image stored for this item.';
+                    return cloned;
+                });
+            }
+
             return {
+                project_name: PROJECT_NAME,
+                project_version: PROJECT_VERSION,
                 exported_at: new Date().toISOString(),
-                export_type: 'canva_ai_prompt_package_no_api_no_sdk',
-                app_note: 'Snapshot of portfolio data at download time. This file is generated locally in the browser.',
+                export_type: 'canva_ai_prompt_package_no_api_no_sdk_text_only_snapshot',
+                app_note: 'Snapshot of portfolio data at download time. Generated locally in the browser. Base64 images are intentionally excluded for Canva AI character-limit safety.',
+                image_policy: {
+                    embedded_base64_images: false,
+                    reason: 'Canva AI prompt/code input may be limited. Base64 images can exceed the limit and are not reliably reconstructed by Canva AI.',
+                    user_action: 'Upload profile/project images manually into Canva, then place them in the generated sections.'
+                },
+                image_manifest: imageManifest,
                 canva_package_files: [
                     'canva_prompt_en.txt',
                     'canva_prompt_th.txt',
@@ -853,7 +897,7 @@ Notes:
         async function downloadCanvaPackage() {
             const data = StorageHandler.load();
             const stamp = getCanvaTimestamp();
-            const folderName = `canva-ai-pack-${stamp}`;
+            const folderName = `canva-ai-pack-${PROJECT_VERSION}-${stamp}`;
             const files = {
                 'canva_prompt_en.txt': buildCanvaPrompt(data, 'en'),
                 'canva_prompt_th.txt': buildCanvaPrompt(data, 'th'),
@@ -1997,18 +2041,8 @@ Notes:
             const scrollyWrappers = document.querySelectorAll('.scrollytelling-wrapper');
             if (scrollyWrappers.length > 0) {
                 if (window._scrollHandler) window.removeEventListener('scroll', window._scrollHandler);
-                if (window._scrollResizeHandler) window.removeEventListener('resize', window._scrollResizeHandler);
                 scrollyWrappers.forEach(w => { const t = w.querySelector('.scrollytelling-track'); if (t) t.removeAttribute('data-max-translate'); });
                 let isTicking = false;
-                const resetTrackCache = () => {
-                    scrollyWrappers.forEach(w => {
-                        const t = w.querySelector('.scrollytelling-track');
-                        if (t) t.removeAttribute('data-max-translate');
-                    });
-                    window._scrollHandler?.();
-                };
-                window._scrollResizeHandler = resetTrackCache;
-                window.addEventListener('resize', window._scrollResizeHandler, { passive: true });
                 window._scrollHandler = () => {
                     const progressBar = document.getElementById('scroll-progress');
                     if (progressBar) {
@@ -2024,64 +2058,28 @@ Notes:
                         heroFrame.style.setProperty('--profile-scroll-angle', `${Math.round(pageProgress * 720)}deg`);
                         heroFrame.style.setProperty('--profile-scroll-glow', `${0.45 + pageProgress * 0.45}`);
                     }
+                    // v31 responsive scrollytelling: keep vertical scroll-driven motion on mobile/tablet too.
                     if (!isTicking) {
                         window.requestAnimationFrame(() => {
-                            const isTouchLayout = window.matchMedia('(max-width: 1023px)').matches;
                             scrollyWrappers.forEach(wrapper => {
-                                const track = wrapper.querySelector('.scrollytelling-track');
-                                const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
-                                const stickyBox = wrapper.querySelector('.sticky');
-                                if (!track || !stickyBox) return;
-
-                                const rect = wrapper.getBoundingClientRect();
-                                const stickyTop = isTouchLayout ? (parseFloat(getComputedStyle(stickyBox).top) || 80) : window.innerHeight * 0.1;
-                                const stickyHeight = stickyBox.offsetHeight;
-                                const totalScrollDistance = Math.max(1, rect.height - stickyHeight);
-                                let progress = (stickyTop - rect.top) / totalScrollDistance;
+                                const track = wrapper.querySelector('.scrollytelling-track'); const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper'); const stickyBox = wrapper.querySelector('.sticky'); if (!track || !stickyBox) return;
+                                const rect = wrapper.getBoundingClientRect(); const stickyTop = window.innerHeight * 0.1; const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
+                                let progress = 0; if (totalScrollDistance > 0) { progress = (stickyTop - rect.top) / totalScrollDistance; }
                                 progress = Math.max(0, Math.min(1, progress));
-
                                 let maxTranslate = track.getAttribute('data-max-translate');
                                 if (!maxTranslate) {
-                                    const wasCollapsed = imageWrapper && imageWrapper.classList.contains('cinematic-collapsed');
-                                    if (imageWrapper && wasCollapsed) {
-                                        imageWrapper.classList.remove('cinematic-collapsed');
-                                        imageWrapper.classList.add('cinematic-expanded');
-                                    }
-                                    maxTranslate = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
-                                    track.setAttribute('data-max-translate', maxTranslate);
-                                    if (imageWrapper && wasCollapsed) {
-                                        imageWrapper.classList.add('cinematic-collapsed');
-                                        imageWrapper.classList.remove('cinematic-expanded');
-                                    }
+                                    const isCol = imageWrapper.classList.contains('cinematic-collapsed'); if (isCol) { imageWrapper.classList.remove('cinematic-collapsed'); imageWrapper.classList.add('cinematic-expanded'); }
+                                    maxTranslate = track.scrollWidth - track.parentElement.clientWidth; track.setAttribute('data-max-translate', maxTranslate);
+                                    if (isCol) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
                                 }
                                 maxTranslate = parseFloat(maxTranslate) || 0;
-
-                                const activeStart = isTouchLayout ? 0.16 : 0.01;
-                                const activeEnd = isTouchLayout ? 0.72 : 0.98;
-                                const shouldExpand = progress > activeStart && progress < activeEnd;
-                                if (imageWrapper) {
-                                    imageWrapper.classList.toggle('cinematic-expanded', shouldExpand);
-                                    imageWrapper.classList.toggle('cinematic-collapsed', !shouldExpand);
-                                }
-
-                                if (maxTranslate > 0) {
-                                    const startMove = isTouchLayout ? 0.20 : 0.05;
-                                    const endMove = isTouchLayout ? 0.64 : 0.85;
-                                    let scrollProgress = 0;
-                                    if (progress > startMove && progress < endMove) scrollProgress = (progress - startMove) / (endMove - startMove);
-                                    else if (progress >= endMove) scrollProgress = 1;
-                                    const currentTranslate = scrollProgress * maxTranslate;
-                                    track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`;
-                                }
-                            });
-                            isTicking = false;
-                        });
-                        isTicking = true;
+                                if (imageWrapper) { if (progress <= 0.01 || progress >= 0.98) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
+                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = 0.05; const endMove = 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; }
+                            }); isTicking = false;
+                        }); isTicking = true;
                     }
                 };
                 window.addEventListener('scroll', window._scrollHandler, { passive: true });
-                window._scrollHandler();
-                setTimeout(() => window._scrollHandler?.(), 120);
             }
         }
 

@@ -4140,3 +4140,116 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
     min-height: 150vh !important;
   }
 }
+
+
+/* ==================================
+   v36 Project version + visible cursor tilt grid
+   - Shows the current project version in the navbar
+   - Makes the 3x3 cursor tilt grid clearly visible on desktop
+   - Keeps mobile/tablet clean by disabling heavy pointer effects below 1024px
+===================================== */
+.project-version-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) 55%, rgba(255,255,255,.12));
+  background: rgba(15, 23, 42, .72);
+  color: #e0f2fe;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  line-height: 1;
+  box-shadow: 0 10px 30px rgba(0,0,0,.22), 0 0 22px color-mix(in srgb, var(--theme-accent, #3b82f6) 22%, transparent);
+  user-select: none;
+}
+
+#theme-decorations {
+  z-index: 1 !important;
+}
+
+#app {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+body > nav.fixed,
+#theme-panel,
+#public-canva-branch,
+#public-export-branch,
+#canva-copy-toast {
+  z-index: 60 !important;
+}
+
+body.layout-portfolio #mouse-grid-field {
+  display: grid !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  grid-template-columns: repeat(9, 1fr) !important;
+  grid-template-rows: repeat(6, 1fr) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  opacity: .54 !important;
+  perspective: 1050px !important;
+  transform-style: preserve-3d !important;
+  mix-blend-mode: screen;
+  contain: layout paint !important;
+}
+
+body.mode-light.layout-portfolio #mouse-grid-field {
+  opacity: .32 !important;
+  mix-blend-mode: multiply;
+}
+
+body.layout-portfolio #mouse-grid-field::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) 25%, transparent) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04) !important;
+}
+
+body.layout-portfolio .mouse-cell {
+  --cell-i: 0;
+  --rx: 0deg;
+  --ry: 0deg;
+  --z: 0px;
+  --shadow-x: 0px;
+  --shadow-y: 0px;
+  position: relative !important;
+  transform:
+    perspective(760px)
+    rotateX(var(--rx))
+    rotateY(var(--ry))
+    translateZ(var(--z))
+    scale(calc(1 + (var(--cell-i) * .025))) !important;
+  transform-origin: center center !important;
+  transform-style: preserve-3d !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(9% + (var(--cell-i) * 55%)), transparent) !important;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(4% + (var(--cell-i) * 18%)), transparent), transparent 56%),
+    linear-gradient(135deg, rgba(255,255,255, calc(.018 + (var(--cell-i) * .09))), transparent 62%) !important;
+  opacity: calc(.055 + (var(--cell-i) * .46)) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255, calc(.008 + (var(--cell-i) * .055))),
+    var(--shadow-x) var(--shadow-y) calc(18px + (var(--cell-i) * 34px)) rgba(0,0,0, calc(.04 + (var(--cell-i) * .18))),
+    0 0 calc(8px + (var(--cell-i) * 22px)) color-mix(in srgb, var(--theme-accent, #3b82f6) calc(var(--cell-i) * 34%), transparent) !important;
+  transition:
+    border-color .32s cubic-bezier(.2,.8,.2,1),
+    opacity .32s cubic-bezier(.2,.8,.2,1),
+    background .32s cubic-bezier(.2,.8,.2,1),
+    box-shadow .32s cubic-bezier(.2,.8,.2,1) !important;
+  will-change: transform, opacity, box-shadow !important;
+}
+
+@media (max-width: 1023px), print, (prefers-reduced-motion: reduce) {
+  .project-version-badge { display: none !important; }
+  body.layout-portfolio #mouse-grid-field,
+  body.layout-portfolio .mouse-cell { display: none !important; }
+}
