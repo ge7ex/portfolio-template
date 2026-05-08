@@ -1,29 +1,18 @@
-VERSION SUMMARY - V41 Mobile Vertical + Studio Restore
+V42 Mobile Scroll + Studio Data Fix
 
-Status:
-- Based on V40 mobile branch button UI.
-- Restores the stable V38 PDF Layout Studio engine because the V39 integrated/no-op hotfix path could make Studio fall back to placeholder data such as 'Your Name'.
-- Keeps the active data hotfix as a separate file so Studio can read the currently rendered portfolio/resume data before opening.
-- Changes mobile/tablet scrollytelling back to vertical swipe flow. Project images no longer become a horizontal left/right gallery on mobile.
-- PDF export remains portrait-only. Landscape PDF UI stays hidden/disabled.
+Changed files:
+- index.html
+- css/style.css
+- js/storage.js
+- js/components/PrintDesigner.js
+- js/components/PrintDesignerHotfix.js
 
-Main runtime files:
-- AI-Portfolio-Toolkit/index.html
-  V40 mobile branch button shell and portrait-only print call.
-- AI-Portfolio-Toolkit/css/style.css
-  V40 mobile branch UI + V41 mobile vertical scrollytelling override at the end of the file.
-- AI-Portfolio-Toolkit/js/storage.js
-  Lazy-loads PrintDesigner.js and then PrintDesignerHotfix.js using V41 cache-busting query strings.
-- AI-Portfolio-Toolkit/js/components/PrintDesigner.js
-  Stable V38 Print Designer engine: PDF Layout Studio, drag/resize/crop, production-themed print renderer.
-- AI-Portfolio-Toolkit/js/components/PrintDesignerHotfix.js
-  V41/V38 active-data hotfix: prevents Studio from opening with demo/placeholder data when real data is already rendered.
+Fixes:
+1. Mobile/tablet scrollytelling now uses vertical page scroll to expand/collapse the project image rail and move images, matching desktop behavior. It is no longer a static grid or manual horizontal swipe gallery.
+2. PDF Layout Studio no longer treats a portfolio as demo-only just because name fields still contain placeholders. Real project text/images are preserved.
+3. Studio header preview uses a transparent header layer on the themed PDF header, so text is not hidden by a white object box.
+4. PrintDesigner script cache version bumped to V42.
+5. Print PDF landscape remains hidden/disabled by the existing PrintDesigner/export guard.
 
-Version snapshots:
-- AI-Portfolio-Toolkit/_version_snapshots/PrintDesigner-v38-stable-used-by-v41.js
-- AI-Portfolio-Toolkit/_version_snapshots/PrintDesignerHotfix-v41-active-data.js
-
-Files intentionally not included:
-- README_V*.md notes
-- Multiple old version note files
-- Accidental nested upload folders
+Install:
+Replace the files above in AI-Portfolio-Toolkit, or upload the complete package.
