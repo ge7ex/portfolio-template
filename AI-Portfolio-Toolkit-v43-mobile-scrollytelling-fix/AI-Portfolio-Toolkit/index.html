@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Portfolio Pro Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .tab-active {
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        .tab-inactive {
+            border-color: transparent;
+            color: #94a3b8;
+        }
+
+        .tab-inactive:hover {
+            color: #e2e8f0;
+        }
+
+        .theme-swatch {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .theme-swatch:hover {
+            transform: scale(1.15);
+        }
+
+        .theme-swatch.active {
+            outline: 2px solid white;
+            outline-offset: 2px;
+            transform: scale(1.1);
+        }
+
+        #watermark {
+            display: none;
+        }
+
+        .is-downloaded #watermark {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            opacity: 0.4;
+            z-index: 100;
+            pointer-events: none;
+            color: gray;
+        }
+
+        .is-downloaded nav button[onclick="toggleModal()"] {
+            display: none !important;
+        }
+
+        .is-downloaded #export-panel {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-[#0f172a] text-white min-h-screen transition-all duration-500 relative">
+
+    <div id="dynamic-bg"
+        class="fixed inset-0 z-[-1] bg-cover bg-center bg-no-repeat transition-all duration-700 opacity-0 bg-blend-overlay bg-[#0f172a]/90">
+    </div>
+    <div id="theme-decorations" class="fixed inset-0 z-[0] pointer-events-none overflow-hidden"></div>
+    <div id="scroll-progress" class="fixed top-0 left-0 h-1 w-0 z-[80] bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 shadow-[0_0_18px_rgba(59,130,246,.65)] transition-[width] duration-150"></div>
+
+    <div id="watermark">Web Portfolio by Kasidech "Ge7ex" Settavanit</div>
+
+    <nav class="fixed top-6 right-6 z-50 flex items-center gap-3">
+        <button onclick="toggleLang()" id="btn-lang"
+            class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all font-bold uppercase text-sm flex items-center justify-center">
+            EN
+        </button>
+
+        <div
+            class="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-1 rounded-full flex shadow-lg items-center relative">
+            <button onclick="setDirectLayout('portfolio')" id="btn-pill-portfolio"
+                class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md">Portfolio</button>
+            <button onclick="setDirectLayout('resume')" id="btn-pill-resume"
+                class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white">Resume</button>
+        </div>
+
+        <button onclick="toggleThemePanel()" id="btn-appearance"
+            class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative">
+            <i data-lucide="palette" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        </button>
+
+        <button onclick="toggleExportBranch()" id="btn-export-branch"
+            class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative"
+            title="Export / Print">
+            <i data-lucide="printer" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        </button>
+
+        <button onclick="toggleCanvaBranch()" id="btn-canva-branch"
+            class="canva-icon-button bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative"
+            title="Download Canva AI prompt package">
+            <span class="canva-mark" aria-hidden="true">C</span>
+        </button>
+
+        <button onclick="toggleModal()"
+            class="bg-emerald-600/90 hover:bg-emerald-500 text-white backdrop-blur-xl border border-emerald-400/30 px-5 h-11 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 group">
+            <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
+            <span class="text-sm">Edit</span>
+        </button>
+    </nav>
+
+    <div id="public-export-branch" class="hidden public-export-branch" aria-label="Quick export actions">
+        <button type="button" onclick="handleExportWeb()" title="Download WEB"><i data-lucide="download" class="w-4 h-4"></i><span>WEB</span></button>
+        <button type="button" onclick="handlePrint('portrait')" title="PDF Portrait"><i data-lucide="file-down" class="w-4 h-4"></i><span>PDF</span></button>
+        <button type="button" onclick="handleExportPPTX()" title="Download PPTX"><i data-lucide="file-presentation" class="w-4 h-4"></i><span>PPTX</span></button>
+    </div>
+
+    <div id="public-canva-branch" class="hidden public-canva-branch" aria-label="Canva AI export package">
+        <button type="button" onclick="downloadCanvaPackage()" title="Download Canva AI prompt package"><i data-lucide="package-down" class="w-4 h-4"></i><span>Canva AI Pack</span></button>
+        <button type="button" onclick="copyCanvaPrompt('en')" title="Copy English Canva Prompt"><i data-lucide="copy" class="w-4 h-4"></i><span>Copy EN</span></button>
+        <button type="button" onclick="copyCanvaPrompt('th')" title="Copy Thai Canva Prompt"><i data-lucide="copy-check" class="w-4 h-4"></i><span>Copy TH</span></button>
+    </div>
+
+    <div id="canva-copy-toast" class="hidden canva-copy-toast" role="status" aria-live="polite">Canva AI package ready</div>
+
+    <div id="theme-panel"
+        class="hidden fixed top-20 right-6 z-40 bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-700 rounded-3xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] w-72 origin-top-right transition-all">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i
+                data-lucide="moon" class="w-3 h-3"></i> Appearance</h3>
+
+        <div class="flex bg-slate-900 rounded-xl p-1 mb-6 border border-slate-800">
+            <button onclick="setDirectColorMode('dark')" id="btn-mode-dark"
+                class="flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-700 text-white flex items-center justify-center gap-2 shadow-md"><i
+                    data-lucide="moon" class="w-3 h-3"></i> Dark</button>
+            <button onclick="setDirectColorMode('light')" id="btn-mode-light"
+                class="flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"><i
+                    data-lucide="sun" class="w-3 h-3"></i> Light</button>
+        </div>
+
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i
+                data-lucide="swatch-book" class="w-3 h-3"></i> Color Theme</h3>
+
+        <div class="theme-wheel-shell" aria-label="Theme wheel selector">
+            <button type="button" class="theme-wheel-arrow theme-wheel-up" onclick="nudgeThemeWheel(-1)" aria-label="Previous theme">⌃</button>
+            <div id="theme-carousel" class="theme-carousel" aria-label="Theme carousel">
+                <button type="button" data-theme="tech" id="swatch-tech" class="theme-swatch theme-dot bg-blue-500 active" title="Tech & Startup"><span>Tech</span></button>
+                <button type="button" data-theme="educ" id="swatch-educ" class="theme-swatch theme-dot bg-emerald-500" title="Education"><span>Education</span></button>
+                <button type="button" data-theme="gov" id="swatch-gov" class="theme-swatch theme-dot bg-amber-500" title="Government"><span>Gov</span></button>
+                <button type="button" data-theme="creative" id="swatch-creative" class="theme-swatch theme-dot bg-fuchsia-500" title="Creative"><span>Creative</span></button>
+                <button type="button" data-theme="minimal" id="swatch-minimal" class="theme-swatch theme-dot bg-white" title="Minimal"><span>Minimal</span></button>
+                <button type="button" data-theme="eco" id="swatch-eco" class="theme-swatch theme-dot bg-teal-500" title="Eco Nature"><span>Eco</span></button>
+                <button type="button" data-theme="bold" id="swatch-bold" class="theme-swatch theme-dot bg-rose-500" title="Bold Passion"><span>Bold</span></button>
+                <button type="button" data-theme="luxury" id="swatch-luxury" class="theme-swatch theme-dot bg-gradient-to-br from-amber-300 to-indigo-900" title="Luxury"><span>Luxury</span></button>
+                <button type="button" data-theme="health" id="swatch-health" class="theme-swatch theme-dot bg-gradient-to-br from-sky-300 to-emerald-400" title="Health & Wellness"><span>Health</span></button>
+                <button type="button" data-theme="esports" id="swatch-esports" class="theme-swatch theme-dot bg-gradient-to-br from-violet-500 to-cyan-400" title="Esports"><span>Esports</span></button>
+            </div>
+            <button type="button" class="theme-wheel-arrow theme-wheel-down" onclick="nudgeThemeWheel(1)" aria-label="Next theme">⌄</button>
+            <div id="theme-wheel-label" class="theme-wheel-label">TECH</div>
+            <div class="theme-mode-branch" aria-label="Color mode">
+                <button type="button" onclick="setDirectColorMode('dark')" id="wheel-mode-dark"><i data-lucide="moon" class="w-3 h-3"></i><span>Dark</span></button>
+                <button type="button" onclick="setDirectColorMode('light')" id="wheel-mode-light"><i data-lucide="sun" class="w-3 h-3"></i><span>Light</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="container mx-auto py-20 px-6"></div>
+
+    <div id="edit-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div
+            class="bg-[#0f172a] text-white w-full max-w-5xl rounded-3xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+
+            <div class="px-8 py-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                <h2 class="text-2xl font-bold flex items-center gap-3"><i data-lucide="user-cog"
+                        class="w-7 h-7 text-blue-400"></i> Manage Profile</h2>
+                <button onclick="toggleModal()" class="text-slate-400 hover:text-white transition-colors"><i
+                        data-lucide="x" class="w-7 h-7"></i></button>
+            </div>
+
+            <div class="flex px-8 pt-4 gap-8 border-b border-slate-800 bg-[#0f172a]">
+                <button onclick="switchTab('basic')" id="tab-basic"
+                    class="tab-active pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="user" class="w-4 h-4"></i> Basic Info</button>
+                <button onclick="switchTab('contact')" id="tab-contact"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="mail" class="w-4 h-4"></i> Contact & Skills</button>
+                <button onclick="switchTab('experience')" id="tab-experience"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="briefcase" class="w-4 h-4"></i> Experience</button>
+                <button onclick="switchTab('sections')" id="tab-sections"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="layout-template" class="w-4 h-4"></i> Extra Sections</button>
+                <button onclick="switchTab('resume')" id="tab-resume"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="file-user" class="w-4 h-4"></i> Resume Settings</button>
+            </div>
+
+            <div id="edit-modal-body" class="p-8 overflow-y-auto flex-1 custom-scrollbar">
+
+                <div id="content-basic" class="block space-y-6">
+                    <div
+                        class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl flex items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm text-slate-400 mb-3 flex items-center gap-2"><i
+                                    data-lucide="image" class="w-4 h-4"></i> Profile Picture</label>
+                            <input type="file" id="in-avatar" accept="image/*" onchange="handleImageUpload(event)"
+                                class="text-sm w-full text-slate-400 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer transition-all">
+                        </div>
+                        <img id="avatar-preview"
+                            class="hidden w-20 h-20 rounded-full object-cover border-2 border-slate-600 shadow-lg">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4 bg-slate-900/40 p-6 rounded-2xl border border-blue-500/20">
+                            <h3
+                                class="text-blue-400 font-bold border-b border-blue-900/50 pb-2 flex items-center gap-2">
+                                🇹🇭 ข้อมูลภาษาไทย</h3>
+                            <div><label
+                                    class="block text-xs font-semibold text-slate-400 uppercase mb-2">ชื่อ-นามสกุล</label><input
+                                    type="text" id="in-name-th"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-blue-500">
+                            </div>
+                            <div><label
+                                    class="block text-xs font-semibold text-slate-400 uppercase mb-2">ตำแหน่งงาน</label><input
+                                    type="text" id="in-role-th"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-blue-500">
+                            </div>
+                            <div><label
+                                    class="block text-xs font-semibold text-slate-400 uppercase mb-2">ประวัติโดยย่อ</label><textarea
+                                    id="in-bio-th"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl h-28 resize-none outline-none focus:border-blue-500"></textarea>
+                            </div>
+                        </div>
+                        <div class="space-y-4 bg-slate-900/40 p-6 rounded-2xl border border-amber-500/20">
+                            <h3
+                                class="text-amber-400 font-bold border-b border-amber-900/50 pb-2 flex items-center gap-2">
+                                🇬🇧 English Data</h3>
+                            <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Full
+                                    Name</label><input type="text" id="in-name-en"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-amber-500">
+                            </div>
+                            <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Job
+                                    Position</label><input type="text" id="in-role-en"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-amber-500">
+                            </div>
+                            <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Professional
+                                    Summary</label><textarea id="in-bio-en"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl h-28 resize-none outline-none focus:border-amber-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-contact" class="hidden space-y-6">
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 gap-5 bg-slate-900/40 p-6 rounded-2xl border border-slate-700">
+                        <div class="relative"><label
+                                class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email</label><input
+                                type="text" id="in-email"
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none">
+                        </div>
+                        <div class="relative"><label
+                                class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Phone</label><input
+                                type="text" id="in-phone"
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none">
+                        </div>
+                        <div class="relative md:col-span-2"><label
+                                class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">LinkedIn
+                                URL</label><input type="text" id="in-linkedin"
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-900/40 p-6 rounded-2xl border border-blue-500/20">
+                            <label class="block text-xs font-semibold text-blue-400 uppercase mb-2">Skills
+                                (ภาษาไทย)</label>
+                            <input type="text" id="in-skills-th" placeholder="เช่น การวางแผน, การจัดการ..."
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-blue-500">
+                        </div>
+                        <div class="bg-slate-900/40 p-6 rounded-2xl border border-amber-500/20">
+                            <label class="block text-xs font-semibold text-amber-400 uppercase mb-2">Skills
+                                (English)</label>
+                            <input type="text" id="in-skills-en" placeholder="e.g. Planning, Management..."
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="content-sections" class="hidden space-y-6">
+                    <div class="bg-slate-900/50 border border-slate-700 rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="layers" class="w-5 h-5 text-violet-400"></i> Optional Portfolio / Resume Sections</h3>
+                        <p class="text-sm text-slate-400 mb-6">กรอกเฉพาะหัวข้อที่ต้องการแสดง ระบบจะไม่ render หัวข้อที่ว่างไว้ / Fill only the sections you want to show. Empty sections are hidden automatically.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-blue-400 border-b border-blue-500/30 pb-2">TH ข้อมูลภาษาไทย</h4>
+                                <label class="extra-label">การศึกษา <span>รูปแบบ: วุฒิ | สถาบัน | ปี | รายละเอียด</span></label>
+                                <textarea id="in-education-th" class="extra-textarea" placeholder="ปริญญาตรี วิทยาการคอมพิวเตอร์ | มหาวิทยาลัยตัวอย่าง | 2565 | เกียรตินิยม"></textarea>
+                                <label class="extra-label">ประกาศนียบัตร <span>ชื่อ | ผู้ออกใบรับรอง | ปี</span></label>
+                                <textarea id="in-certifications-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">รางวัลและความสำเร็จ <span>ชื่อ | หน่วยงาน | ปี | รายละเอียด</span></label>
+                                <textarea id="in-awards-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">กรณีศึกษา / ผลลัพธ์ <span>โปรเจกต์ | โจทย์ | วิธีทำ | ผลลัพธ์</span></label>
+                                <textarea id="in-caseStudies-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">บริการ <span>ชื่อบริการ | รายละเอียด</span></label>
+                                <textarea id="in-services-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">คำรับรอง <span>คำพูด | ชื่อ | ตำแหน่ง</span></label>
+                                <textarea id="in-testimonials-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">ลูกค้า / หน่วยงาน <span>คั่นด้วย comma หรือขึ้นบรรทัดใหม่</span></label>
+                                <textarea id="in-clients-th" class="extra-textarea small"></textarea>
+                                <label class="extra-label">CTA <span>หัวข้อ | รายละเอียด | ข้อความปุ่ม | URL</span></label>
+                                <textarea id="in-cta-th" class="extra-textarea small"></textarea>
+                                <label class="extra-label">บทความ / สื่อเผยแพร่ <span>ชื่อ | รายละเอียด | URL</span></label>
+                                <textarea id="in-articles-th" class="extra-textarea"></textarea>
+                            </div>
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-amber-400 border-b border-amber-500/30 pb-2">EN English Data</h4>
+                                <label class="extra-label">Education <span>Format: Degree | School | Year | Detail</span></label>
+                                <textarea id="in-education-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Certifications <span>Name | Issuer | Year</span></label>
+                                <textarea id="in-certifications-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Awards <span>Name | Organization | Year | Detail</span></label>
+                                <textarea id="in-awards-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Case Studies <span>Project | Problem | Action | Result</span></label>
+                                <textarea id="in-caseStudies-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Services <span>Service | Description</span></label>
+                                <textarea id="in-services-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Testimonials <span>Quote | Name | Role</span></label>
+                                <textarea id="in-testimonials-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Clients / Partners <span>Comma or newline separated</span></label>
+                                <textarea id="in-clients-en" class="extra-textarea small"></textarea>
+                                <label class="extra-label">CTA <span>Headline | Description | Button | URL</span></label>
+                                <textarea id="in-cta-en" class="extra-textarea small"></textarea>
+                                <label class="extra-label">Articles / Publications <span>Title | Description | URL</span></label>
+                                <textarea id="in-articles-en" class="extra-textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-resume" class="hidden space-y-6">
+                    <div class="bg-slate-900/50 border border-slate-700 rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="file-user" class="w-5 h-5 text-cyan-400"></i> Resume Component Visibility</h3>
+                        <p class="text-sm text-slate-400 mb-5">เลือกหัวข้อที่จะแสดงใน Resume Mode ได้ แต่ตำแหน่งของแต่ละหัวข้อจะถูกล็อกไว้ เพื่อให้ Resume ยังดูสวยและพิมพ์ A4 ได้เสถียร</p>
+                        <div class="resume-toggle-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <label><input type="checkbox" id="rv-profile" checked> Profile / รูป + ชื่อ</label>
+                            <label><input type="checkbox" id="rv-contact" checked> Contact / ติดต่อ</label>
+                            <label><input type="checkbox" id="rv-skills" checked> Skills / ทักษะ</label>
+                            <label><input type="checkbox" id="rv-summary" checked> Summary / ประวัติย่อ</label>
+                            <label><input type="checkbox" id="rv-experience" checked> Experience / ประสบการณ์</label>
+                            <label><input type="checkbox" id="rv-education" checked> Education / การศึกษา</label>
+                            <label><input type="checkbox" id="rv-certifications" checked> Certifications / ใบรับรอง</label>
+                            <label><input type="checkbox" id="rv-awards" checked> Awards / รางวัล</label>
+                            <label><input type="checkbox" id="rv-services" checked> Services / บริการ</label>
+                            <label><input type="checkbox" id="rv-clients" checked> Clients / หน่วยงาน</label>
+                            <label><input type="checkbox" id="rv-articles" checked> Articles / สื่อเผยแพร่</label>
+                            <label><input type="checkbox" id="rv-caseStudies" checked> Case Studies / กรณีศึกษา</label>
+                            <label><input type="checkbox" id="rv-testimonials" checked> Testimonials / คำรับรอง</label>
+                        </div>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <button type="button" onclick="setResumeVisibilityPreset('full')" class="px-4 py-2 rounded-xl bg-cyan-600/20 border border-cyan-400/30 text-cyan-200 font-bold text-sm">Show all</button>
+                            <button type="button" onclick="setResumeVisibilityPreset('official')" class="px-4 py-2 rounded-xl bg-emerald-600/20 border border-emerald-400/30 text-emerald-200 font-bold text-sm">Thai official concise</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-experience" class="hidden">
+                    <div class="p-6 bg-slate-900/50 rounded-3xl border border-slate-700 mb-8">
+                        <label class="block text-sm font-bold text-slate-200 mb-4 flex items-center gap-2"><i
+                                data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> <span id="exp-form-title">Add
+                                / Edit Experience</span></label>
+
+                        <div
+                            class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <select id="new-exp-start-month"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                                <option value="">Start Month</option>
+                                <option value="Jan">Jan</option>
+                                <option value="Feb">Feb</option>
+                                <option value="Mar">Mar</option>
+                                <option value="Apr">Apr</option>
+                                <option value="May">May</option>
+                                <option value="Jun">Jun</option>
+                                <option value="Jul">Jul</option>
+                                <option value="Aug">Aug</option>
+                                <option value="Sep">Sep</option>
+                                <option value="Oct">Oct</option>
+                                <option value="Nov">Nov</option>
+                                <option value="Dec">Dec</option>
+                            </select>
+                            <input type="number" id="new-exp-start-year" placeholder="Start Year" min="1900"
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                            <select id="new-exp-end-month"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                                <option value="">End Month</option>
+                                <option value="Jan">Jan</option>
+                                <option value="Feb">Feb</option>
+                                <option value="Mar">Mar</option>
+                                <option value="Apr">Apr</option>
+                                <option value="May">May</option>
+                                <option value="Jun">Jun</option>
+                                <option value="Jul">Jul</option>
+                                <option value="Aug">Aug</option>
+                                <option value="Sep">Sep</option>
+                                <option value="Oct">Oct</option>
+                                <option value="Nov">Nov</option>
+                                <option value="Dec">Dec</option>
+                            </select>
+                            <input type="number" id="new-exp-end-year" placeholder="End Year" min="1900"
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                            <div class="col-span-2 md:col-span-4 flex items-center gap-2 mt-1">
+                                <input type="checkbox" id="new-exp-current" onchange="toggleEndDate()"
+                                    class="w-4 h-4 accent-emerald-500">
+                                <label for="new-exp-current" class="text-sm text-emerald-400 font-medium">I currently
+                                    work here (ทำงานที่นี่ในปัจจุบัน)</label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="space-y-3 bg-[#0f172a] p-5 rounded-2xl border border-blue-500/20 shadow-inner">
+                                <h3
+                                    class="text-blue-400 font-bold border-b border-slate-700 pb-2 text-sm flex items-center gap-2">
+                                    🇹🇭 ข้อมูลภาษาไทย</h3>
+                                <input type="text" id="new-exp-company-th"
+                                    placeholder="ชื่อบริษัท / ลูกค้า (Company/Client)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
+                                <input type="text" id="new-exp-title-th"
+                                    placeholder="ตำแหน่ง / ชื่อโปรเจกต์ (Role/Project)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
+                                <input type="text" id="new-exp-desc-th" placeholder="รายละเอียดแบบย่อ"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
+                                <textarea id="new-exp-highlights-th"
+                                    placeholder="จุดเด่น/หน้าที่ (กด Enter เพื่อขึ้นข้อใหม่)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500 h-24 resize-none text-sm"></textarea>
+                            </div>
+                            <div class="space-y-3 bg-[#0f172a] p-5 rounded-2xl border border-amber-500/20 shadow-inner">
+                                <h3
+                                    class="text-amber-400 font-bold border-b border-slate-700 pb-2 text-sm flex items-center gap-2">
+                                    🇬🇧 English Data</h3>
+                                <input type="text" id="new-exp-company-en" placeholder="Company / Client"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
+                                <input type="text" id="new-exp-title-en" placeholder="Role / Project Name"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
+                                <input type="text" id="new-exp-desc-en" placeholder="Short description"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
+                                <textarea id="new-exp-highlights-en"
+                                    placeholder="Highlights/Duties (Press Enter for new line)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500 h-24 resize-none text-sm"></textarea>
+                            </div>
+                        </div>
+
+                        <div id="exp-image-box" class="mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <label class="block text-xs font-semibold text-slate-400 mb-2"><i data-lucide="image"
+                                    class="w-3 h-3 inline"></i> Project Images / รูปภาพโปรเจกต์</label>
+                            <p class="text-xs text-slate-500 mb-3">เพิ่ม/ลบรูปได้จากตรงนี้ แล้วกด <b class="text-emerald-400">Save & Close</b> เพื่อบันทึกทันที</p>
+                            <input type="file" id="new-exp-img" accept="image/*" multiple
+                                onchange="handleExpImageUpload(event)"
+                                class="text-sm w-full text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
+                            <div id="exp-img-preview"
+                                class="flex gap-2 py-2 overflow-x-auto mt-2 hidden scrollbar-hide"></div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="cancelEditExp()" id="btn-cancel-exp"
+                                class="hidden px-6 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-all font-semibold">Cancel</button>
+                            <button onclick="addExperience(true)" id="btn-add-more-exp"
+                                class="px-6 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded-xl font-bold transition-all flex items-center gap-2"
+                                title="บันทึกโปรเจกต์นี้ และเคลียร์ช่องเพื่อเพิ่มโปรเจกต์ถัดไป">
+                                <i data-lucide="copy-plus" class="w-5 h-5"></i> <span class="hidden md:inline">Save &
+                                    Add Another</span>
+                            </button>
+                            <button onclick="addExperience(false)" id="btn-add-exp"
+                                class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="check" class="w-5 h-5"></i> Save & Close
+                            </button>
+                        </div>
+                    </div>
+
+                    <label class="block text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Timeline
+                        (เรียงลำดับใหม่-เก่าอัตโนมัติ)</label>
+                    <div id="exp-list-preview" class="space-y-3"></div>
+                </div>
+
+            </div>
+
+            <div id="export-panel"
+                class="p-6 border-t border-slate-800 bg-slate-900/80 flex flex-wrap justify-end gap-3 rounded-b-3xl">
+                <button onclick="handleExportWeb()"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-600/20 transition-all flex items-center justify-center gap-2 border border-cyan-500">
+                    <i data-lucide="download" class="w-4 h-4"></i> <span class="text-sm">Download WEB</span>
+                </button>
+                <button id="btn-export-pptx" onclick="handleExportPPTX()"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-orange-600 hover:bg-orange-500 shadow-lg shadow-orange-600/20 transition-all flex items-center justify-center gap-2 border border-orange-500">
+                    <i data-lucide="file-presentation" class="w-4 h-4"></i> <span class="text-sm">Download PPTX</span>
+                </button>
+                <button id="btn-export-pdf-portrait" onclick="handlePrint('portrait')"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 border border-emerald-500">
+                    <i data-lucide="printer" class="w-4 h-4"></i> <span class="text-sm">PDF Portrait</span>
+                </button>
+                <button id="btn-export-pdf-landscape" onclick="handlePrint('landscape')"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-teal-600 hover:bg-teal-500 shadow-lg shadow-teal-600/30 transition-all flex items-center justify-center gap-2 border border-teal-500">
+                    <i data-lucide="panel-top" class="w-4 h-4"></i> <span class="text-sm">PDF Landscape</span>
+                </button>
+                <button id="btn-export-docx" onclick="handleExportDOCX()" aria-hidden="true" tabindex="-1" disabled
+                    class="hidden !hidden flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-600/20 transition-all flex items-center justify-center gap-2 border border-violet-500">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> <span class="text-sm">Download DOCX</span>
+                </button>
+                <button onclick="updatePreview()"
+                    class="w-full md:w-auto px-10 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="save" class="w-5 h-5"></i> Save Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="quick-edit-popover" class="quick-edit-popover hidden" role="dialog" aria-modal="true">
+        <div class="quick-edit-card">
+            <div class="quick-edit-head">
+                <div><span class="quick-edit-kicker">Quick Edit</span><h3 id="quick-edit-title">Edit section</h3></div>
+                <button type="button" onclick="closeQuickEdit()" class="quick-edit-close"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="quick-edit-experience-manager" class="quick-edit-experience-manager hidden"></div>
+            <div class="quick-edit-grid" id="quick-edit-grid">
+                <label><span id="quick-edit-label-th">TH</span><textarea id="quick-edit-th"></textarea></label>
+                <label><span id="quick-edit-label-en">EN</span><textarea id="quick-edit-en"></textarea></label>
+            </div>
+            <div class="quick-edit-actions">
+                <button type="button" onclick="closeQuickEdit()">Cancel</button>
+                <button type="button" id="quick-edit-save-btn" onclick="saveQuickEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="in-theme" value="portfolio">
+
+    <script src="js/components/Header.js"></script>
+    <script src="js/components/Bio.js"></script>
+    <script src="js/components/Experience.js"></script>
+    <script src="js/components/Skill.js"></script>
+    <script src="js/components/Contact.js"></script>
+    <script src="js/components/EducationComponent.js"></script>
+    <script src="js/components/CertificationComponent.js"></script>
+    <script src="js/components/AwardsComponent.js"></script>
+    <script src="js/components/CaseStudyComponent.js"></script>
+    <script src="js/components/ServicesComponent.js"></script>
+    <script src="js/components/TestimonialsComponent.js"></script>
+    <script src="js/components/ClientsComponent.js"></script>
+    <script src="js/components/CTAComponent.js"></script>
+    <script src="js/components/ArticlesComponent.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/exporter.js"></script>
+
+    <script>
+        const createPortfolioIcons = () => { if (window.lucide) lucide.createIcons(); };
+        createPortfolioIcons();
+        let currentAvatarBase64 = "";
+        let currentExpImagesBase64 = [];
+        let editingExpIndex = -1;
+
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('theme-panel');
+            const btn = document.getElementById('btn-appearance');
+            const exportPanel = document.getElementById('public-export-branch');
+            const exportBtn = document.getElementById('btn-export-branch');
+            const canvaPanel = document.getElementById('public-canva-branch');
+            const canvaBtn = document.getElementById('btn-canva-branch');
+            if (panel && btn && !panel.classList.contains('hidden') && !panel.contains(e.target) && !btn.contains(e.target)) {
+                panel.classList.add('hidden');
+            }
+            if (exportPanel && exportBtn && !exportPanel.classList.contains('hidden') && !exportPanel.contains(e.target) && !exportBtn.contains(e.target)) {
+                exportPanel.classList.add('hidden');
+            }
+            if (canvaPanel && canvaBtn && !canvaPanel.classList.contains('hidden') && !canvaPanel.contains(e.target) && !canvaBtn.contains(e.target)) {
+                canvaPanel.classList.add('hidden');
+            }
+        });
+
+
+        function toggleThemePanel() {
+            const panel = document.getElementById('theme-panel');
+            const isOpening = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden');
+            if (isOpening) {
+                // Keep the wheel state aligned with the current saved theme every time the palette opens.
+                // This must run AFTER the hidden class is removed, otherwise wheel.clientHeight is 0
+                // and the picker falls back visually to the first/default swatch.
+                requestAnimationFrame(() => {
+                    const currentTheme = (StorageHandler.load().portfolioStyle || 'tech');
+                    initThemeCarousel({ skipInitialSync: true });
+                    syncThemeWheel(currentTheme, { behavior: 'auto', force: true });
+                    setTimeout(() => syncThemeWheel(currentTheme, { behavior: 'auto', force: true }), 80);
+                });
+            }
+        }
+        function toggleExportBranch() {
+            const panel = document.getElementById('public-export-branch');
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+            const canvaPanel = document.getElementById('public-canva-branch');
+            if (canvaPanel && !panel.classList.contains('hidden')) canvaPanel.classList.add('hidden');
+            if (!panel.classList.contains('hidden')) createPortfolioIcons();
+        }
+
+        function toggleCanvaBranch() {
+            const panel = document.getElementById('public-canva-branch');
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+            const exportPanel = document.getElementById('public-export-branch');
+            if (exportPanel && !panel.classList.contains('hidden')) exportPanel.classList.add('hidden');
+            if (!panel.classList.contains('hidden')) createPortfolioIcons();
+        }
+
+        function safeCanvaText(value) {
+            return String(value || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim();
+        }
+
+        function pickLang(data, key, lang = 'en') {
+            if (lang === 'th') return safeCanvaText(data[`${key}_th`] || data[`${key}_en`] || data[key] || '');
+            return safeCanvaText(data[`${key}_en`] || data[`${key}_th`] || data[key] || '');
+        }
+
+        function getCanvaTimestamp() {
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        }
+
+        function getThemeDescription(style, mode, lang = 'en') {
+            const map = {
+                tech: { en: 'Tech/startup look with blue-cyan glow, dark premium background, glass cards, clean futuristic spacing.', th: 'ธีมเทคโนโลยี/สตาร์ทอัพ โทนฟ้า-ไซแอน มีแสง glow พื้นหลังเข้มแบบพรีเมียม การ์ดแก้ว และระยะหายใจแบบอนาคต' },
+                educ: { en: 'Education/professional academic style with emerald accents, calm hierarchy, trustworthy spacing.', th: 'ธีมการศึกษา/วิชาการ โทนเขียวมรกต ดูน่าเชื่อถือ ลำดับชั้นอ่านง่าย และระยะจัดวางสุภาพ' },
+                gov: { en: 'Government/formal style with amber accents, restrained contrast, official and credible feeling.', th: 'ธีมราชการ/ทางการ โทนทองอำพัน คอนทราสต์พอดี สุภาพ เป็นทางการ และน่าเชื่อถือ' },
+                creative: { en: 'Creative style with fuchsia-purple gradients, expressive rounded shapes, energetic portfolio feeling.', th: 'ธีมครีเอทีฟ โทนม่วง-ฟูเชีย ใช้ gradient และรูปทรงโค้งมน มีพลังและดูทันสมัย' },
+                minimal: { en: 'Minimal editorial style with monochrome contrast, clean grid, strong typography, no visual clutter.', th: 'ธีมมินิมอลแบบ editorial ใช้คอนทราสต์ขาวดำ กริดสะอาด ตัวอักษรเด่น และไม่รก' },
+                eco: { en: 'Eco/nature style with teal-green accents, soft organic shapes, premium environmental feeling.', th: 'ธีม eco/nature โทนเขียวทีล รูปทรงออร์แกนิก นุ่มตา และพรีเมียม' },
+                bold: { en: 'Bold high-impact style with rose/red accents, strong titles, confident visual rhythm.', th: 'ธีม bold โทนแดง-โรส หัวข้อหนักแน่น จังหวะภาพมั่นใจและโดดเด่น' },
+                luxury: { en: 'Luxury style with gold accents, deep navy/purple background, elegant serif-like hierarchy.', th: 'ธีม luxury โทนทองกับพื้นน้ำเงิน/ม่วงเข้ม ดูหรู เรียบ และจัดลำดับแบบพรีเมียม' },
+                health: { en: 'Health and wellness style with cyan-emerald accents, fresh clean gradients, friendly trust.', th: 'ธีม health/wellness โทนไซแอน-เขียวมรกต สะอาด สดชื่น เป็นมิตร และน่าเชื่อถือ' },
+                esports: { en: 'Esports style with violet-cyan neon accents, dynamic contrast, bold gamer identity.', th: 'ธีม esports โทนม่วง-ไซแอนนีออน คอนทราสต์จัด ตัวตนเกมเมอร์ชัดเจน' }
+            };
+            const fallback = map.tech;
+            const item = map[style] || fallback;
+            return `${item[lang] || item.en} ${lang === 'th' ? `โหมดสีปัจจุบัน: ${mode || 'dark'}.` : `Current color mode: ${mode || 'dark'}.`}`;
+        }
+
+        function normalizeHighlights(item, lang = 'en') {
+            const primary = lang === 'th'
+                ? (item.highlights_th || item.highlights_en || item.highlights || [])
+                : (item.highlights_en || item.highlights_th || item.highlights || []);
+            if (Array.isArray(primary)) return primary.map(safeCanvaText).filter(Boolean);
+            return String(primary || '').split('\n').map(safeCanvaText).filter(Boolean);
+        }
+
+        function buildExperienceLines(data, lang = 'en') {
+            const exp = Array.isArray(data.exp) ? data.exp : [];
+            if (!exp.length) return lang === 'th' ? '- ไม่มีข้อมูลประสบการณ์ที่บันทึกไว้' : '- No saved experience data.';
+            return exp.map((item, index) => {
+                const title = safeCanvaText(lang === 'th' ? (item.title_th || item.title_en || item.title) : (item.title_en || item.title_th || item.title)) || (lang === 'th' ? `ประสบการณ์ ${index + 1}` : `Experience ${index + 1}`);
+                const company = safeCanvaText(lang === 'th' ? (item.company_th || item.company_en || item.company) : (item.company_en || item.company_th || item.company));
+                const desc = safeCanvaText(lang === 'th' ? (item.desc_th || item.desc_en || item.desc) : (item.desc_en || item.desc_th || item.desc));
+                const present = lang === 'th' ? 'ปัจจุบัน' : 'Present';
+                const period = `${safeCanvaText(item.startMonth)} ${safeCanvaText(item.startYear)} - ${item.isCurrent ? present : `${safeCanvaText(item.endMonth)} ${safeCanvaText(item.endYear)}`.trim()}`.trim();
+                const highlights = normalizeHighlights(item, lang).slice(0, 8).map(h => `  • ${h}`).join('\n');
+                return `- ${title}${company ? (lang === 'th' ? ` | ${company}` : ` at ${company}`) : ''}${period ? ` (${period})` : ''}${desc ? `\n  ${desc}` : ''}${highlights ? `\n${highlights}` : ''}`;
+            }).join('\n');
+        }
+
+        function buildOptionalLines(data, lang = 'en') {
+            const labels = lang === 'th'
+                ? [['education','การศึกษา'], ['certifications','ประกาศนียบัตร'], ['awards','รางวัล'], ['caseStudies','กรณีศึกษา'], ['services','บริการ'], ['testimonials','คำรับรอง'], ['clients','ลูกค้า/หน่วยงาน'], ['cta','CTA'], ['articles','บทความ/สื่อเผยแพร่']]
+                : [['education','Education'], ['certifications','Certifications'], ['awards','Awards'], ['caseStudies','Case studies'], ['services','Services'], ['testimonials','Testimonials'], ['clients','Clients / Partners'], ['cta','CTA'], ['articles','Articles / Publications']];
+            return labels.map(([key, label]) => `${label}: ${pickLang(data, key, lang) || '-'}`).join('\n');
+        }
+
+        
+        function getCanvaExportMode(data = StorageHandler.load()) {
+            return (data && data.layout === 'resume') ? 'resume' : 'portfolio';
+        }
+
+        function getCanvaModeLabel(mode = 'portfolio', lang = 'en') {
+            if (lang === 'th') return mode === 'resume' ? 'Resume / A4 CV' : 'Portfolio / Scrollytelling Website';
+            return mode === 'resume' ? 'Resume / A4 CV' : 'Portfolio / Scrollytelling Website';
+        }
+
+        function buildCanvaPrompt(data = StorageHandler.load(), lang = 'en', requestedMode = getCanvaExportMode(data)) {
+            const isTh = lang === 'th';
+            const exportMode = requestedMode === 'resume' ? 'resume' : 'portfolio';
+            const name = pickLang(data, 'name', lang) || (isTh ? 'เจ้าของพอร์ตโฟลิโอ' : 'Portfolio Owner');
+            const role = pickLang(data, 'role', lang) || (isTh ? 'ผู้เชี่ยวชาญ' : 'Professional');
+            const bio = pickLang(data, 'bio', lang);
+            const skills = pickLang(data, 'skills', lang);
+            const style = safeCanvaText(data.portfolioStyle || 'tech');
+            const mode = safeCanvaText(data.colorMode || 'dark');
+            const resumeVis = { ...DEFAULT_RESUME_VISIBILITY, ...(data.resumeVisibility || {}) };
+            const visibleResumeComponents = Object.entries(resumeVis)
+                .filter(([, enabled]) => !!enabled)
+                .map(([key]) => key)
+                .join(', ') || 'profile, contact, skills, summary, experience';
+            const contact = [
+                data.email ? `Email: ${safeCanvaText(data.email)}` : '',
+                data.phone ? `Phone: ${safeCanvaText(data.phone)}` : '',
+                data.linkedin ? `LinkedIn: ${safeCanvaText(data.linkedin)}` : ''
+            ].filter(Boolean).join(' | ');
+
+            if (exportMode === 'resume') {
+                if (isTh) {
+                    return `สร้างดีไซน์ Resume / CV ขนาด A4 ใน Canva AI โดยอ้างอิงข้อมูลจาก Portfolio Mode ด้านล่างให้ครบถ้วน
+
+โหมดที่ผู้ใช้กดดาวน์โหลด: Resume / A4 CV
+
+เป้าหมายงานออกแบบ:
+- สร้างเป็น Resume / CV ขนาด A4 แนวตั้ง ไม่ใช่เว็บไซต์ scrollytelling และไม่ใช่โปสเตอร์ภาพนิ่ง
+- ให้เป็นเอกสารที่พร้อมพิมพ์ PDF บนกระดาษ A4 โดยใช้พื้นที่เต็มหน้าอย่างเหมาะสม
+- เว้น safe margin สำหรับการพิมพ์เอกสารราชการไทย อ่านง่าย ไม่ชิดขอบเกินไป
+- ใช้ข้อมูลจาก Portfolio เป็นหลัก แต่จัดใหม่ในรูปแบบ resume ที่กระชับ เป็นทางการ และมืออาชีพ
+- ห้ามใส่ปุ่ม Print, Export, Download, Theme selector, Dark/Light selector, Layout selector หรือปุ่มเปลี่ยนภาษาในตัว Resume A4
+- ห้ามเพิ่มข้อมูลที่ไม่มีอยู่จริง ถ้าข้อมูลบางส่วนไม่มี ให้เว้นส่วนหรือจัด layout ให้สวยโดยไม่แต่งเรื่องเพิ่ม
+
+สัดส่วน layout ที่ต้องการ:
+- ใช้ A4 portrait เต็มหน้า
+- แนะนำ 2 คอลัมน์แบบ resume: คอลัมน์ซ้ายสำหรับ Profile image, Name, Role, Contact, Skills และคอลัมน์ขวาสำหรับ Professional Summary, Experience/Projects, Education และส่วนเสริมที่เปิดไว้
+- ตำแหน่ง component ให้คงที่และสวยงาม ไม่ต้องทำให้ผู้ใช้ลากย้ายตำแหน่งเอง
+- Component ที่ควรแสดงตามค่าปัจจุบัน: ${visibleResumeComponents}
+- ให้คง hierarchy ชัดเจน มี section divider, timeline หรือ progress indicator ได้ตามความเหมาะสม
+
+Theme to adapt:
+${getThemeDescription(style, mode, 'th')}
+
+Profile data:
+ชื่อ: ${name}
+บทบาท/ตำแหน่ง: ${role}
+สรุปประวัติ: ${bio || 'สรุปประวัติจากข้อมูลที่มีให้กระชับและเป็นมืออาชีพ'}
+ทักษะ: ${skills || '-'}
+ติดต่อ: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'th')}
+
+Optional sections:
+${buildOptionalLines(data, 'th')}
+
+ข้อกำหนดเรื่องการแก้ไขใน Canva:
+- ข้อความทั้งหมดต้องเป็น editable Canva text boxes ไม่ใช่ภาพนิ่ง
+- ห้าม flatten, rasterize หรือ merge ข้อความเข้ากับภาพ
+- ชื่อ ตำแหน่ง ประวัติ ข้อมูลติดต่อ ทักษะ หัวข้อ section และข้อความทุกส่วนต้องแก้ไขได้ทีละส่วนใน Canva
+- ให้สร้างเป็นเลเยอร์/กลุ่มที่จัดระเบียบดี สามารถแก้ไข text และ section ได้ ไม่ใช่ภาพเดียวทั้งหน้า
+- หากมีรูปโปรไฟล์ ให้ใช้เป็น image placeholder ที่เปลี่ยนรูปได้ ไม่ฝังรวมกับพื้นหลัง`;
+                }
+
+                return `Create an editable A4 Resume / CV design in Canva AI using the current Portfolio Mode data below.
+
+Downloaded mode: Resume / A4 CV
+
+Design goal:
+- Build a portrait A4 resume/CV document, not a scrollytelling website and not a static poster.
+- Use the full A4 page area with print-safe spacing suitable for Thai official document printing.
+- Base the content on the portfolio data, but restructure it into a concise, formal, professional resume.
+- Do NOT include Print, Export, Download, Theme selector, Dark/Light selector, Layout selector, or Language switcher inside the A4 resume design.
+- Do not invent achievements, clients, certifications, references, or metrics that are not present in the data.
+
+Layout direction:
+- Use a full A4 portrait layout.
+- Prefer a clean two-column resume system: left column for profile image, name, role, contact, and skills; right column for professional summary, experience/projects, education, and enabled optional sections.
+- Component positions should remain fixed and visually balanced. Do not design it as a drag-and-drop builder.
+- Current visible resume components: ${visibleResumeComponents}
+- Use clear section dividers, timeline accents, or skill indicators when appropriate.
+
+Theme to adapt:
+${getThemeDescription(style, mode, 'en')}
+
+Profile data:
+Name: ${name}
+Role: ${role}
+Professional summary: ${bio || 'Create a concise professional summary from the available profile data.'}
+Skills: ${skills || '-'}
+Contact: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'en')}
+
+Optional sections:
+${buildOptionalLines(data, 'en')}
+
+Editability requirements for Canva:
+- All text must remain as editable Canva text boxes, not flattened images.
+- Do not flatten, rasterize, or merge text into graphics.
+- Name, role, summary, contact info, skills, section headings, and all body text must be individually editable in Canva.
+- Keep layers/groups organized so the resume can be edited section by section, not as one static full-page image.
+- If a profile photo is used, keep it as a replaceable image placeholder, not merged into the background.`;
+            }
+
+            if (isTh) {
+                return `สร้างเว็บไซต์พอร์ตโฟลิโอแบบ scrollytelling ใน Canva AI โดยอ้างอิงข้อมูลและธีมต่อไปนี้ให้ครบถ้วน
+
+โหมดที่ผู้ใช้กดดาวน์โหลด: Portfolio / Scrollytelling Website
+
+เป้าหมายงานออกแบบ:
+- สร้างเป็นหน้าเว็บพอร์ตโฟลิโอ ไม่ใช่เรซูเม่ธรรมดา และไม่ใช่ไฟล์สำหรับพิมพ์
+- Hero section ต้องคงส่วนควบคุมแบบ Interactive Website ไว้ ได้แก่ Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษา
+- ไม่ต้องมีปุ่ม Print, Export, Download หรือปุ่มดาวน์โหลดไฟล์ใด ๆ ใน hero section หรือหน้าเว็บที่ Canva สร้าง
+- ให้ทำเป็น public-facing portfolio website ที่ผู้ชมเลื่อนขึ้นลงได้อย่างลื่นไหล
+- ต้องมีความรู้สึกแบบ scrollytelling: เมื่อเลื่อนหน้าเว็บ ให้เนื้อหากับภาพผลงานค่อย ๆ เปิดเผยเป็นลำดับ มี section ของประสบการณ์/โปรเจกต์ที่เล่าเรื่องได้
+- หาก Canva AI ไม่สามารถทำ animation จริงได้ ให้จำลองด้วย long-form landing page ที่มีลำดับ section ชัดเจน, image gallery, timeline, card, และ visual rhythm แบบ scrollytelling
+- ต้องรักษาลักษณะธีม สี อารมณ์ และข้อมูลที่แสดงอยู่ในเว็บต้นฉบับให้ใกล้เคียงที่สุด
+
+Theme to duplicate:
+${getThemeDescription(style, mode, 'th')}
+
+Profile data:
+ชื่อ: ${name}
+บทบาท/ตำแหน่ง: ${role}
+สรุปประวัติ: ${bio || 'สรุปประวัติจากข้อมูลที่มีให้กระชับและเป็นมืออาชีพ'}
+ทักษะ: ${skills || '-'}
+ติดต่อ: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'th')}
+
+Optional sections:
+${buildOptionalLines(data, 'th')}
+
+ข้อกำหนดการออกแบบ:
+- ใช้ภาษาไทยจากข้อมูลนี้เป็นหลัก แต่สามารถใช้หัวข้อภาษาอังกฤษสั้น ๆ ได้ถ้าทำให้ดีไซน์ดูเป็นสากล
+- เน้น hierarchy ชัดเจน อ่านง่าย และดูพรีเมียม
+- Hero ต้องมีชื่อ บทบาท สรุปสั้น ภาพ/visual centerpiece และปุ่มควบคุม interactive ได้แก่ Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษา
+- ห้ามใส่ปุ่ม Print, Export, Download หรือปุ่มดาวน์โหลดไฟล์ใด ๆ ในเว็บที่ Canva สร้าง
+- สร้าง section ต่อเนื่อง: About, Skills, Experience/Projects, Optional sections, Contact
+- ทำให้เว็บไซต์เหมาะกับ desktop และ mobile โดยยังให้ผู้ใช้เลื่อนขึ้นลงเป็นหลัก
+- ห้ามเพิ่มข้อมูลที่ไม่มีอยู่จริง ถ้าข้อมูลบางส่วนไม่มี ให้จัด layout ให้สวยโดยไม่แต่งเรื่องเพิ่ม
+
+ข้อกำหนดเรื่องการแก้ไขใน Canva:
+- ข้อความทั้งหมดต้องเป็น editable Canva text boxes ไม่ใช่ภาพนิ่ง
+- ห้าม flatten, rasterize หรือ merge ข้อความเข้ากับภาพ
+- ชื่อ ตำแหน่ง ประวัติ ปุ่ม หัวข้อ ทักษะ และข้อความใน project cards ต้องแก้ไขได้ทีละส่วนใน Canva
+- จัดโครงสร้างเป็น section/card ที่แก้ไขแยกกันได้ ไม่ใช่โปสเตอร์ภาพเดียว`;
+            }
+
+            return `Create a Canva AI website portfolio that duplicates the current portfolio theme, visual direction, and visible content as completely as possible.
+
+Downloaded mode: Portfolio / Scrollytelling Website
+
+Design goal:
+- Build a public-facing portfolio website, not a printable document and not a generic resume.
+- The hero section MUST keep interactive website controls such as the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher.
+- Do NOT include Print, Export, Download, or file-download controls in the hero section or in the Canva-generated website.
+- Create a smooth vertical scrolling website.
+- Use a scrollytelling feeling: as visitors scroll, content and project visuals should be revealed in a cinematic sequence. Experience/project sections should feel like story cards with image galleries, timelines, and strong visual rhythm.
+- If Canva AI cannot create real scroll animation, simulate the scrollytelling experience with a long-form landing page, clearly staged sections, timeline blocks, image galleries, and cinematic spacing.
+- Duplicate the original theme mood, color system, spacing, and portfolio identity as closely as Canva allows.
+
+Theme to duplicate:
+${getThemeDescription(style, mode, 'en')}
+
+Profile data:
+Name: ${name}
+Role: ${role}
+Professional summary: ${bio || 'Create a concise professional summary from the available profile data.'}
+Skills: ${skills || '-'}
+Contact: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'en')}
+
+Optional sections:
+${buildOptionalLines(data, 'en')}
+
+Design requirements:
+- Use English text only unless the provided content exists only in Thai.
+- Use a premium modern hierarchy, strong typography, readable spacing, glass/card surfaces when appropriate, and theme-matched accent colors.
+- Hero section should include name, role, short summary, a visual centerpiece, and interactive controls: Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher.
+- Do not include Print, Export, Download, or file-download buttons in the Canva-generated website.
+- Include sections in this order when data exists: About, Skills, Experience/Projects, Optional sections, Contact.
+- Make it responsive for desktop and mobile while keeping vertical scrolling as the main interaction.
+- Do not invent achievements, clients, certifications, or metrics that are not present in the data.
+
+Editability requirements for Canva:
+- All text must remain as editable Canva text boxes, not flattened images.
+- Do not flatten, rasterize, or merge text into graphics.
+- Name, role, summary, buttons, headings, skills, and project-card text must be individually editable in Canva.
+- Keep the layout modular with editable sections/cards rather than one static poster image.`;
+        }
+
+
+                function buildCanvaInstruction(lang = 'en', requestedMode = getCanvaExportMode(StorageHandler.load())) {
+            const exportMode = requestedMode === 'resume' ? 'resume' : 'portfolio';
+            if (lang === 'th') {
+                if (exportMode === 'resume') {
+                    return `วิธีนำไฟล์ Resume Prompt ไปใช้กับ Canva AI / Magic Design
+
+โหมดไฟล์ชุดนี้: Resume / A4 CV
+
+ขั้นตอนสำคัญมาก:
+1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
+2. หากมีตัวเลือก ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Design from prompt, Document design หรือ AI ที่สร้าง A4 document ได้
+3. เปิดไฟล์ canva_prompt_resume_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางใน Canva AI
+4. ย้ำว่าให้ Canva สร้างเป็น A4 Resume / CV แบบ editable ไม่ใช่เว็บไซต์ ไม่ใช่ poster และไม่ใช่ภาพนิ่งเต็มหน้า
+5. หลังสร้างแล้ว ตรวจสอบว่า text ทุกจุดแก้ไขได้จริง เช่น ชื่อ ตำแหน่ง ประวัติ ประสบการณ์ ทักษะ และข้อมูลติดต่อ
+6. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษ แล้วเติมเฉพาะข้อมูลที่จำเป็นจาก portfolio_data_snapshot.json
+7. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_resume_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน
+8. ตรวจสอบ safe margin ก่อน export PDF เพื่อพิมพ์ A4
+
+ไฟล์ข้อมูล:
+- portfolio_data_snapshot.json คือข้อมูลทั้งหมด ณ เวลาที่กดดาวน์โหลด ใช้สำรองข้อมูลและคัดลอกข้อมูลเพิ่มเข้า Canva ได้
+- ไฟล์ .json สามารถเปิดด้วย Notepad ได้ โดยคลิกขวา > Open with > Notepad หรือเปิดด้วย VS Code / browser ก็ได้
+- ถ้าเห็นตัวอักษรติดกันเยอะ ให้ใช้ Notepad แบบ Word Wrap หรือเปิดผ่าน VS Code จะอ่านง่ายกว่า
+
+หมายเหตุ:
+- ชุดไฟล์นี้ไม่ใช้ Canva API และไม่ใช้ Canva SDK จึงไม่มีค่า API
+- โหมด Resume จะไม่ใส่ Theme selector, Mode selector, Language switcher, Print หรือ Export controls ลงในเอกสาร A4
+- ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
+                }
+                return `วิธีนำไฟล์ Portfolio Prompt ไปใช้กับ Canva AI / Magic Design
+
+โหมดไฟล์ชุดนี้: Portfolio / Scrollytelling Website
+
+ขั้นตอนสำคัญมาก:
+1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
+2. ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Website Code, Code for website, หรือช่องสร้างเว็บด้วย AI ที่รองรับการสร้างหน้าเว็บจากคำสั่ง
+3. ห้ามเริ่มจาก template presentation / poster / document ทั่วไปก่อน เพราะ Canva มักจะไม่ทำ layout ให้เหมือนเว็บ scrollytelling
+4. เปิดไฟล์ canva_prompt_portfolio_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
+5. ตรวจสอบว่า prompt ระบุให้คง Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษาไว้ แต่ไม่ใส่ Print/Export/Download
+6. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_portfolio_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน เพราะ Canva เข้าใจ prompt ภาษาอังกฤษได้แม่นกว่า
+7. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษ แล้วเติมข้อมูลสำคัญจาก portfolio_data_snapshot.json เฉพาะส่วนที่จำเป็น
+8. หลัง Canva สร้างดีไซน์แล้ว ให้ตรวจสอบชื่อ ตำแหน่ง ประสบการณ์ รูปภาพ และข้อมูลติดต่ออีกครั้งก่อนเผยแพร่
+
+ไฟล์ข้อมูล:
+- portfolio_data_snapshot.json คือข้อมูลทั้งหมด ณ เวลาที่กดดาวน์โหลด ใช้สำรองข้อมูลและคัดลอกข้อมูลเพิ่มเข้า Canva ได้
+- ไฟล์ .json สามารถเปิดด้วย Notepad ได้ โดยคลิกขวา > Open with > Notepad หรือเปิดด้วย VS Code / browser ก็ได้
+- ถ้าเห็นตัวอักษรติดกันเยอะ ให้ใช้ Notepad แบบ Word Wrap หรือเปิดผ่าน VS Code จะอ่านง่ายกว่า
+
+หมายเหตุ:
+- ชุดไฟล์นี้ไม่ใช้ Canva API และไม่ใช้ Canva SDK จึงไม่มีค่า API
+- Canva AI อาจไม่รองรับ animation แบบ scrollytelling เต็มรูปแบบ ให้ใช้ prompt เพื่อให้ Canva สร้าง layout ที่จำลองประสบการณ์การเลื่อนหน้าเว็บแทน
+- ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
+            }
+            if (exportMode === 'resume') {
+                return `How to use this Resume Prompt package with Canva AI / Magic Design
+
+Package mode: Resume / A4 CV
+
+Very important steps:
+1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
+2. If available, choose a function related to Code, Design from prompt, Document design, or an AI tool that can create an A4 document.
+3. Open canva_prompt_resume_en.txt and paste the full prompt into Canva AI.
+4. Make sure Canva generates an editable A4 Resume / CV, not a website, not a poster, and not one flattened full-page image.
+5. After generation, verify that every text area is editable: name, role, summary, experience, skills, and contact details.
+6. If Canva limits prompt length, start with the English prompt, then add only important missing details from portfolio_data_snapshot.json.
+7. canva_prompt_resume_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
+8. Check print-safe margins before exporting the resume as PDF.
+
+Data files:
+- portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
+- .json files can be opened with Notepad: right click > Open with > Notepad. You can also open them with VS Code or a browser.
+- If the JSON appears as a long block of text, enable Word Wrap in Notepad or open it in VS Code for easier reading.
+
+Notes:
+- This package does not use Canva API or Canva SDK, so there is no API cost.
+- Resume mode does not include Theme selector, Mode selector, Language switcher, Print, or Export controls inside the A4 document.
+- Review privacy and team sharing settings before pasting sensitive personal data into Canva.`;
+            }
+            return `How to use this Portfolio Prompt package with Canva AI / Magic Design
+
+Package mode: Portfolio / Scrollytelling Website
+
+Very important steps:
+1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
+2. Choose the Code, Website Code, Code for website, or AI website creation function that can generate a web page from a prompt.
+3. Do not start from a normal presentation / poster / document template, because Canva will usually not recreate the scrollytelling website layout correctly.
+4. Open canva_prompt_portfolio_en.txt and paste the full prompt into Canva's Code/Website AI function.
+5. Confirm that the prompt keeps the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher, but removes Print/Export/Download controls.
+6. canva_prompt_portfolio_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
+7. If Canva limits prompt length, start with the English prompt, then add only the most important missing details from portfolio_data_snapshot.json.
+8. After Canva generates the design, carefully review the name, role, experience, images, and contact information before publishing.
+
+Data files:
+- portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
+- .json files can be opened with Notepad: right click > Open with > Notepad. You can also open them with VS Code or a browser.
+- If the JSON appears as a long block of text, enable Word Wrap in Notepad or open it in VS Code for easier reading.
+
+Notes:
+- This package does not use Canva API or Canva SDK, so there is no API cost.
+- Canva AI may not support full scrollytelling animation. The prompt asks Canva to simulate the feeling through staged sections, image galleries, and cinematic vertical layout.
+- Review privacy and team sharing settings before pasting sensitive personal data into Canva.`;
+        }
+
+
+        function buildCanvaDataSnapshot(data = StorageHandler.load(), requestedMode = getCanvaExportMode(data)) {
+            const clean = JSON.parse(JSON.stringify(data || {}));
+            delete clean._isFirstRunDemo;
+            delete clean._hasStoredCache;
+            return {
+                exported_at: new Date().toISOString(),
+                export_type: `canva_ai_${requestedMode === 'resume' ? 'resume_a4' : 'portfolio_website'}_prompt_package_no_api_no_sdk`,
+                prompt_mode: requestedMode,
+                app_note: 'Snapshot of portfolio data at download time. This file is generated locally in the browser.',
+                canva_package_files: [
+                    `canva_prompt_${requestedMode}_en.txt`,
+                    `canva_prompt_${requestedMode}_th.txt`,
+                    `canva_instruction_${requestedMode}_en.txt`,
+                    `canva_instruction_${requestedMode}_th.txt`,
+                    'portfolio_data_snapshot.json'
+                ],
+                data: clean
+            };
+        }
+
+        function downloadTextFile(filename, content, mime = 'text/plain;charset=utf-8') {
+            const blob = new Blob([content], { type: mime });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+        }
+
+        async function downloadCanvaPackage() {
+            const data = StorageHandler.load();
+            const stamp = getCanvaTimestamp();
+            const exportMode = getCanvaExportMode(data);
+            const folderName = `canva-ai-pack-${exportMode}-${stamp}`;
+            const files = {
+                [`canva_prompt_${exportMode}_en.txt`]: buildCanvaPrompt(data, 'en', exportMode),
+                [`canva_prompt_${exportMode}_th.txt`]: buildCanvaPrompt(data, 'th', exportMode),
+                [`canva_instruction_${exportMode}_en.txt`]: buildCanvaInstruction('en', exportMode),
+                [`canva_instruction_${exportMode}_th.txt`]: buildCanvaInstruction('th', exportMode),
+                'portfolio_data_snapshot.json': JSON.stringify(buildCanvaDataSnapshot(data, exportMode), null, 2)
+            };
+
+            if (!window.JSZip) {
+                Object.entries(files).forEach(([filename, content]) => {
+                    downloadTextFile(`${folderName}_${filename}`, content, filename.endsWith('.json') ? 'application/json;charset=utf-8' : 'text/plain;charset=utf-8');
+                });
+                showCanvaToast('JSZip unavailable: files downloaded separately');
+                return;
+            }
+
+            const zip = new JSZip();
+            const packFolder = zip.folder(folderName);
+            Object.entries(files).forEach(([filename, content]) => packFolder.file(filename, content));
+            const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${folderName}.zip`;
+            a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+            showCanvaToast(`${getCanvaModeLabel(exportMode, 'en')} Canva Pack ZIP downloaded`);
+        }
+
+        async function copyCanvaPrompt(lang = 'en') {
+            const data = StorageHandler.load();
+            const exportMode = getCanvaExportMode(data);
+            const prompt = buildCanvaPrompt(data, lang === 'th' ? 'th' : 'en', exportMode);
+            try {
+                await navigator.clipboard.writeText(prompt);
+                showCanvaToast(lang === 'th' ? `Thai ${getCanvaModeLabel(exportMode, 'en')} prompt copied` : `English ${getCanvaModeLabel(exportMode, 'en')} prompt copied`);
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = prompt;
+                textarea.setAttribute('readonly', 'readonly');
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showCanvaToast(lang === 'th' ? `Thai ${getCanvaModeLabel(exportMode, 'en')} prompt copied` : `English ${getCanvaModeLabel(exportMode, 'en')} prompt copied`);
+            }
+        }
+
+        function showCanvaToast(message) {
+            const toast = document.getElementById('canva-copy-toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.add('hidden'), 2200);
+        }
+
+        // v28: robust fallback for the printer/export button.
+        // Keeps it clickable even if browser ignores inline onclick after repeated generated patches.
+        document.addEventListener('DOMContentLoaded', () => {
+            const exportBtn = document.getElementById('btn-export-branch');
+            if (exportBtn && !exportBtn.dataset.exportBound) {
+                exportBtn.dataset.exportBound = '1';
+                exportBtn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    toggleExportBranch();
+                }, true);
+            }
+            const canvaBtn = document.getElementById('btn-canva-branch');
+            if (canvaBtn && !canvaBtn.dataset.canvaBound) {
+                canvaBtn.dataset.canvaBound = '1';
+                canvaBtn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    toggleCanvaBranch();
+                }, true);
+            }
+        });
+        function setDirectLayout(mode) { const data = StorageHandler.load(); data.layout = mode; StorageHandler.save(data); render(data); }
+        function setDirectColorMode(mode) { const data = StorageHandler.load(); data.colorMode = mode; StorageHandler.save(data); render(data); }
+        function setDirectTheme(theme, opts = {}) {
+            const data = StorageHandler.load();
+            const previous = data.portfolioStyle || 'tech';
+            if (!theme || theme === previous) { syncThemeWheel(theme || previous); return; }
+            data.portfolioStyle = theme;
+            StorageHandler.save(data);
+            playThemeTransition(theme, previous);
+            render(data);
+            if (!opts.skipScroll) setTimeout(() => syncThemeWheel(theme), 80);
+        }
+        const themeOrder = ['tech','educ','gov','creative','minimal','eco','bold','luxury','health','esports'];
+        let themeWheelTimer = null;
+        let themeWheelLock = false;
+        let themeWheelDrag = null;
+
+        function getThemeWheelCenterY(wheel) {
+            const r = wheel.getBoundingClientRect();
+            return r.top + r.height / 2;
+        }
+
+        function centerThemeDot(dot, behavior = 'smooth') {
+            const wheel = document.getElementById('theme-carousel');
+            if (!wheel || !dot) return;
+            const wheelH = wheel.clientHeight;
+            const dotH = dot.offsetHeight;
+            if (!wheelH || !dotH) {
+                requestAnimationFrame(() => centerThemeDot(dot, behavior));
+                return;
+            }
+            const target = dot.offsetTop - ((wheelH - dotH) / 2);
+            wheel.scrollTo({ top: Math.max(0, target), behavior });
+        }
+
+        function setWheelActiveDot(dot) {
+            if (!dot) return;
+            const theme = dot.dataset.theme;
+            document.querySelectorAll('.theme-dot').forEach(item => item.classList.toggle('active', item === dot));
+            const label = document.getElementById('theme-wheel-label');
+            if (label) label.textContent = String(theme || '').toUpperCase();
+        }
+
+        function getNearestThemeDot() {
+            const wheel = document.getElementById('theme-carousel');
+            if (!wheel) return null;
+            const dots = Array.from(wheel.querySelectorAll('.theme-dot'));
+            const centerY = getThemeWheelCenterY(wheel);
+            let nearest = null;
+            let nearestDist = Infinity;
+            dots.forEach(dot => {
+                const r = dot.getBoundingClientRect();
+                const d = Math.abs((r.top + r.height / 2) - centerY);
+                const normalized = Math.min(1, d / Math.max(1, wheel.clientHeight / 2));
+                dot.style.setProperty('--wheel-distance', normalized.toFixed(3));
+                if (d < nearestDist) { nearestDist = d; nearest = dot; }
+            });
+            return nearest;
+        }
+
+        function snapThemeWheelToNearest(applyTheme = true, behavior = 'smooth') {
+            const nearest = getNearestThemeDot();
+            if (!nearest) return;
+            setWheelActiveDot(nearest);
+            centerThemeDot(nearest, behavior);
+            if (applyTheme && !themeWheelLock) {
+                const data = StorageHandler.load();
+                const theme = nearest.dataset.theme;
+                if (theme && data.portfolioStyle !== theme) setDirectTheme(theme, { skipScroll: true });
+            }
+        }
+
+        function syncThemeWheel(theme, options = {}) {
+            const selectedTheme = theme || (StorageHandler.load().portfolioStyle || 'tech');
+            const active = document.getElementById(`swatch-${selectedTheme}`);
+            if (!active) return;
+            setWheelActiveDot(active);
+            themeWheelLock = true;
+            const behavior = options.behavior || 'smooth';
+            const run = () => centerThemeDot(active, behavior);
+            if (options.force) {
+                run();
+                requestAnimationFrame(run);
+            } else {
+                requestAnimationFrame(run);
+            }
+            setTimeout(() => { themeWheelLock = false; getNearestThemeDot(); }, behavior === 'auto' ? 120 : 360);
+        }
+
+        function initThemeCarousel(options = {}) {
+            const wheel = document.getElementById('theme-carousel');
+            if (!wheel) return;
+
+            if (wheel.dataset.ready !== '1') {
+                wheel.dataset.ready = '1';
+                wheel.querySelectorAll('.theme-dot').forEach(dot => {
+                    dot.addEventListener('click', (ev) => {
+                        if (themeWheelDrag?.moved) { ev.preventDefault(); return; }
+                        themeWheelLock = true;
+                        setWheelActiveDot(dot);
+                        centerThemeDot(dot, 'smooth');
+                        setTimeout(() => {
+                            themeWheelLock = false;
+                            setDirectTheme(dot.dataset.theme, { skipScroll: true });
+                        }, 260);
+                    });
+                });
+
+                const beginDrag = (ev) => {
+                    themeWheelDrag = { active: true, startY: ev.clientY, startTop: wheel.scrollTop, lastY: ev.clientY, lastT: performance.now(), velocity: 0, moved: false };
+                    wheel.classList.add('dragging');
+                    wheel.setPointerCapture?.(ev.pointerId);
+                };
+                const moveDrag = (ev) => {
+                    if (!themeWheelDrag?.active) return;
+                    const now = performance.now();
+                    const dy = ev.clientY - themeWheelDrag.startY;
+                    const dt = Math.max(1, now - themeWheelDrag.lastT);
+                    themeWheelDrag.velocity = (ev.clientY - themeWheelDrag.lastY) / dt;
+                    themeWheelDrag.lastY = ev.clientY;
+                    themeWheelDrag.lastT = now;
+                    if (Math.abs(dy) > 3) themeWheelDrag.moved = true;
+                    wheel.scrollTop = themeWheelDrag.startTop - dy;
+                    getNearestThemeDot();
+                };
+                const endDrag = (ev) => {
+                    if (!themeWheelDrag?.active) return;
+                    const drag = themeWheelDrag;
+                    drag.active = false;
+                    wheel.classList.remove('dragging');
+                    wheel.releasePointerCapture?.(ev.pointerId);
+                    // A tiny inertial push, then snap to the nearest swatch like a hardware picker.
+                    if (Math.abs(drag.velocity) > 0.08) {
+                        wheel.scrollBy({ top: -drag.velocity * 180, behavior: 'smooth' });
+                    }
+                    clearTimeout(themeWheelTimer);
+                    themeWheelTimer = setTimeout(() => snapThemeWheelToNearest(true, 'smooth'), 170);
+                    setTimeout(() => { if (themeWheelDrag === drag) themeWheelDrag = null; }, 120);
+                };
+
+                wheel.addEventListener('pointerdown', beginDrag);
+                wheel.addEventListener('pointermove', moveDrag);
+                wheel.addEventListener('pointerup', endDrag);
+                wheel.addEventListener('pointercancel', endDrag);
+                wheel.addEventListener('pointerleave', endDrag);
+
+                wheel.addEventListener('scroll', () => {
+                    getNearestThemeDot();
+                    if (themeWheelDrag?.active || themeWheelLock) return;
+                    clearTimeout(themeWheelTimer);
+                    themeWheelTimer = setTimeout(() => snapThemeWheelToNearest(true, 'smooth'), 190);
+                }, { passive: true });
+
+                wheel.addEventListener('wheel', (ev) => {
+                    ev.preventDefault();
+                    wheel.scrollBy({ top: ev.deltaY * 0.75, behavior: 'auto' });
+                    getNearestThemeDot();
+                    clearTimeout(themeWheelTimer);
+                    themeWheelTimer = setTimeout(() => snapThemeWheelToNearest(true, 'smooth'), 160);
+                }, { passive: false });
+            }
+
+            if (!options.skipInitialSync) syncThemeWheel(StorageHandler.load().portfolioStyle || 'tech');
+        }
+
+        function nudgeThemeWheel(dir) {
+            const wheel = document.getElementById('theme-carousel');
+            if (!wheel) return;
+            const dots = Array.from(wheel.querySelectorAll('.theme-dot'));
+            const currentDot = getNearestThemeDot() || dots.find(d => d.classList.contains('active'));
+            const current = Math.max(0, dots.indexOf(currentDot));
+            const next = dots[Math.max(0, Math.min(dots.length - 1, current + dir))];
+            if (!next) return;
+            themeWheelLock = true;
+            setWheelActiveDot(next);
+            centerThemeDot(next, 'smooth');
+            setTimeout(() => { themeWheelLock = false; setDirectTheme(next.dataset.theme, { skipScroll: true }); }, 260);
+        }
+
+        const RESUME_VIS_KEYS = ['profile','contact','skills','summary','experience','education','certifications','awards','services','clients','articles','caseStudies','testimonials'];
+        const DEFAULT_RESUME_VISIBILITY = Object.fromEntries(RESUME_VIS_KEYS.map(k => [k, true]));
+        function getResumeVisibilityFromUI(fallback = DEFAULT_RESUME_VISIBILITY) {
+            const out = { ...DEFAULT_RESUME_VISIBILITY, ...(fallback || {}) };
+            RESUME_VIS_KEYS.forEach(k => { const el = document.getElementById('rv-' + k); if (el) out[k] = !!el.checked; });
+            return out;
+        }
+        function applyResumeVisibilityToUI(data = StorageHandler.load()) {
+            const vis = { ...DEFAULT_RESUME_VISIBILITY, ...(data.resumeVisibility || {}) };
+            RESUME_VIS_KEYS.forEach(k => { const el = document.getElementById('rv-' + k); if (el) el.checked = vis[k] !== false; });
+        }
+        function setResumeVisibilityPreset(type) {
+            const presets = {
+                full: DEFAULT_RESUME_VISIBILITY,
+                official: { profile:true, contact:true, skills:true, summary:true, experience:true, education:true, certifications:true, awards:true, services:false, clients:false, articles:false, caseStudies:false, testimonials:false }
+            };
+            const selected = presets[type] || DEFAULT_RESUME_VISIBILITY;
+            RESUME_VIS_KEYS.forEach(k => { const el = document.getElementById('rv-' + k); if (el) el.checked = selected[k] !== false; });
+        }
+
+        function switchTab(tabId) {
+            ['basic', 'contact', 'experience', 'sections', 'resume'].forEach(t => {
+                document.getElementById('content-' + t).classList.add('hidden');
+                document.getElementById('content-' + t).classList.remove('block');
+                document.getElementById('tab-' + t).classList.replace('tab-active', 'tab-inactive');
+            });
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('content-' + tabId).classList.add('block');
+            document.getElementById('tab-' + tabId).classList.replace('tab-inactive', 'tab-active');
+        }
+
+        function toggleModal() {
+            if (document.body.classList.contains('is-downloaded')) return;
+            const modal = document.getElementById('edit-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+            if (!modal.classList.contains('hidden')) { refreshExpPreview(); applyResumeVisibilityToUI(); }
+        }
+
+        function openExperienceEditor(index = -1) {
+            if (document.body.classList.contains('is-downloaded')) return;
+            closeQuickEdit();
+            const expIndex = Number(index);
+            const modal = document.getElementById('edit-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            switchTab('experience');
+            refreshExpPreview();
+            if (Number.isInteger(expIndex) && expIndex >= 0) {
+                editExp(expIndex);
+            } else {
+                cancelEditExp();
+            }
+            setTimeout(() => {
+                const modalBody = document.getElementById('edit-modal-body');
+                const form = document.getElementById('content-experience');
+                const targetCard = form ? form.firstElementChild : null;
+                const titleInput = document.getElementById('new-exp-title-th') || document.getElementById('new-exp-title-en');
+                if (modalBody) modalBody.scrollTo({ top: form ? form.offsetTop : 0, behavior: 'smooth' });
+                if (form && !modalBody) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (targetCard) {
+                    targetCard.classList.add('exp-edit-target-pulse');
+                    setTimeout(() => targetCard.classList.remove('exp-edit-target-pulse'), 1600);
+                }
+                if (titleInput) {
+                    titleInput.focus({ preventScroll: true });
+                    titleInput.select();
+                }
+            }, 80);
+        }
+
+        function toggleLang() {
+            const data = StorageHandler.load();
+            data.lang = data.lang === 'th' ? 'en' : 'th';
+            StorageHandler.save(data);
+            render(data);
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width; let height = img.height;
+                        const MAX_WIDTH = 400;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                        currentAvatarBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                        document.getElementById('avatar-preview').src = currentAvatarBase64;
+                        document.getElementById('avatar-preview').classList.remove('hidden');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resizeImageFileToBase64(file, maxWidth = 900, quality = 0.82) {
+            return new Promise((resolve, reject) => {
+                if (!file || !String(file.type || '').startsWith('image/')) { reject(new Error('รองรับเฉพาะไฟล์รูปภาพเท่านั้น')); return; }
+                if (file.size > 12 * 1024 * 1024) { reject(new Error('รูปใหญ่เกินไป กรุณาใช้รูปไม่เกิน 12MB')); return; }
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('อ่านไฟล์รูปไม่สำเร็จ'));
+                reader.onload = function (e) {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('ไฟล์รูปภาพไม่ถูกต้อง'));
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width; let height = img.height;
+                        if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+                        canvas.width = Math.max(1, Math.round(width));
+                        canvas.height = Math.max(1, Math.round(height));
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleExpImageUpload(event) {
+            const files = Array.from(event.target.files || []);
+            for (const file of files) {
+                try {
+                    currentExpImagesBase64.push(await resizeImageFileToBase64(file, 900, 0.82));
+                    renderExpImagePreview();
+                } catch (err) {
+                    alert(err.message || 'อัปโหลดรูปไม่สำเร็จ');
+                }
+            }
+            event.target.value = '';
+        }
+
+        function removeExpImage(index) { currentExpImagesBase64.splice(index, 1); renderExpImagePreview(); }
+
+        function renderExpImagePreview() {
+            const preview = document.getElementById('exp-img-preview');
+            if (currentExpImagesBase64.length === 0) { preview.classList.add('hidden'); return; }
+            preview.classList.remove('hidden');
+            preview.innerHTML = currentExpImagesBase64.map((b64, idx) => `<div class="relative inline-block shrink-0 mt-2 mr-2"><img src="${b64}" class="h-16 w-16 object-cover rounded-md border border-slate-600"><button onclick="removeExpImage(${idx})" class="absolute -top-2 -right-2 bg-slate-900 border border-slate-600 hover:text-red-500 rounded-full w-5 h-5 flex items-center justify-center text-slate-300"><i data-lucide="x" class="w-3 h-3"></i></button></div>`).join('');
+            createPortfolioIcons();
+        }
+
+        function toggleEndDate() {
+            const isCurrent = document.getElementById('new-exp-current').checked;
+            document.getElementById('new-exp-end-month').disabled = isCurrent;
+            document.getElementById('new-exp-end-year').disabled = isCurrent;
+        }
+
+        function addExperience(keepContext = false) {
+            const sm = document.getElementById('new-exp-start-month').value;
+            const sy = document.getElementById('new-exp-start-year').value;
+            const em = document.getElementById('new-exp-end-month').value;
+            const ey = document.getElementById('new-exp-end-year').value;
+            const isCurrent = document.getElementById('new-exp-current').checked;
+            const company_th = document.getElementById('new-exp-company-th').value;
+            const title_th = document.getElementById('new-exp-title-th').value;
+            const desc_th = document.getElementById('new-exp-desc-th').value;
+            const hl_th = document.getElementById('new-exp-highlights-th').value.split('\n').filter(h => h.trim() !== '');
+            const company_en = document.getElementById('new-exp-company-en').value;
+            const title_en = document.getElementById('new-exp-title-en').value;
+            const desc_en = document.getElementById('new-exp-desc-en').value;
+            const hl_en = document.getElementById('new-exp-highlights-en').value.split('\n').filter(h => h.trim() !== '');
+
+            if (!sy || (!title_th && !title_en)) return alert("Please fill at least Start Year and Title");
+            const data = StorageHandler.load();
+            if (!data.exp) data.exp = [];
+            const expItem = { startMonth: sm, startYear: sy, endMonth: em, endYear: ey, isCurrent, year: sy, company_th, title_th, desc_th, highlights_th: hl_th, company_en, title_en, desc_en, highlights_en: hl_en, images: [...currentExpImagesBase64] };
+            if (editingExpIndex === -1) { data.exp.push(expItem); } else { data.exp[editingExpIndex] = expItem; }
+            StorageHandler.save(data);
+
+            if (keepContext) {
+                ['title-th', 'desc-th', 'highlights-th', 'title-en', 'desc-en', 'highlights-en'].forEach(id => { if (document.getElementById(`new-exp-${id}`)) document.getElementById(`new-exp-${id}`).value = ''; });
+                currentExpImagesBase64 = []; renderExpImagePreview();
+                editingExpIndex = -1; refreshExpPreview();
+                const btn = document.getElementById('btn-add-more-exp');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-green-400"></i> <span class="hidden md:inline text-green-400">Saved!</span>`;
+                createPortfolioIcons(); setTimeout(() => { btn.innerHTML = originalHtml; createPortfolioIcons(); }, 1000);
+            } else { cancelEditExp(); refreshExpPreview(); }
+        }
+
+        function editExp(index) {
+            const data = StorageHandler.load();
+            const item = data.exp[index]; editingExpIndex = index;
+            document.getElementById('new-exp-start-month').value = item.startMonth || '';
+            document.getElementById('new-exp-start-year').value = item.startYear || item.year || '';
+            document.getElementById('new-exp-end-month').value = item.endMonth || '';
+            document.getElementById('new-exp-end-year').value = item.endYear || '';
+            document.getElementById('new-exp-current').checked = item.isCurrent || false;
+            toggleEndDate();
+            document.getElementById('new-exp-company-th').value = item.company_th || item.company || '';
+            document.getElementById('new-exp-title-th').value = item.title_th || item.title || '';
+            document.getElementById('new-exp-desc-th').value = item.desc_th || item.desc || '';
+            document.getElementById('new-exp-highlights-th').value = item.highlights_th ? item.highlights_th.join('\n') : (item.highlights ? item.highlights.join('\n') : '');
+            document.getElementById('new-exp-company-en').value = item.company_en || '';
+            document.getElementById('new-exp-title-en').value = item.title_en || '';
+            document.getElementById('new-exp-desc-en').value = item.desc_en || '';
+            document.getElementById('new-exp-highlights-en').value = item.highlights_en ? item.highlights_en.join('\n') : '';
+            currentExpImagesBase64 = item.images ? [...item.images] : [];
+            renderExpImagePreview();
+            document.getElementById('btn-add-exp').innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Update Experience';
+            document.getElementById('btn-add-exp').classList.replace('text-emerald-400', 'text-amber-400');
+            document.getElementById('btn-add-exp').classList.replace('bg-emerald-600/20', 'bg-amber-600/20');
+            document.getElementById('btn-cancel-exp').classList.remove('hidden');
+            document.getElementById('btn-add-more-exp').classList.add('hidden');
+            createPortfolioIcons();
+        }
+
+        function cancelEditExp() {
+            editingExpIndex = -1;
+            ['start-month', 'start-year', 'end-month', 'end-year', 'company-th', 'title-th', 'desc-th', 'highlights-th', 'company-en', 'title-en', 'desc-en', 'highlights-en'].forEach(id => { if (document.getElementById(`new-exp-${id}`)) document.getElementById(`new-exp-${id}`).value = ''; });
+            document.getElementById('new-exp-current').checked = false; toggleEndDate();
+            currentExpImagesBase64 = []; renderExpImagePreview();
+            document.getElementById('btn-add-exp').innerHTML = '<i data-lucide="check" class="w-5 h-5"></i> Save & Close';
+            document.getElementById('btn-add-exp').classList.replace('text-amber-400', 'text-emerald-400');
+            document.getElementById('btn-add-exp').classList.replace('bg-amber-600/20', 'bg-emerald-600/20');
+            document.getElementById('btn-cancel-exp').classList.add('hidden');
+            document.getElementById('btn-add-more-exp').classList.remove('hidden');
+            createPortfolioIcons();
+        }
+
+        function removeExp(index) { const data = StorageHandler.load(); data.exp.splice(index, 1); StorageHandler.save(data); refreshExpPreview(); }
+
+        function refreshExpPreview() {
+            const data = StorageHandler.load();
+            const container = document.getElementById('exp-list-preview');
+            if (!data.exp || data.exp.length === 0) return container.innerHTML = '<p class="text-sm text-slate-500 italic">No experience added yet.</p>';
+            const lang = data.lang || 'th';
+            const formatYear = (yStr, targetLang) => { if (!yStr) return ''; const y = parseInt(yStr); if (isNaN(y)) return yStr; if (targetLang === 'th' && y < 2500) return (y + 543).toString(); if (targetLang === 'en' && y >= 2500) return (y - 543).toString(); return y.toString(); };
+            container.innerHTML = data.exp.map((item, index) => {
+                const showTitle = lang === 'th' ? (item.title_th || item.title) : (item.title_en || item.title_th || item.title);
+                const showCompany = lang === 'th' ? (item.company_th || item.company) : (item.company_en || item.company_th || item.company);
+                const sy = formatYear(item.startYear || item.year, lang); const ey = formatYear(item.endYear, lang); const showEnd = item.isCurrent ? (lang === 'th' ? ' - ปัจจุบัน' : ' - Present') : (ey ? ' - ' + ey : '');
+                const imgCount = (item.images || []).length;
+                return `<div class="exp-preview-card bg-[#0f172a] p-4 rounded-xl border border-slate-700 shadow-inner">
+                    <div class="flex justify-between gap-4 items-start">
+                        <div class="min-w-0">
+                            <span class="text-emerald-400 font-bold text-sm bg-emerald-400/10 px-2 py-1 rounded inline-block mb-1">${sy}${showEnd}</span>
+                            <h4 class="text-white font-medium text-lg truncate">${escapeHtml(showTitle || '(Untitled Project)')}</h4>
+                            ${showCompany ? `<p class="text-sm text-slate-400 truncate">@ ${escapeHtml(showCompany)}</p>` : ''}
+                            <p class="text-xs text-slate-500 mt-1">${imgCount} image${imgCount === 1 ? '' : 's'}</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2 justify-end">
+                            <button onclick="openExperienceEditor(${index})" class="px-3 py-2 rounded-xl text-amber-300 bg-amber-400/10 hover:bg-amber-400/20 border border-amber-400/20 text-xs font-bold flex items-center gap-1" title="แก้ข้อความและรูปภาพ"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้/รูป</button>
+                            <button onclick="removeExp(${index})" class="px-3 py-2 rounded-xl text-red-300 bg-red-400/10 hover:bg-red-400/20 border border-red-400/20 text-xs font-bold flex items-center gap-1"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button>
+                        </div>
+                    </div>
+                </div>`
+            }).join('');
+            createPortfolioIcons();
+        }
+
+        function updatePreview() {
+            if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
+            const currentData = StorageHandler.load();
+            const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
+            const data = { projectVersion: 'v43', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            StorageHandler.save(data); render(data); toggleModal();
+        }
+
+        function render(data) {
+            const app = document.getElementById('app'); const layout = data.layout || 'portfolio'; const colorMode = data.colorMode || 'dark'; const pStyle = data.portfolioStyle || 'tech'; const lang = data.lang || 'th';
+            const hasVisibleProfileContent = (profileData) => {
+                const textKeys = [
+                    'name_th', 'name_en', 'role_th', 'role_en', 'bio_th', 'bio_en',
+                    'skills_th', 'skills_en', 'education_th', 'education_en',
+                    'certifications_th', 'certifications_en', 'awards_th', 'awards_en',
+                    'caseStudies_th', 'caseStudies_en', 'services_th', 'services_en',
+                    'testimonials_th', 'testimonials_en', 'clients_th', 'clients_en',
+                    'cta_th', 'cta_en', 'articles_th', 'articles_en', 'email', 'phone',
+                    'linkedin', 'avatar'
+                ];
+                const hasText = textKeys.some(key => String(profileData[key] || '').trim());
+                const hasExperience = Array.isArray(profileData.exp) && profileData.exp.some(item =>
+                    ['company_th', 'company_en', 'company', 'title_th', 'title_en', 'title', 'desc_th', 'desc_en', 'desc']
+                        .some(key => String(item[key] || '').trim()) ||
+                    (Array.isArray(item.highlights_th) && item.highlights_th.length > 0) ||
+                    (Array.isArray(item.highlights_en) && item.highlights_en.length > 0) ||
+                    (Array.isArray(item.images) && item.images.length > 0)
+                );
+                return hasText || hasExperience;
+            };
+            const isFirstRunEmptyState = !data._hasStoredCache && !hasVisibleProfileContent(data);
+            const displayData = isFirstRunEmptyState ? {
+                ...data,
+                _isFirstRunDemo: true,
+                name_th: 'Your Portfolio',
+                name_en: 'Your Portfolio',
+                role_th: 'Portfolio Template',
+                role_en: 'Portfolio Template',
+                bio_th: 'Add your name, role, summary, skills, and project work to turn this template into a finished portfolio.',
+                bio_en: 'Add your name, role, summary, skills, and project work to turn this template into a finished portfolio.',
+                skills_th: 'Portfolio, Resume, Projects, Skills, Contact',
+                skills_en: 'Portfolio, Resume, Projects, Skills, Contact',
+                exp: [{
+                    startYear: new Date().getFullYear().toString(),
+                    company_th: 'Your work or organization',
+                    company_en: 'Your work or organization',
+                    title_th: 'Featured project placeholder',
+                    title_en: 'Featured project placeholder',
+                    desc_th: 'Replace this block with your first project, responsibility, result, or achievement.',
+                    desc_en: 'Replace this block with your first project, responsibility, result, or achievement.',
+                    highlights_th: ['Add project screenshots from Edit', 'Describe measurable results', 'Export as portfolio, resume, PDF, DOCX, or PPTX'],
+                    highlights_en: ['Add project screenshots from Edit', 'Describe measurable results', 'Export as portfolio, resume, PDF, DOCX, or PPTX'],
+                    images: []
+                }]
+            } : data;
+
+            if (typeof window !== 'undefined' && window.INJECTED_PORTFOLIO_DATA) { document.body.classList.add('is-downloaded'); }
+
+            if (layout === 'resume') {
+                document.body.classList.add('layout-resume'); document.body.classList.remove('layout-portfolio');
+                if (document.getElementById('btn-export-pptx')) document.getElementById('btn-export-pptx').classList.add('hidden');
+                document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
+                document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md";
+            } else {
+                document.body.classList.add('layout-portfolio'); document.body.classList.remove('layout-resume');
+                if (document.getElementById('btn-export-pptx')) document.getElementById('btn-export-pptx').classList.remove('hidden');
+                document.getElementById('btn-pill-resume').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white";
+                document.getElementById('btn-pill-portfolio').className = "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md";
+            }
+
+            if (colorMode === 'dark') { document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-700 text-white flex items-center justify-center gap-2 shadow-md"; document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"; } else { document.getElementById('btn-mode-light').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-200 text-slate-900 flex items-center justify-center gap-2 shadow-md"; document.getElementById('btn-mode-dark').className = "flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"; }
+            const wheelDark = document.getElementById('wheel-mode-dark');
+            const wheelLight = document.getElementById('wheel-mode-light');
+            if (wheelDark && wheelLight) {
+                wheelDark.classList.toggle('active', colorMode === 'dark');
+                wheelLight.classList.toggle('active', colorMode === 'light');
+            }
+            document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active')); if (document.getElementById(`swatch-${pStyle}`)) document.getElementById(`swatch-${pStyle}`).classList.add('active');
+            const resumeVis = { ...DEFAULT_RESUME_VISIBILITY, ...(displayData.resumeVisibility || {}) };
+            const localizedData = { name: displayData[`name_${lang}`] || displayData.name_th || '', role: displayData[`role_${lang}`] || displayData.role_th || '', bio: displayData[`bio_${lang}`] || displayData.bio_th || '', skills: displayData[`skills_${lang}`] || displayData.skills_th || '', education: displayData[`education_${lang}`] || '', certifications: displayData[`certifications_${lang}`] || '', awards: displayData[`awards_${lang}`] || '', caseStudies: displayData[`caseStudies_${lang}`] || '', services: displayData[`services_${lang}`] || '', testimonials: displayData[`testimonials_${lang}`] || '', clients: displayData[`clients_${lang}`] || '', cta: displayData[`cta_${lang}`] || '', articles: displayData[`articles_${lang}`] || '', exp: (displayData.exp || []).map(e => ({ ...e, company: e[`company_${lang}`] || e.company_th || e.company || '', title: e[`title_${lang}`] || e.title_th || e.title || '', desc: e[`desc_${lang}`] || e.desc_th || e.desc || '', highlights: e[`highlights_${lang}`] || e.highlights_th || e.highlights || [] })) };
+            const themeBGs = { tech: { dark: 'bg-[#020617]', light: 'bg-slate-50' }, educ: { dark: 'bg-[#022c22]', light: 'bg-emerald-50' }, gov: { dark: 'bg-[#0f172a]', light: 'bg-slate-100' }, creative: { dark: 'bg-[#2e1065]', light: 'bg-fuchsia-50' }, minimal: { dark: 'bg-black', light: 'bg-white' }, eco: { dark: 'bg-[#042f2e]', light: 'bg-teal-50' }, bold: { dark: 'bg-[#450a0a]', light: 'bg-rose-50' }, luxury: { dark: 'bg-[#1e1b4b]', light: 'bg-indigo-50' }, health: { dark: 'bg-[#062b33]', light: 'bg-cyan-50' }, esports: { dark: 'bg-[#160b35]', light: 'bg-violet-50' } };
+            const currentBg = themeBGs[pStyle] ? themeBGs[pStyle][colorMode] : themeBGs['tech'][colorMode];
+            document.body.className = `min-h-screen transition-colors duration-700 antialiased relative overflow-x-hidden ${currentBg} ${colorMode === 'light' ? "text-slate-900" : "text-white"} ${document.body.classList.contains('is-downloaded') ? 'is-downloaded' : ''} ${displayData._isFirstRunDemo ? 'is-first-run-demo' : ''} ${layout === 'resume' ? 'layout-resume' : 'layout-portfolio'} theme-${pStyle} mode-${colorMode}`;
+
+            const decorationContainer = document.getElementById('theme-decorations');
+            if (decorationContainer) {
+                let decorationsHTML = ''; if (layout === 'portfolio') {
+                    switch (pStyle) {
+                        case 'tech': decorationsHTML = `<div class="absolute inset-0 bg-[#3b82f6] opacity-[0.03] dark:opacity-[0.05]" style="background-image: linear-gradient(rgba(59, 130, 246, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.2) 1px, transparent 1px); background-size: 40px 40px; will-change: transform;"></div><div class="absolute left-[5%] top-0 w-[2px] h-[200px] bg-blue-500 shadow-[0_0_15px_#3b82f6] animate-[tech-scan_3s_linear_infinite] will-change-transform"></div><div class="absolute right-[10%] top-0 w-[1px] h-[300px] bg-cyan-400 opacity-70 shadow-[0_0_10px_#22d3ee] animate-[tech-scan_4.5s_linear_infinite_reverse] will-change-transform"></div>`; break;
+                        case 'educ': decorationsHTML = `<div class="absolute top-[20%] left-[10%] w-[40vh] h-[40vh] bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.15)_0%,transparent_70%)] animate-[float-orb_8s_ease-in-out_infinite] will-change-transform"></div><div class="absolute top-[60%] right-[10%] w-[50vh] h-[50vh] bg-[radial-gradient(circle_at_center,rgba(20,184,166,0.15)_0%,transparent_70%)] animate-[float-orb_12s_ease-in-out_infinite_reverse] will-change-transform"></div>`; break;
+                        case 'gov': decorationsHTML = `<div class="absolute inset-0 overflow-hidden opacity-20 dark:opacity-10 pointer-events-none"><div class="absolute top-0 left-0 w-[50px] h-[200%] bg-gradient-to-r from-transparent via-amber-400 to-transparent animate-[gov-shimmer_6s_infinite_linear] will-change-transform"></div><div class="absolute top-0 right-1/4 w-[80px] h-[200%] bg-gradient-to-r from-transparent via-amber-200 to-transparent animate-[gov-shimmer_9s_infinite_linear_2s] will-change-transform"></div></div>`; break;
+                        case 'creative': decorationsHTML = `<div class="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-[radial-gradient(circle_at_center,rgba(217,70,239,0.15)_0%,transparent_60%)] animate-[creative-blob_15s_infinite_linear] will-change-transform"></div><div class="absolute bottom-1/4 right-1/4 w-[40vw] h-[40vw] bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.15)_0%,transparent_60%)] animate-[creative-blob_10s_infinite_linear_reverse] will-change-transform"></div>`; break;
+                        case 'minimal': decorationsHTML = `<div class="absolute inset-0 opacity-10 dark:opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAiLz4KPHBhdGggZD0iTTAgMGgxdjFIMHptMiAyaDF2MUgyeiIgZmlsbD0iIzAwMCIgZmlsbC1vcGFjaXR5PSIwLjEiLz4KPC9zdmc+')]"></div>`; break;
+                        case 'eco': decorationsHTML = `<div class="absolute -top-10 left-[20%] w-8 h-8 bg-green-500/30 rounded-tl-full rounded-br-full animate-[eco-leaf_10s_ease-in-out_infinite] will-change-transform shadow-[0_0_10px_rgba(34,197,94,0.3)]"></div><div class="absolute -top-10 left-[50%] w-6 h-6 bg-teal-500/30 rounded-tl-full rounded-br-full animate-[eco-leaf_15s_ease-in-out_infinite_2s] will-change-transform shadow-[0_0_10px_rgba(20,184,166,0.3)]"></div><div class="absolute -top-10 left-[80%] w-10 h-10 bg-emerald-500/20 rounded-tl-full rounded-br-full animate-[eco-leaf_12s_ease-in-out_infinite_1s] will-change-transform shadow-[0_0_10px_rgba(16,185,129,0.3)]"></div>`; break;
+                        case 'bold': decorationsHTML = `<div class="absolute inset-0 opacity-70"><div class="absolute -top-24 -right-20 w-[46vw] h-[46vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(244,63,94,.24)_0%,rgba(244,63,94,.08)_38%,transparent_70%)] animate-[bold-orbit_12s_ease-in-out_infinite] will-change-transform"></div><div class="absolute bottom-[-18vh] left-[-12vw] w-[55vw] h-[55vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(251,113,133,.22)_0%,rgba(220,38,38,.10)_42%,transparent_72%)] animate-[bold-orbit_16s_ease-in-out_infinite_reverse] will-change-transform"></div><div class="absolute inset-0 bg-[linear-gradient(120deg,transparent_0%,rgba(244,63,94,.10)_46%,rgba(255,255,255,.10)_50%,rgba(244,63,94,.10)_54%,transparent_100%)] animate-[bold-shine_5.5s_ease-in-out_infinite] will-change-transform"></div></div>`; break;
+                        case 'luxury': decorationsHTML = `<div class="absolute w-full h-full pointer-events-none"><div class="absolute top-[80%] left-[10%] w-2 h-2 bg-amber-200 rounded-full shadow-[0_0_15px_#fde68a] animate-[luxury-dust_8s_infinite] will-change-transform"></div><div class="absolute top-[90%] left-[30%] w-3 h-3 bg-amber-300 rounded-full shadow-[0_0_20px_#fcd34d] animate-[luxury-dust_12s_infinite_2s] will-change-transform"></div><div class="absolute top-[70%] left-[80%] w-1.5 h-1.5 bg-amber-100 rounded-full shadow-[0_0_10px_#fef3c7] animate-[luxury-dust_6s_infinite_1s] will-change-transform"></div><div class="absolute top-[85%] left-[60%] w-2.5 h-2.5 bg-yellow-200 rounded-full shadow-[0_0_15px_#fef08a] animate-[luxury-dust_10s_infinite_4s] will-change-transform"></div></div>`; break;
+                        case 'health': decorationsHTML = `<div class="absolute inset-0 opacity-60"><div class="absolute left-[12%] top-[20%] w-[42vw] h-[42vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(34,211,238,.14)_0%,rgba(16,185,129,.08)_36%,transparent_68%)] animate-[health-pulse_7s_ease-in-out_infinite] will-change-transform"></div><div class="absolute right-[9%] bottom-[10%] w-[34vw] h-[34vw] rounded-full bg-[radial-gradient(circle_at_center,rgba(125,211,252,.12)_0%,transparent_70%)] animate-[health-breathe_10s_ease-in-out_infinite] will-change-transform"></div></div>`; break;
+                        case 'esports': decorationsHTML = `<div class="absolute inset-0 opacity-45"><div class="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,transparent_46%,rgba(139,92,246,.16)_48%,rgba(34,211,238,.12)_52%,transparent_56%,transparent_100%)] animate-[esports-sweep_5s_ease-in-out_infinite] will-change-transform"></div><div class="absolute left-[8%] top-[18%] w-[36vw] h-[36vw] bg-[conic-gradient(from_90deg,transparent,rgba(34,211,238,.16),transparent,rgba(139,92,246,.14),transparent)] blur-2xl animate-[esports-spin_14s_linear_infinite] will-change-transform"></div></div>`; break;
+                    }
+                }
+                const oldMouseGrid = document.getElementById('mouse-grid-field');
+                if (oldMouseGrid) oldMouseGrid.remove();
+                decorationContainer.innerHTML = decorationsHTML;
+                requestAnimationFrame(initMicroInteractions);
+            }
+
+            if (layout === 'resume') { app.className = `resume-a4-preview fade-in`; } else { app.className = "container mx-auto py-24 px-6 fade-in w-full max-w-full"; }
+
+            let appContent = '';
+            if (layout === 'resume') {
+                const sideProfile = resumeVis.profile ? `<div id="header-section" class="print-order-1">${HeaderComponent.render(localizedData.name, localizedData.role, layout, displayData.avatar, colorMode, pStyle, lang)}</div>` : '';
+                const sideContact = resumeVis.contact ? `<div class="resume-sidebar-block print-order-2">${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}</div>` : '';
+                const sideSkills = resumeVis.skills ? `<div class="resume-sidebar-block print-order-3">${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}</div>` : '';
+                const mainTop = [
+                    resumeVis.summary ? BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.education ? EducationComponent.render(localizedData.education, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.certifications ? CertificationComponent.render(localizedData.certifications, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.awards ? AwardsComponent.render(localizedData.awards, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.services ? ServicesComponent.render(localizedData.services, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.clients ? ClientsComponent.render(localizedData.clients, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.articles ? ArticlesComponent.render(localizedData.articles, layout, colorMode, pStyle, lang) : ''
+                ].join('');
+                const mainWork = [
+                    resumeVis.experience ? ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.caseStudies ? CaseStudyComponent.render(localizedData.caseStudies, layout, colorMode, pStyle, lang) : '',
+                    resumeVis.testimonials ? TestimonialsComponent.render(localizedData.testimonials, layout, colorMode, pStyle, lang) : ''
+                ].join('');
+                appContent = `
+                    <div class="resume-cv-shell print-layout-wrapper resume-fixed-map resume-a4-sheet">
+                        <aside class="resume-cv-sidebar">${sideProfile}${sideContact}${sideSkills}</aside>
+                        <main class="resume-cv-main">
+                            <div class="print-order-4 resume-section-card">${mainTop}</div>
+                            <div class="print-order-5 resume-section-card">${mainWork}</div>
+                        </main>
+                    </div>
+                `;
+            } else {
+                appContent = `
+                    <div class="print-layout-wrapper flex flex-col gap-12 mt-10 w-full">
+                        <div id="header-section" class="print-order-1 scroll-reveal w-full max-w-5xl mx-auto fade-in">
+                                ${HeaderComponent.render(localizedData.name, localizedData.role, layout, displayData.avatar, colorMode, pStyle, lang)}
+                        </div>
+                        <div class="print-order-2 w-full max-w-5xl mx-auto">
+                            ${BioComponent.render(localizedData.bio, layout, colorMode, pStyle, lang)}
+                        </div>
+                        <div class="print-order-3 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 mt-20">
+                            ${SkillsComponent.render(localizedData.skills, layout, colorMode, pStyle, lang)}
+                            ${ContactComponent.render(data.email, data.phone, data.linkedin, layout, colorMode, pStyle, lang)}
+                        </div>
+
+                        <div class="print-order-extra w-full max-w-5xl mx-auto">
+                            ${ServicesComponent.render(localizedData.services, layout, colorMode, pStyle, lang)}
+                            ${ClientsComponent.render(localizedData.clients, layout, colorMode, pStyle, lang)}
+                        </div>
+                        <div class="print-order-4 w-full">
+                            ${ExperienceComponent.render(localizedData.exp, layout, colorMode, pStyle, lang)}
+                        </div>
+                        <div class="print-order-extra w-full max-w-5xl mx-auto">
+                            ${CaseStudyComponent.render(localizedData.caseStudies, layout, colorMode, pStyle, lang)}
+                            ${EducationComponent.render(localizedData.education, layout, colorMode, pStyle, lang)}
+                            ${CertificationComponent.render(localizedData.certifications, layout, colorMode, pStyle, lang)}
+                            ${AwardsComponent.render(localizedData.awards, layout, colorMode, pStyle, lang)}
+                            ${TestimonialsComponent.render(localizedData.testimonials, layout, colorMode, pStyle, lang)}
+                            ${ArticlesComponent.render(localizedData.articles, layout, colorMode, pStyle, lang)}
+                            ${CTAComponent.render(localizedData.cta, layout, colorMode, pStyle, lang)}
+                        </div>
+                    </div>
+                `;
+            }
+            app.innerHTML = appContent;
+
+            if (document.getElementById('btn-lang')) document.getElementById('btn-lang').innerText = lang === 'th' ? 'TH' : 'EN';
+            setTimeout(() => { createPortfolioIcons(); initThemeCarousel(); if (layout === 'portfolio') { initScrollEffects(); initMicroInteractions(); } initQuickEditHotspots(); }, 50);
+        }
+
+        async function handleExportWeb() {
+            const btn = document.querySelector('button[onclick="handleExportWeb()"]');
+            const originalHtml = btn.innerHTML;
+            try {
+                if (window.location.protocol === 'file:') { alert("⚠️ ฟีเจอร์ 'ดาวน์โหลด WEB' ต้องใช้งานผ่านอินเทอร์เน็ต (เช่น บน Vercel) เท่านั้นครับ"); return; }
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-white"></i> <span class="text-sm">Downloading...</span>`;
+                createPortfolioIcons();
+                const data = StorageHandler.load(); const dataString = JSON.stringify(data);
+                const response = await fetch(window.location.href); let html = await response.text();
+                let baseUrl = window.location.origin + window.location.pathname;
+                if (!baseUrl.endsWith('/')) { baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1); }
+                html = html.replace(/src="js\//g, `src="${baseUrl}js/`);
+                html = html.replace(/href="css\//g, `href="${baseUrl}css/`);
+                const scriptInject = `\n<script>\nwindow.INJECTED_PORTFOLIO_DATA = ${dataString};\n<\/script>\n`;
+                html = html.replace('</head>', `${scriptInject}</head>`);
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                const safeName = (data.name_en || data.name_th || 'My').replace(/\s+/g, '_');
+                a.download = `${safeName}_Web_Portfolio.html`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            } catch (err) { alert("เกิดข้อผิดพลาดในการดาวน์โหลดเว็บ"); }
+            finally { setTimeout(() => { btn.innerHTML = originalHtml; createPortfolioIcons(); }, 1500); }
+        }
+
+
+                function initMicroInteractions() {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const grid = document.getElementById('mouse-grid-field');
+            const cells = grid ? Array.from(grid.querySelectorAll('.mouse-cell')) : [];
+            if (!grid || cells.length !== 9) return;
+
+            if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+            if (window._portfolioMouseMove) window.removeEventListener('mousemove', window._portfolioMouseMove);
+            if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioMouseLeave) document.removeEventListener('mouseleave', window._portfolioMouseLeave);
+
+            let raf = null;
+            let tx = window.innerWidth / 2, ty = Math.max(160, window.innerHeight / 2);
+            let cx = tx, cy = ty;
+            const layoutCells = [[-1,-1],[0,-1],[1,-1],[-1,0],[0,0],[1,0],[-1,1],[0,1],[1,1]];
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const lerp = (a,b,t) => a + (b-a)*t;
+
+            const update = () => {
+                raf = null;
+                if (!document.body.classList.contains('layout-portfolio')) {
+                    grid.style.opacity = '0';
+                    return;
+                }
+                cx = lerp(cx, tx, .28);
+                cy = lerp(cy, ty, .28);
+                const size = clamp(Math.min(window.innerWidth, window.innerHeight) * .118, 86, 132);
+                grid.style.setProperty('--grid-x', `${cx}px`);
+                grid.style.setProperty('--grid-y', `${cy}px`);
+                grid.style.setProperty('--grid-size', `${size}px`);
+                grid.style.opacity = '1';
+                cells.forEach((cell, i) => {
+                    const [gx, gy] = layoutCells[i];
+                    const isCenter = i === 4;
+                    const dist = Math.hypot(gx, gy) || 1;
+                    // Cell 5 is the cursor anchor. Neighbor cells tilt toward the cursor.
+                    const rx = isCenter ? 0 : clamp(gy * -10.5 / dist, -11, 11);
+                    const ry = isCenter ? 0 : clamp(gx * 10.5 / dist, -11, 11);
+                    cell.style.setProperty('--cell-x', `${gx * size}px`);
+                    cell.style.setProperty('--cell-y', `${gy * size}px`);
+                    cell.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
+                    cell.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
+                    cell.style.setProperty('--cell-opacity', isCenter ? .34 : .56);
+                    cell.classList.toggle('is-center', isCenter);
+                });
+                if (Math.abs(cx - tx) > .45 || Math.abs(cy - ty) > .45) raf = requestAnimationFrame(update);
+            };
+
+            const move = (e) => {
+                if (e && typeof e.clientX === 'number') {
+                    tx = e.clientX;
+                    ty = e.clientY;
+                }
+                grid.style.opacity = '1';
+                if (!raf) raf = requestAnimationFrame(update);
+            };
+            const leave = () => { grid.style.opacity = '0'; };
+
+            window._portfolioPointerMove = move;
+            window._portfolioMouseMove = move;
+            window._portfolioPointerLeave = leave;
+            window._portfolioMouseLeave = leave;
+            window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+            window.addEventListener('mousemove', window._portfolioMouseMove, { passive: true });
+            window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+            document.addEventListener('mouseleave', window._portfolioMouseLeave, { passive: true });
+            update();
+        }
+
+
+        function playThemeTransition(theme, fromTheme) {
+            if (document.body.classList.contains('is-downloaded')) return;
+            const colors = { tech:'#3b82f6', educ:'#10b981', gov:'#f59e0b', creative:'#d946ef', minimal:'#ffffff', eco:'#14b8a6', bold:'#f43f5e', luxury:'#fbbf24', health:'#22d3ee', esports:'#8b5cf6' };
+            const burst = document.createElement('div');
+            burst.className = `theme-change-burst theme-change-${theme}`;
+            burst.style.setProperty('--burst-color', colors[theme] || '#3b82f6');
+            const templates = {
+                tech: '<i></i><i></i><i></i><i></i><i></i><b></b>',
+                educ: '<span></span><span></span><span></span><span></span><em></em>',
+                gov: '<strong></strong><strong></strong><strong></strong>',
+                creative: '<span></span><span></span><span></span><span></span>',
+                minimal: '<b></b>',
+                eco: '<i></i><i></i><i></i><i></i><i></i><i></i>',
+                bold: '<strong></strong><strong></strong><strong></strong>',
+                luxury: '<span></span><span></span><span></span><span></span><span></span>',
+                health: '<span></span><span></span><span></span><span></span><b></b>',
+                esports: '<i></i><i></i><i></i><i></i><strong></strong>'
+            };
+            burst.innerHTML = templates[theme] || templates.tech;
+            document.body.appendChild(burst);
+            setTimeout(() => burst.remove(), 1250);
+        }
+
+        let quickEditKey = null;
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[ch]));
+        }
+
+        function getExperienceLabel(item, lang = 'th') {
+            const title = lang === 'th' ? (item.title_th || item.title_en || item.title || '') : (item.title_en || item.title_th || item.title || '');
+            const company = lang === 'th' ? (item.company_th || item.company_en || item.company || '') : (item.company_en || item.company_th || item.company || '');
+            return { title: title || (lang === 'th' ? 'โปรเจกต์ยังไม่มีชื่อ' : 'Untitled project'), company };
+        }
+
+        function renderQuickExperienceManager(data = StorageHandler.load()) {
+            const holder = document.getElementById('quick-edit-experience-manager');
+            if (!holder) return;
+            const lang = data.lang || 'th';
+            const items = data.exp || [];
+            const cards = items.length ? items.map((item, index) => {
+                const label = getExperienceLabel(item, lang);
+                const thumbs = (item.images || []).slice(0, 6).map((src, imgIndex) => `
+                    <div class="quick-exp-thumb">
+                        <img src="${escapeHtml(src)}" alt="Project image ${imgIndex + 1}">
+                        <button type="button" onclick="removeQuickExpImage(${index}, ${imgIndex})" title="ลบรูปนี้"><i data-lucide="x" class="w-3 h-3"></i></button>
+                    </div>`).join('');
+                const more = (item.images || []).length > 6 ? `<span class="quick-exp-more">+${(item.images || []).length - 6}</span>` : '';
+                return `
+                    <article class="quick-exp-card">
+                        <div class="quick-exp-card-main">
+                            <div class="quick-exp-title-row">
+                                <span class="quick-exp-number">#${index + 1}</span>
+                                <div class="min-w-0">
+                                    <h4>${escapeHtml(label.title)}</h4>
+                                    ${label.company ? `<p>${escapeHtml(label.company)}</p>` : '<p>ไม่มีบริษัท/ลูกค้า</p>'}
+                                </div>
+                            </div>
+                            <div class="quick-exp-thumbs ${thumbs ? '' : 'is-empty'}">${thumbs || '<span>ยังไม่มีรูป — กดเพิ่มรูปได้ทันที</span>'}${more}</div>
+                        </div>
+                        <div class="quick-exp-actions">
+                            <button type="button" onclick="openExperienceEditor(${index})"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ข้อมูล/รูป</button>
+                            <label class="quick-exp-file-btn"><i data-lucide="image-plus" class="w-4 h-4"></i> เพิ่มรูป<input type="file" accept="image/*" multiple onchange="handleQuickExpImageUpload(event, ${index})"></label>
+                            <button type="button" onclick="duplicateQuickExp(${index})"><i data-lucide="copy" class="w-4 h-4"></i> สำเนา</button>
+                            <button type="button" class="danger" onclick="deleteQuickExp(${index})"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button>
+                        </div>
+                    </article>`;
+            }).join('') : `<div class="quick-exp-empty">ยังไม่มีประสบการณ์/โปรเจกต์ กด “เพิ่มโปรเจกต์ใหม่” เพื่อเริ่มกรอก</div>`;
+            holder.innerHTML = `
+                <div class="quick-exp-toolbar">
+                    <div>
+                        <strong>Project Manager</strong>
+                        <span>แก้ข้อความและรูปจากปุ่มนี้ง่ายกว่า bulk text ด้านล่าง</span>
+                    </div>
+                    <button type="button" onclick="openExperienceEditor(-1)"><i data-lucide="plus" class="w-4 h-4"></i> เพิ่มโปรเจกต์ใหม่</button>
+                </div>
+                <div class="quick-exp-list">${cards}</div>
+                <details class="quick-exp-advanced">
+                    <summary>Advanced bulk text edit / แก้หลายรายการแบบข้อความ</summary>
+                    <p>รูปภาพจะยังคงอยู่กับแต่ละโปรเจกต์ตามลำดับเดิม หากต้องการแก้รูปให้ใช้ปุ่ม “แก้ข้อมูล/รูป” หรือ “เพิ่มรูป” ด้านบน</p>
+                </details>`;
+            createPortfolioIcons();
+        }
+
+        async function handleQuickExpImageUpload(event, index) {
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[index]) return;
+            const files = Array.from(event.target.files || []);
+            for (const file of files) {
+                try {
+                    data.exp[index].images = data.exp[index].images || [];
+                    data.exp[index].images.push(await resizeImageFileToBase64(file, 900, 0.82));
+                } catch (err) {
+                    alert(err.message || 'อัปโหลดรูปไม่สำเร็จ');
+                }
+            }
+            event.target.value = '';
+            StorageHandler.save(data);
+            render(data);
+            quickEditKey = 'experience';
+            const pop = document.getElementById('quick-edit-popover');
+            if (pop) { pop.classList.remove('hidden'); pop.classList.add('flex'); }
+            document.getElementById('quick-edit-title').textContent = 'Experience / ประสบการณ์';
+            document.getElementById('quick-edit-th').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'th');
+            document.getElementById('quick-edit-en').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'en');
+            renderQuickExperienceManager(StorageHandler.load());
+        }
+
+        function removeQuickExpImage(expIndex, imageIndex) {
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[expIndex] || !data.exp[expIndex].images) return;
+            data.exp[expIndex].images.splice(imageIndex, 1);
+            StorageHandler.save(data);
+            render(data);
+            quickEditKey = 'experience';
+            const pop = document.getElementById('quick-edit-popover');
+            if (pop) { pop.classList.remove('hidden'); pop.classList.add('flex'); }
+            document.getElementById('quick-edit-title').textContent = 'Experience / ประสบการณ์';
+            document.getElementById('quick-edit-th').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'th');
+            document.getElementById('quick-edit-en').value = serializeExperiencesForQuickEdit(StorageHandler.load(), 'en');
+            renderQuickExperienceManager(StorageHandler.load());
+        }
+
+        function duplicateQuickExp(index) {
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[index]) return;
+            const copy = JSON.parse(JSON.stringify(data.exp[index]));
+            copy.title_th = (copy.title_th || copy.title || 'Project') + ' (Copy)';
+            copy.title_en = (copy.title_en || copy.title || 'Project') + ' (Copy)';
+            data.exp.splice(index + 1, 0, copy);
+            StorageHandler.save(data);
+            render(data);
+            openQuickEdit('experience');
+        }
+
+        function deleteQuickExp(index) {
+            if (!confirm('ลบโปรเจกต์นี้ออกจาก Portfolio?')) return;
+            const data = StorageHandler.load();
+            if (!data.exp || !data.exp[index]) return;
+            data.exp.splice(index, 1);
+            StorageHandler.save(data);
+            render(data);
+            openQuickEdit('experience');
+        }
+
+        function serializeExperiencesForQuickEdit(data, targetLang) {
+            return (data.exp || []).map(item => {
+                const title = item[`title_${targetLang}`] || item.title_th || item.title_en || item.title || '';
+                const company = item[`company_${targetLang}`] || item.company_th || item.company_en || item.company || '';
+                const desc = item[`desc_${targetLang}`] || item.desc_th || item.desc_en || item.desc || '';
+                const highlights = item[`highlights_${targetLang}`] || item.highlights_th || item.highlights_en || item.highlights || [];
+                return [title, company, desc, (highlights || []).join('; ')].map(v => String(v || '').trim()).join(' | ');
+            }).join('\n');
+        }
+
+        function applyExperiencesFromQuickEdit(data, thText, enText) {
+            const parseLines = (text) => String(text || '').split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+                const parts = line.split('|').map(x => x.trim());
+                return { title: parts[0] || '', company: parts[1] || '', desc: parts[2] || '', highlights: (parts[3] || '').split(';').map(x => x.trim()).filter(Boolean) };
+            });
+            const th = parseLines(thText);
+            const en = parseLines(enText);
+            const max = Math.max(th.length, en.length, (data.exp || []).length);
+            const old = data.exp || [];
+            data.exp = Array.from({ length: max }).map((_, i) => {
+                const base = old[i] || { startMonth: '', startYear: '', endMonth: '', endYear: '', isCurrent: false, images: [] };
+                const t = th[i] || {};
+                const e = en[i] || {};
+                return {
+                    ...base,
+                    title_th: t.title ?? base.title_th ?? '',
+                    company_th: t.company ?? base.company_th ?? '',
+                    desc_th: t.desc ?? base.desc_th ?? '',
+                    highlights_th: t.highlights ?? base.highlights_th ?? [],
+                    title_en: e.title ?? base.title_en ?? '',
+                    company_en: e.company ?? base.company_en ?? '',
+                    desc_en: e.desc ?? base.desc_en ?? '',
+                    highlights_en: e.highlights ?? base.highlights_en ?? []
+                };
+            }).filter(item => item.title_th || item.title_en || item.desc_th || item.desc_en || (item.highlights_th||[]).length || (item.highlights_en||[]).length || (item.images||[]).length);
+        }
+
+        function setQuickEditTextLabels(leftLabel = 'TH', rightLabel = 'EN') {
+            const left = document.getElementById('quick-edit-label-th');
+            const right = document.getElementById('quick-edit-label-en');
+            if (left) left.textContent = leftLabel;
+            if (right) right.textContent = rightLabel;
+        }
+
+        function applyContactFromQuickEdit(data, emailText, contactText) {
+            const contactLines = String(contactText || '').split('\n').map(line => line.trim());
+            data.email = String(emailText || '').trim();
+            data.phone = contactLines[0] || '';
+            data.linkedin = contactLines.slice(1).join('\n').trim();
+        }
+
+        const quickMap = {
+            experience: { title: 'Experience / ประสบการณ์', special: 'experience' },
+            bio: { title: 'Professional Summary / ประวัติโดยย่อ', th: 'bio_th', en: 'bio_en', selector: '#app section:has(h3)' },
+            skills: { title: 'Skills / ทักษะ', th: 'skills_th', en: 'skills_en', selector: '.skills-section' },
+            contact: { title: 'Contact / ข้อมูลติดต่อ', special: 'contact', selector: '.contact-section' },
+            education: { title: 'Education / การศึกษา', th: 'education_th', en: 'education_en', selector: '.education-section' },
+            certifications: { title: 'Certifications / ประกาศนียบัตร', th: 'certifications_th', en: 'certifications_en', selector: '.cert-section' },
+            awards: { title: 'Awards / รางวัล', th: 'awards_th', en: 'awards_en', selector: '.awards-section' },
+            caseStudies: { title: 'Case Studies / กรณีศึกษา', th: 'caseStudies_th', en: 'caseStudies_en', selector: '.case-section' },
+            services: { title: 'Services / บริการ', th: 'services_th', en: 'services_en', selector: '.services-section' },
+            testimonials: { title: 'Testimonials / คำรับรอง', th: 'testimonials_th', en: 'testimonials_en', selector: '.testimonials-section' },
+            clients: { title: 'Clients / ลูกค้า', th: 'clients_th', en: 'clients_en', selector: '.clients-section' },
+            articles: { title: 'Articles / บทความ', th: 'articles_th', en: 'articles_en', selector: '.articles-section' },
+            cta: { title: 'CTA / คำเชิญชวน', th: 'cta_th', en: 'cta_en', selector: '.cta-section' }
+        };
+
+        function initQuickEditHotspots() {
+            if (document.body.classList.contains('is-downloaded')) return;
+            const app = document.getElementById('app');
+            if (!app) return;
+            app.querySelectorAll('.quick-edit-trigger').forEach(btn => btn.remove());
+            const candidates = [
+                ['experience', [...app.querySelectorAll('section')].find(s => /ประสบการณ์และผลงาน|Experience & Projects/i.test(s.textContent))],
+                ['bio', [...app.querySelectorAll('section')].find(s => /ประวัติโดยย่อ|Professional Summary/i.test(s.textContent))],
+                ['skills', app.querySelector('.skills-section')],
+                ['contact', app.querySelector('.contact-section')],
+                ['education', app.querySelector('.education-section')],
+                ['certifications', app.querySelector('.cert-section')],
+                ['awards', app.querySelector('.awards-section')],
+                ['caseStudies', app.querySelector('.case-section')],
+                ['services', app.querySelector('.services-section')],
+                ['testimonials', app.querySelector('.testimonials-section')],
+                ['clients', app.querySelector('.clients-section')],
+                ['articles', app.querySelector('.articles-section')]
+            ];
+            candidates.forEach(([key, el]) => {
+                if (!el || el.dataset.quickReady) return;
+                el.dataset.quickReady = '1';
+                el.classList.add('quick-edit-zone');
+                const btn = document.createElement('button');
+                btn.className = 'quick-edit-trigger';
+                btn.type = 'button';
+                btn.innerHTML = '<i data-lucide="pencil" class="w-4 h-4"></i><span>Edit</span>';
+                btn.addEventListener('click', (ev) => { ev.stopPropagation(); openQuickEdit(key); });
+                el.appendChild(btn);
+            });
+            createPortfolioIcons();
+        }
+
+        function openQuickEdit(key) {
+            const map = quickMap[key];
+            if (!map) return;
+            quickEditKey = key;
+            const data = StorageHandler.load();
+            document.getElementById('quick-edit-title').textContent = map.title;
+            const expManager = document.getElementById('quick-edit-experience-manager');
+            const grid = document.getElementById('quick-edit-grid');
+            const saveBtn = document.getElementById('quick-edit-save-btn');
+            if (map.special === 'experience') {
+                setQuickEditTextLabels('TH', 'EN');
+                if (expManager) expManager.classList.remove('hidden');
+                if (grid) grid.classList.add('quick-edit-grid-advanced');
+                if (saveBtn) saveBtn.textContent = 'Save bulk text';
+                document.getElementById('quick-edit-th').placeholder = 'ชื่อโปรเจกต์ | บริษัท | รายละเอียด | bullet 1; bullet 2';
+                document.getElementById('quick-edit-en').placeholder = 'Project title | Company | Description | bullet 1; bullet 2';
+                document.getElementById('quick-edit-th').value = serializeExperiencesForQuickEdit(data, 'th');
+                document.getElementById('quick-edit-en').value = serializeExperiencesForQuickEdit(data, 'en');
+                renderQuickExperienceManager(data);
+            } else if (map.special === 'contact') {
+                setQuickEditTextLabels('Email', 'Phone / LinkedIn');
+                if (expManager) { expManager.classList.add('hidden'); expManager.innerHTML = ''; }
+                if (grid) grid.classList.remove('quick-edit-grid-advanced');
+                if (saveBtn) saveBtn.textContent = 'Save';
+                document.getElementById('quick-edit-th').placeholder = 'hello@example.com';
+                document.getElementById('quick-edit-en').placeholder = '+66 00 000 0000\nlinkedin.com/in/your-profile';
+                document.getElementById('quick-edit-th').value = data.email || '';
+                document.getElementById('quick-edit-en').value = [data.phone || '', data.linkedin || ''].filter(Boolean).join('\n');
+            } else {
+                setQuickEditTextLabels('TH', 'EN');
+                if (expManager) { expManager.classList.add('hidden'); expManager.innerHTML = ''; }
+                if (grid) grid.classList.remove('quick-edit-grid-advanced');
+                if (saveBtn) saveBtn.textContent = 'Save';
+                document.getElementById('quick-edit-th').placeholder = '';
+                document.getElementById('quick-edit-en').placeholder = '';
+                document.getElementById('quick-edit-th').value = data[map.th] || '';
+                document.getElementById('quick-edit-en').value = data[map.en] || '';
+            }
+            const pop = document.getElementById('quick-edit-popover');
+            pop.classList.remove('hidden');
+            pop.classList.add('flex');
+            createPortfolioIcons();
+        }
+
+        function closeQuickEdit() {
+            const pop = document.getElementById('quick-edit-popover');
+            if (!pop) return;
+            pop.classList.add('hidden');
+            pop.classList.remove('flex');
+            quickEditKey = null;
+        }
+
+        function saveQuickEdit() {
+            if (!quickEditKey || !quickMap[quickEditKey]) return;
+            const data = StorageHandler.load();
+            const map = quickMap[quickEditKey];
+            if (map.special === 'experience') {
+                applyExperiencesFromQuickEdit(data, document.getElementById('quick-edit-th').value, document.getElementById('quick-edit-en').value);
+            } else if (map.special === 'contact') {
+                applyContactFromQuickEdit(data, document.getElementById('quick-edit-th').value, document.getElementById('quick-edit-en').value);
+            } else {
+                data[map.th] = document.getElementById('quick-edit-th').value;
+                data[map.en] = document.getElementById('quick-edit-en').value;
+            }
+            StorageHandler.save(data);
+            closeQuickEdit();
+            render(data);
+        }
+
+        function initScrollEffects() {
+            const revealObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('show'); }); }, { threshold: 0.1 });
+            document.querySelectorAll('.scroll-reveal').forEach(el => revealObserver.observe(el));
+            const scrollyWrappers = document.querySelectorAll('.scrollytelling-wrapper');
+            if (scrollyWrappers.length > 0) {
+                if (window._scrollHandler) window.removeEventListener('scroll', window._scrollHandler);
+                scrollyWrappers.forEach(w => { const t = w.querySelector('.scrollytelling-track'); if (t) t.removeAttribute('data-max-translate'); });
+                let isTicking = false;
+                window._scrollHandler = () => {
+                    const progressBar = document.getElementById('scroll-progress');
+                    if (progressBar) {
+                        const doc = document.documentElement;
+                        const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+                        progressBar.style.width = `${Math.min(100, Math.max(0, (window.scrollY / max) * 100))}%`;
+                    }
+                    const heroFrame = document.querySelector('.hero-frame');
+                    if (heroFrame) {
+                        const doc = document.documentElement;
+                        const max = Math.max(1, doc.scrollHeight - window.innerHeight);
+                        const pageProgress = Math.min(1, Math.max(0, window.scrollY / max));
+                        heroFrame.style.setProperty('--profile-scroll-angle', `${Math.round(pageProgress * 720)}deg`);
+                        heroFrame.style.setProperty('--profile-scroll-glow', `${0.45 + pageProgress * 0.45}`);
+                    }
+                    // v31 responsive scrollytelling: keep vertical scroll-driven motion on mobile/tablet too.
+                    if (!isTicking) {
+                        window.requestAnimationFrame(() => {
+                            scrollyWrappers.forEach(wrapper => {
+                                const track = wrapper.querySelector('.scrollytelling-track'); const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper'); const stickyBox = wrapper.querySelector('.sticky'); if (!track || !stickyBox) return;
+                                const rect = wrapper.getBoundingClientRect(); const stickyTop = window.innerHeight * 0.1; const stickyHeight = stickyBox.offsetHeight; const totalScrollDistance = rect.height - stickyHeight;
+                                let progress = 0; if (totalScrollDistance > 0) { progress = (stickyTop - rect.top) / totalScrollDistance; }
+                                progress = Math.max(0, Math.min(1, progress));
+                                let maxTranslate = track.getAttribute('data-max-translate');
+                                if (!maxTranslate) {
+                                    const isCol = imageWrapper.classList.contains('cinematic-collapsed'); if (isCol) { imageWrapper.classList.remove('cinematic-collapsed'); imageWrapper.classList.add('cinematic-expanded'); }
+                                    maxTranslate = track.scrollWidth - track.parentElement.clientWidth; track.setAttribute('data-max-translate', maxTranslate);
+                                    if (isCol) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); }
+                                }
+                                maxTranslate = parseFloat(maxTranslate) || 0;
+                                if (imageWrapper) { if (progress <= 0.01 || progress >= 0.98) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
+                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = 0.05; const endMove = 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; }
+                            }); isTicking = false;
+                        }); isTicking = true;
+                    }
+                };
+                window.addEventListener('scroll', window._scrollHandler, { passive: true });
+            }
+        }
+
+        function handlePrint(orientation = 'portrait') {
+            const modal = document.getElementById("edit-modal");
+            const wasOpen = modal && !modal.classList.contains("hidden");
+            if (wasOpen) { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+
+            const oldPrintStyle = document.getElementById('dynamic-print-page-size');
+            if (oldPrintStyle) oldPrintStyle.remove();
+            const printStyle = document.createElement('style');
+            printStyle.id = 'dynamic-print-page-size';
+            printStyle.textContent = `@media print { @page { size: A4 ${orientation === 'landscape' ? 'landscape' : 'portrait'}; margin: 0; } body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }`;
+            document.head.appendChild(printStyle);
+
+            document.body.classList.toggle('print-landscape', orientation === 'landscape');
+            document.body.classList.toggle('print-portrait', orientation !== 'landscape');
+            setTimeout(() => { window.print(); }, 120);
+        }
+
+        function handleExportDOCX() {
+            const data = StorageHandler.load();
+            if (typeof Exporter === 'undefined' || !Exporter.generateDOCX) {
+                alert('DOCX exporter is not ready. Please reload this file.');
+                return;
+            }
+            Exporter.generateDOCX(data);
+        }
+
+        async function handleExportPPTX() {
+            const btn = document.querySelector('button[onclick="handleExportPPTX()"]');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-white"></i> <span class="text-sm">Rendering...</span>`;
+            createPortfolioIcons();
+
+            try {
+                const data = StorageHandler.load();
+
+                // file:// pages have a unique security origin. html2canvas can trigger
+                // "Unsafe attempt to load URL file://" in Chrome, so PPTX export skips
+                // screenshot backgrounds when opened offline and uses theme colors instead.
+                if (window.location.protocol !== 'file:' && window.html2canvas) {
+                    const app = document.getElementById('app');
+                    const nav = document.querySelector('nav');
+                    const wm = document.getElementById('watermark');
+                    const modal = document.getElementById('edit-modal');
+                    if (app) app.style.visibility = 'hidden';
+                    if (nav) nav.style.visibility = 'hidden';
+                    if (wm) wm.style.visibility = 'hidden';
+                    if (modal) modal.style.visibility = 'hidden';
+                    try {
+                        const canvas = await html2canvas(document.body, {
+                            scale: 1,
+                            windowWidth: 1920,
+                            windowHeight: 1080,
+                            backgroundColor: null,
+                            useCORS: true
+                        });
+                        data.bgSnapshot = canvas.toDataURL('image/jpeg', 0.8);
+                    } finally {
+                        if (app) app.style.visibility = '';
+                        if (nav) nav.style.visibility = '';
+                        if (wm) wm.style.visibility = '';
+                        if (modal) modal.style.visibility = '';
+                    }
+                } else {
+                    delete data.bgSnapshot;
+                }
+
+                Exporter.generatePPT(data);
+            } catch (e) {
+                console.error(e);
+                alert('Export PPTX failed. Please save your profile and try again.');
+            } finally {
+                btn.innerHTML = originalHtml;
+                createPortfolioIcons();
+            }
+        }
+
+        /* v43: robust cursor-local seamless 3x3 tilt grid
+           - No static center tile
+           - Shows only after pointer/mouse movement in Portfolio mode
+           - 9 cells follow the pointer; cell #5 is the cursor anchor
+           - Neighbor cells tilt toward the pointer
+        */
+        function ensureCursorLocalGrid() {
+            document.querySelectorAll('#mouse-grid-field, #cursor-local-grid').forEach((node, idx) => {
+                if (node.id === 'mouse-grid-field' || idx > 0) node.remove();
+            });
+            let grid = document.getElementById('cursor-local-grid');
+            if (!grid) {
+                grid = document.createElement('div');
+                grid.id = 'cursor-local-grid';
+                grid.setAttribute('aria-hidden', 'true');
+                grid.innerHTML = Array.from({ length: 9 }, (_, i) => `<span class="cursor-local-cell" data-cell="${i + 1}"></span>`).join('');
+                document.body.appendChild(grid);
+            }
+            return grid;
+        }
+
+        function initMicroInteractions() {
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const nonHoverDevice = window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse), (max-width: 767px)').matches;
+            const grid = ensureCursorLocalGrid();
+            const cells = Array.from(grid.querySelectorAll('.cursor-local-cell'));
+
+            if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+            if (window._portfolioMouseMove) window.removeEventListener('mousemove', window._portfolioMouseMove);
+            if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioDocLeave) document.removeEventListener('mouseleave', window._portfolioDocLeave);
+
+            if (reduceMotion || nonHoverDevice || cells.length !== 9) {
+                grid.classList.remove('is-active');
+                return;
+            }
+
+            let raf = 0;
+            let targetX = 0, targetY = 0;
+            let currentX = 0, currentY = 0;
+            let hasPointer = false;
+            const map = [
+                [-1, -1], [0, -1], [1, -1],
+                [-1,  0], [0,  0], [1,  0],
+                [-1,  1], [0,  1], [1,  1]
+            ];
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const lerp = (a, b, t) => a + (b - a) * t;
+
+            const hide = () => {
+                hasPointer = false;
+                grid.classList.remove('is-active');
+                if (raf) cancelAnimationFrame(raf);
+                raf = 0;
+            };
+
+            const draw = () => {
+                raf = 0;
+                if (!document.body.classList.contains('layout-portfolio') || document.body.classList.contains('is-printing')) {
+                    hide();
+                    return;
+                }
+                if (!hasPointer) return;
+
+                currentX = lerp(currentX, targetX, 0.42);
+                currentY = lerp(currentY, targetY, 0.42);
+
+                const cellSize = clamp(Math.min(window.innerWidth, window.innerHeight) * 0.082, 54, 92);
+                grid.style.setProperty('--cursor-grid-size', `${cellSize}px`);
+
+                cells.forEach((cell, i) => {
+                    const [gx, gy] = map[i];
+                    const isCenter = i === 4;
+                    const x = currentX + gx * cellSize;
+                    const y = currentY + gy * cellSize;
+                    const dx = currentX - x;
+                    const dy = currentY - y;
+                    const dist = Math.max(1, Math.hypot(dx, dy));
+                    const pullX = dx / dist;
+                    const pullY = dy / dist;
+                    const diagonal = Math.abs(gx) + Math.abs(gy) === 2;
+                    const strength = isCenter ? 0 : diagonal ? 12 : 9.25;
+
+                    cell.style.setProperty('--cell-left', `${x}px`);
+                    cell.style.setProperty('--cell-top', `${y}px`);
+                    cell.style.setProperty('--rx', `${(-pullY * strength).toFixed(2)}deg`);
+                    cell.style.setProperty('--ry', `${(pullX * strength).toFixed(2)}deg`);
+                    cell.style.setProperty('--tz', `${isCenter ? 0 : 14}px`);
+                    cell.style.setProperty('--cell-opacity', `${isCenter ? 0.20 : 0.50}`);
+                    cell.classList.toggle('is-center', isCenter);
+                });
+
+                grid.classList.add('is-active');
+                if (Math.abs(currentX - targetX) > 0.35 || Math.abs(currentY - targetY) > 0.35) {
+                    raf = requestAnimationFrame(draw);
+                }
+            };
+
+            const move = (ev) => {
+                if (!ev || typeof ev.clientX !== 'number') return;
+                if (!document.body.classList.contains('layout-portfolio')) {
+                    hide();
+                    return;
+                }
+                const modal = document.getElementById('edit-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    hide();
+                    return;
+                }
+                targetX = ev.clientX;
+                targetY = ev.clientY;
+                if (!hasPointer) {
+                    currentX = targetX;
+                    currentY = targetY;
+                    hasPointer = true;
+                }
+                if (!raf) raf = requestAnimationFrame(draw);
+            };
+
+            window._portfolioPointerMove = move;
+            window._portfolioMouseMove = move;
+            window._portfolioPointerLeave = hide;
+            window._portfolioDocLeave = hide;
+            window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+            window.addEventListener('mousemove', window._portfolioMouseMove, { passive: true });
+            window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+            document.addEventListener('mouseleave', window._portfolioDocLeave, { passive: true });
+        }
+
+        let hasBootedPortfolioApp = false;
+        function initializePortfolioApp() {
+            if (hasBootedPortfolioApp) return;
+            hasBootedPortfolioApp = true;
+            const savedData = StorageHandler.load();
+            if (document.getElementById('in-portfolio-style')) document.getElementById('in-portfolio-style').value = savedData.portfolioStyle || 'tech';
+            ['name-th', 'name-en', 'role-th', 'role-en', 'bio-th', 'bio-en', 'skills-th', 'skills-en'].forEach(id => { const valKey = id.replace('-', '_'); if (document.getElementById(`in-${id}`)) document.getElementById(`in-${id}`).value = savedData[valKey] || ''; });
+            document.getElementById('in-email').value = savedData.email || '';
+            document.getElementById('in-phone').value = savedData.phone || '';
+            document.getElementById('in-linkedin').value = savedData.linkedin || '';
+            ['education-th','education-en','certifications-th','certifications-en','awards-th','awards-en','caseStudies-th','caseStudies-en','services-th','services-en','testimonials-th','testimonials-en','clients-th','clients-en','cta-th','cta-en','articles-th','articles-en'].forEach(id => {
+                const key = id.replace('-', '_');
+                const el = document.getElementById(`in-${id}`);
+                if (el) el.value = savedData[key] || '';
+            });
+            if (savedData.avatar) { currentAvatarBase64 = savedData.avatar; document.getElementById('avatar-preview').src = currentAvatarBase64; document.getElementById('avatar-preview').classList.remove('hidden'); }
+            render(savedData);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializePortfolioApp, { once: true });
+        } else {
+            initializePortfolioApp();
+        }
+        window.addEventListener('load', initializePortfolioApp, { once: true });
+    </script>
+
+    <script>
+        /* v43: robust mobile/tablet scrollytelling fallback.
+           The Experience section must stay vertical-scroll driven on touch devices. */
+        (function () {
+            const rafThrottle = (fn) => {
+                let ticking = false;
+                return function throttled() {
+                    if (ticking) return;
+                    ticking = true;
+                    requestAnimationFrame(() => {
+                        ticking = false;
+                        fn();
+                    });
+                };
+            };
+
+            window.initScrollEffects = initScrollEffects = function initScrollEffectsV43() {
+                if (window._revealObserver && typeof window._revealObserver.disconnect === 'function') {
+                    window._revealObserver.disconnect();
+                }
+                window._revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('show');
+                    });
+                }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+                document.querySelectorAll('.scroll-reveal').forEach(el => window._revealObserver.observe(el));
+
+                if (window._scrollHandler) window.removeEventListener('scroll', window._scrollHandler);
+                if (window._scrollResizeHandler) window.removeEventListener('resize', window._scrollResizeHandler);
+                if (window._orientationScrollHandler) window.removeEventListener('orientationchange', window._orientationScrollHandler);
+                if (window.visualViewport && window._vvScrollHandler) {
+                    window.visualViewport.removeEventListener('resize', window._vvScrollHandler);
+                    window.visualViewport.removeEventListener('scroll', window._vvScrollHandler);
+                }
+
+                const wrappers = Array.from(document.querySelectorAll('body.layout-portfolio .experience-section .scrollytelling-wrapper'));
+                const progressBar = document.getElementById('scroll-progress');
+                const heroFrame = document.querySelector('.hero-frame');
+
+                const invalidateMeasurements = () => {
+                    wrappers.forEach(wrapper => {
+                        const track = wrapper.querySelector('.scrollytelling-track');
+                        if (track) track.removeAttribute('data-max-translate');
+                    });
+                };
+
+                const measureTranslate = (wrapper, track, imageWrapper) => {
+                    let cached = parseFloat(track.getAttribute('data-max-translate'));
+                    if (Number.isFinite(cached) && cached >= 0) return cached;
+
+                    const wasCollapsed = imageWrapper && imageWrapper.classList.contains('cinematic-collapsed');
+                    if (imageWrapper && wasCollapsed) {
+                        imageWrapper.classList.remove('cinematic-collapsed');
+                        imageWrapper.classList.add('cinematic-expanded');
+                    }
+
+                    // Use viewport width as fallback because collapsed parents can report 0px on some mobile browsers.
+                    const parentWidth = Math.max(
+                        1,
+                        track.parentElement ? track.parentElement.clientWidth : 0,
+                        wrapper.clientWidth || 0,
+                        window.innerWidth || 0
+                    );
+                    const maxTranslate = Math.max(0, Math.ceil(track.scrollWidth - parentWidth));
+                    track.setAttribute('data-max-translate', String(maxTranslate));
+
+                    if (imageWrapper && wasCollapsed) {
+                        imageWrapper.classList.add('cinematic-collapsed');
+                        imageWrapper.classList.remove('cinematic-expanded');
+                    }
+                    return maxTranslate;
+                };
+
+                const update = () => {
+                    const doc = document.documentElement;
+                    const viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight || 1;
+                    const maxDoc = Math.max(1, doc.scrollHeight - viewportHeight);
+                    const pageProgress = Math.min(1, Math.max(0, window.scrollY / maxDoc));
+
+                    if (progressBar) progressBar.style.width = `${pageProgress * 100}%`;
+                    if (heroFrame) {
+                        heroFrame.style.setProperty('--profile-scroll-angle', `${Math.round(pageProgress * 720)}deg`);
+                        heroFrame.style.setProperty('--profile-scroll-glow', `${0.45 + pageProgress * 0.45}`);
+                    }
+
+                    wrappers.forEach(wrapper => {
+                        const track = wrapper.querySelector('.scrollytelling-track');
+                        const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
+                        const stickyBox = wrapper.querySelector('.sticky');
+                        if (!track || !stickyBox) return;
+
+                        const rect = wrapper.getBoundingClientRect();
+                        const stickyStyle = window.getComputedStyle(stickyBox);
+                        const stickyTop = Number.parseFloat(stickyStyle.top) || Math.min(96, viewportHeight * 0.12);
+                        const stickyHeight = Math.max(1, stickyBox.offsetHeight || stickyBox.getBoundingClientRect().height || 1);
+                        const activeDistance = Math.max(1, rect.height - stickyHeight);
+
+                        let progress = (stickyTop - rect.top) / activeDistance;
+                        progress = Math.max(0, Math.min(1, progress));
+
+                        const isInViewport = rect.bottom > stickyTop && rect.top < viewportHeight;
+                        const isActive = isInViewport && progress > 0.015 && progress < 0.985;
+
+                        if (imageWrapper) {
+                            imageWrapper.classList.toggle('cinematic-expanded', isActive);
+                            imageWrapper.classList.toggle('cinematic-collapsed', !isActive);
+                        }
+
+                        const maxTranslate = measureTranslate(wrapper, track, imageWrapper);
+                        const startMove = 0.045;
+                        const endMove = 0.90;
+                        let moveProgress = 0;
+                        if (progress > startMove && progress < endMove) {
+                            moveProgress = (progress - startMove) / (endMove - startMove);
+                        } else if (progress >= endMove) {
+                            moveProgress = 1;
+                        }
+                        const currentTranslate = Math.max(0, Math.min(maxTranslate, moveProgress * maxTranslate));
+                        track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`;
+                    });
+                };
+
+                const throttledUpdate = rafThrottle(update);
+                window._scrollHandler = throttledUpdate;
+                window._scrollResizeHandler = () => { invalidateMeasurements(); throttledUpdate(); setTimeout(throttledUpdate, 160); };
+                window._orientationScrollHandler = () => { invalidateMeasurements(); setTimeout(throttledUpdate, 240); setTimeout(throttledUpdate, 620); };
+                window._vvScrollHandler = window._scrollResizeHandler;
+
+                window.addEventListener('scroll', window._scrollHandler, { passive: true });
+                window.addEventListener('resize', window._scrollResizeHandler, { passive: true });
+                window.addEventListener('orientationchange', window._orientationScrollHandler, { passive: true });
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener('resize', window._vvScrollHandler, { passive: true });
+                    window.visualViewport.addEventListener('scroll', window._vvScrollHandler, { passive: true });
+                }
+
+                wrappers.forEach(wrapper => {
+                    wrapper.querySelectorAll('img').forEach(img => {
+                        if (!img.complete) {
+                            img.addEventListener('load', () => { invalidateMeasurements(); throttledUpdate(); }, { once: true });
+                            img.addEventListener('error', () => { invalidateMeasurements(); throttledUpdate(); }, { once: true });
+                        }
+                    });
+                });
+
+                invalidateMeasurements();
+                throttledUpdate();
+                setTimeout(throttledUpdate, 80);
+                setTimeout(() => { invalidateMeasurements(); throttledUpdate(); }, 320);
+            };
+        })();
+    </script>
+</body>
+
+</html>
