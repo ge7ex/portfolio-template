@@ -1,29 +1,36 @@
-# AI-Portfolio-Toolkit v35
+# AI Portfolio Toolkit v49
 
-## Changes in v35
+## What changed in v49
 
-- Updated Canva AI prompts in both Thai and English.
-- Canva prompt now keeps interactive website controls:
-  - Theme selector
-  - Dark/Light mode selector
-  - Layout/Mode selector
-  - Language switcher
-- Canva prompt removes only Print / Export / Download controls from the generated Canva website.
-- Added stronger Canva editability instructions:
-  - Text must remain editable Canva text boxes.
-  - Do not flatten or rasterize typography.
-  - Keep sections and cards modular and editable.
-- Preserved the portfolio micro-interaction: pointer-driven 3D tilt grid on desktop.
-- Mobile keeps lightweight behavior and hides heavy grid effects for performance.
+- Reworked the Portfolio micro interaction into an anchored background hinge grid.
+- The grid is fixed to the page/background grid, not a cursor-tail object.
+- Only 3x3 cells around the cursor's current background grid cell are visible.
+- Cell 5 is the center/current cursor grid cell.
+- Fixed the hinge direction so surrounding cells face the cursor instead of folding away from it. Cell 4 folds right toward the cursor; cell 6 folds left toward the cursor; top/bottom cells hinge vertically toward the cursor.
+- Mobile/tablet still keeps the existing vertical scrollytelling behavior and disables the desktop grid for performance.
+- Resume/print mode keeps the grid disabled.
+- Project version updated to v49.
 
-## Canva AI Pack
+## Folder structure
 
-Use the Canva AI Pack button in the app to download a single ZIP package containing:
+```text
+AI-Portfolio-Toolkit/
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   ├── storage.js
+│   └── exporter.js
+└── README.md
+```
 
-- canva_prompt_en.txt
-- canva_prompt_th.txt
-- canva_instruction_en.txt
-- canva_instruction_th.txt
-- portfolio_data_snapshot.json
+## Notes
 
-The JSON file stores the portfolio data at download time. Project images are included as Base64 strings inside `data.exp[].images` when images exist, but Canva AI may not automatically import them as editable assets. Upload important images into Canva manually when needed.
+Open `index.html` directly or deploy the whole folder. After updating a live deployment, clear browser cache/hard refresh before testing the grid interaction.
+
+
+## v49 hotfix
+- Refined anchored background grid from simple hinge tilt to progressive folding.
+- Center panel now leans gradually toward the cursor.
+- Direction panel folds closed as the pointer approaches the next cell.
+- Grid remains anchored to the page background and does not behave like a cursor tail.

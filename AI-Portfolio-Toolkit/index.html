@@ -687,22 +687,127 @@
             return labels.map(([key, label]) => `${label}: ${pickLang(data, key, lang) || '-'}`).join('\n');
         }
 
-        function buildCanvaPrompt(data = StorageHandler.load(), lang = 'en') {
+        
+        function getCanvaExportMode(data = StorageHandler.load()) {
+            return (data && data.layout === 'resume') ? 'resume' : 'portfolio';
+        }
+
+        function getCanvaModeLabel(mode = 'portfolio', lang = 'en') {
+            if (lang === 'th') return mode === 'resume' ? 'Resume / A4 CV' : 'Portfolio / Scrollytelling Website';
+            return mode === 'resume' ? 'Resume / A4 CV' : 'Portfolio / Scrollytelling Website';
+        }
+
+        function buildCanvaPrompt(data = StorageHandler.load(), lang = 'en', requestedMode = getCanvaExportMode(data)) {
             const isTh = lang === 'th';
+            const exportMode = requestedMode === 'resume' ? 'resume' : 'portfolio';
             const name = pickLang(data, 'name', lang) || (isTh ? 'เจ้าของพอร์ตโฟลิโอ' : 'Portfolio Owner');
             const role = pickLang(data, 'role', lang) || (isTh ? 'ผู้เชี่ยวชาญ' : 'Professional');
             const bio = pickLang(data, 'bio', lang);
             const skills = pickLang(data, 'skills', lang);
             const style = safeCanvaText(data.portfolioStyle || 'tech');
             const mode = safeCanvaText(data.colorMode || 'dark');
+            const resumeVis = { ...DEFAULT_RESUME_VISIBILITY, ...(data.resumeVisibility || {}) };
+            const visibleResumeComponents = Object.entries(resumeVis)
+                .filter(([, enabled]) => !!enabled)
+                .map(([key]) => key)
+                .join(', ') || 'profile, contact, skills, summary, experience';
             const contact = [
                 data.email ? `Email: ${safeCanvaText(data.email)}` : '',
                 data.phone ? `Phone: ${safeCanvaText(data.phone)}` : '',
                 data.linkedin ? `LinkedIn: ${safeCanvaText(data.linkedin)}` : ''
             ].filter(Boolean).join(' | ');
 
+            if (exportMode === 'resume') {
+                if (isTh) {
+                    return `สร้างดีไซน์ Resume / CV ขนาด A4 ใน Canva AI โดยอ้างอิงข้อมูลจาก Portfolio Mode ด้านล่างให้ครบถ้วน
+
+โหมดที่ผู้ใช้กดดาวน์โหลด: Resume / A4 CV
+
+เป้าหมายงานออกแบบ:
+- สร้างเป็น Resume / CV ขนาด A4 แนวตั้ง ไม่ใช่เว็บไซต์ scrollytelling และไม่ใช่โปสเตอร์ภาพนิ่ง
+- ให้เป็นเอกสารที่พร้อมพิมพ์ PDF บนกระดาษ A4 โดยใช้พื้นที่เต็มหน้าอย่างเหมาะสม
+- เว้น safe margin สำหรับการพิมพ์เอกสารราชการไทย อ่านง่าย ไม่ชิดขอบเกินไป
+- ใช้ข้อมูลจาก Portfolio เป็นหลัก แต่จัดใหม่ในรูปแบบ resume ที่กระชับ เป็นทางการ และมืออาชีพ
+- ห้ามใส่ปุ่ม Print, Export, Download, Theme selector, Dark/Light selector, Layout selector หรือปุ่มเปลี่ยนภาษาในตัว Resume A4
+- ห้ามเพิ่มข้อมูลที่ไม่มีอยู่จริง ถ้าข้อมูลบางส่วนไม่มี ให้เว้นส่วนหรือจัด layout ให้สวยโดยไม่แต่งเรื่องเพิ่ม
+
+สัดส่วน layout ที่ต้องการ:
+- ใช้ A4 portrait เต็มหน้า
+- แนะนำ 2 คอลัมน์แบบ resume: คอลัมน์ซ้ายสำหรับ Profile image, Name, Role, Contact, Skills และคอลัมน์ขวาสำหรับ Professional Summary, Experience/Projects, Education และส่วนเสริมที่เปิดไว้
+- ตำแหน่ง component ให้คงที่และสวยงาม ไม่ต้องทำให้ผู้ใช้ลากย้ายตำแหน่งเอง
+- Component ที่ควรแสดงตามค่าปัจจุบัน: ${visibleResumeComponents}
+- ให้คง hierarchy ชัดเจน มี section divider, timeline หรือ progress indicator ได้ตามความเหมาะสม
+
+Theme to adapt:
+${getThemeDescription(style, mode, 'th')}
+
+Profile data:
+ชื่อ: ${name}
+บทบาท/ตำแหน่ง: ${role}
+สรุปประวัติ: ${bio || 'สรุปประวัติจากข้อมูลที่มีให้กระชับและเป็นมืออาชีพ'}
+ทักษะ: ${skills || '-'}
+ติดต่อ: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'th')}
+
+Optional sections:
+${buildOptionalLines(data, 'th')}
+
+ข้อกำหนดเรื่องการแก้ไขใน Canva:
+- ข้อความทั้งหมดต้องเป็น editable Canva text boxes ไม่ใช่ภาพนิ่ง
+- ห้าม flatten, rasterize หรือ merge ข้อความเข้ากับภาพ
+- ชื่อ ตำแหน่ง ประวัติ ข้อมูลติดต่อ ทักษะ หัวข้อ section และข้อความทุกส่วนต้องแก้ไขได้ทีละส่วนใน Canva
+- ให้สร้างเป็นเลเยอร์/กลุ่มที่จัดระเบียบดี สามารถแก้ไข text และ section ได้ ไม่ใช่ภาพเดียวทั้งหน้า
+- หากมีรูปโปรไฟล์ ให้ใช้เป็น image placeholder ที่เปลี่ยนรูปได้ ไม่ฝังรวมกับพื้นหลัง`;
+                }
+
+                return `Create an editable A4 Resume / CV design in Canva AI using the current Portfolio Mode data below.
+
+Downloaded mode: Resume / A4 CV
+
+Design goal:
+- Build a portrait A4 resume/CV document, not a scrollytelling website and not a static poster.
+- Use the full A4 page area with print-safe spacing suitable for Thai official document printing.
+- Base the content on the portfolio data, but restructure it into a concise, formal, professional resume.
+- Do NOT include Print, Export, Download, Theme selector, Dark/Light selector, Layout selector, or Language switcher inside the A4 resume design.
+- Do not invent achievements, clients, certifications, references, or metrics that are not present in the data.
+
+Layout direction:
+- Use a full A4 portrait layout.
+- Prefer a clean two-column resume system: left column for profile image, name, role, contact, and skills; right column for professional summary, experience/projects, education, and enabled optional sections.
+- Component positions should remain fixed and visually balanced. Do not design it as a drag-and-drop builder.
+- Current visible resume components: ${visibleResumeComponents}
+- Use clear section dividers, timeline accents, or skill indicators when appropriate.
+
+Theme to adapt:
+${getThemeDescription(style, mode, 'en')}
+
+Profile data:
+Name: ${name}
+Role: ${role}
+Professional summary: ${bio || 'Create a concise professional summary from the available profile data.'}
+Skills: ${skills || '-'}
+Contact: ${contact || '-'}
+
+Experience / Projects:
+${buildExperienceLines(data, 'en')}
+
+Optional sections:
+${buildOptionalLines(data, 'en')}
+
+Editability requirements for Canva:
+- All text must remain as editable Canva text boxes, not flattened images.
+- Do not flatten, rasterize, or merge text into graphics.
+- Name, role, summary, contact info, skills, section headings, and all body text must be individually editable in Canva.
+- Keep layers/groups organized so the resume can be edited section by section, not as one static full-page image.
+- If a profile photo is used, keep it as a replaceable image placeholder, not merged into the background.`;
+            }
+
             if (isTh) {
                 return `สร้างเว็บไซต์พอร์ตโฟลิโอแบบ scrollytelling ใน Canva AI โดยอ้างอิงข้อมูลและธีมต่อไปนี้ให้ครบถ้วน
+
+โหมดที่ผู้ใช้กดดาวน์โหลด: Portfolio / Scrollytelling Website
 
 เป้าหมายงานออกแบบ:
 - สร้างเป็นหน้าเว็บพอร์ตโฟลิโอ ไม่ใช่เรซูเม่ธรรมดา และไม่ใช่ไฟล์สำหรับพิมพ์
@@ -747,11 +852,13 @@ ${buildOptionalLines(data, 'th')}
 
             return `Create a Canva AI website portfolio that duplicates the current portfolio theme, visual direction, and visible content as completely as possible.
 
+Downloaded mode: Portfolio / Scrollytelling Website
+
 Design goal:
 - Build a public-facing portfolio website, not a printable document and not a generic resume.
 - The hero section MUST keep interactive website controls such as the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher.
 - Do NOT include Print, Export, Download, or file-download controls in the hero section or in the Canva-generated website.
-- Keep it as a smooth vertical scrolling website.
+- Create a smooth vertical scrolling website.
 - Use a scrollytelling feeling: as visitors scroll, content and project visuals should be revealed in a cinematic sequence. Experience/project sections should feel like story cards with image galleries, timelines, and strong visual rhythm.
 - If Canva AI cannot create real scroll animation, simulate the scrollytelling experience with a long-form landing page, clearly staged sections, timeline blocks, image galleries, and cinematic spacing.
 - Duplicate the original theme mood, color system, spacing, and portfolio identity as closely as Canva allows.
@@ -788,18 +895,47 @@ Editability requirements for Canva:
 - Keep the layout modular with editable sections/cards rather than one static poster image.`;
         }
 
-        function buildCanvaInstruction(lang = 'en') {
+
+                function buildCanvaInstruction(lang = 'en', requestedMode = getCanvaExportMode(StorageHandler.load())) {
+            const exportMode = requestedMode === 'resume' ? 'resume' : 'portfolio';
             if (lang === 'th') {
-                return `วิธีนำไฟล์ไปใช้กับ Canva AI / Magic Design
+                if (exportMode === 'resume') {
+                    return `วิธีนำไฟล์ Resume Prompt ไปใช้กับ Canva AI / Magic Design
+
+โหมดไฟล์ชุดนี้: Resume / A4 CV
+
+ขั้นตอนสำคัญมาก:
+1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
+2. หากมีตัวเลือก ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Design from prompt, Document design หรือ AI ที่สร้าง A4 document ได้
+3. เปิดไฟล์ canva_prompt_resume_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางใน Canva AI
+4. ย้ำว่าให้ Canva สร้างเป็น A4 Resume / CV แบบ editable ไม่ใช่เว็บไซต์ ไม่ใช่ poster และไม่ใช่ภาพนิ่งเต็มหน้า
+5. หลังสร้างแล้ว ตรวจสอบว่า text ทุกจุดแก้ไขได้จริง เช่น ชื่อ ตำแหน่ง ประวัติ ประสบการณ์ ทักษะ และข้อมูลติดต่อ
+6. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษ แล้วเติมเฉพาะข้อมูลที่จำเป็นจาก portfolio_data_snapshot.json
+7. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_resume_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน
+8. ตรวจสอบ safe margin ก่อน export PDF เพื่อพิมพ์ A4
+
+ไฟล์ข้อมูล:
+- portfolio_data_snapshot.json คือข้อมูลทั้งหมด ณ เวลาที่กดดาวน์โหลด ใช้สำรองข้อมูลและคัดลอกข้อมูลเพิ่มเข้า Canva ได้
+- ไฟล์ .json สามารถเปิดด้วย Notepad ได้ โดยคลิกขวา > Open with > Notepad หรือเปิดด้วย VS Code / browser ก็ได้
+- ถ้าเห็นตัวอักษรติดกันเยอะ ให้ใช้ Notepad แบบ Word Wrap หรือเปิดผ่าน VS Code จะอ่านง่ายกว่า
+
+หมายเหตุ:
+- ชุดไฟล์นี้ไม่ใช้ Canva API และไม่ใช้ Canva SDK จึงไม่มีค่า API
+- โหมด Resume จะไม่ใส่ Theme selector, Mode selector, Language switcher, Print หรือ Export controls ลงในเอกสาร A4
+- ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
+                }
+                return `วิธีนำไฟล์ Portfolio Prompt ไปใช้กับ Canva AI / Magic Design
+
+โหมดไฟล์ชุดนี้: Portfolio / Scrollytelling Website
 
 ขั้นตอนสำคัญมาก:
 1. เปิด Canva แล้วไปที่ Canva AI / Magic Studio / Magic Design ตามหน้าที่บัญชีของคุณมีให้ใช้งาน
 2. ให้เลือกฟังก์ชันที่เกี่ยวกับ Code, Website Code, Code for website, หรือช่องสร้างเว็บด้วย AI ที่รองรับการสร้างหน้าเว็บจากคำสั่ง
 3. ห้ามเริ่มจาก template presentation / poster / document ทั่วไปก่อน เพราะ Canva มักจะไม่ทำ layout ให้เหมือนเว็บ scrollytelling
-4. เปิดไฟล์ canva_prompt_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
+4. เปิดไฟล์ canva_prompt_portfolio_en.txt เป็นหลัก แล้วคัดลอกข้อความทั้งหมดไปวางในฟังก์ชัน Code/Website AI ของ Canva
 5. ตรวจสอบว่า prompt ระบุให้คง Theme selector, Dark/Light mode selector, Layout/Mode selector และปุ่มเปลี่ยนภาษาไว้ แต่ไม่ใส่ Print/Export/Download
-6. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน เพราะ Canva เข้าใจ prompt ภาษาอังกฤษได้แม่นกว่า
-7. หาก Canva จำกัดความยาว prompt ให้เริ่มจาก canva_prompt_en.txt แล้วเติมข้อมูลสำคัญจาก portfolio_data_snapshot.json เฉพาะส่วนที่จำเป็น
+6. หากต้องการอ่านคำสั่งภาษาไทย ให้เปิด canva_prompt_portfolio_th.txt เพื่อทำความเข้าใจ แต่ตอนสั่ง Canva ควรใช้ไฟล์ภาษาอังกฤษก่อน เพราะ Canva เข้าใจ prompt ภาษาอังกฤษได้แม่นกว่า
+7. หาก Canva จำกัดความยาว prompt ให้เริ่มจากไฟล์ภาษาอังกฤษ แล้วเติมข้อมูลสำคัญจาก portfolio_data_snapshot.json เฉพาะส่วนที่จำเป็น
 8. หลัง Canva สร้างดีไซน์แล้ว ให้ตรวจสอบชื่อ ตำแหน่ง ประสบการณ์ รูปภาพ และข้อมูลติดต่ออีกครั้งก่อนเผยแพร่
 
 ไฟล์ข้อมูล:
@@ -812,16 +948,43 @@ Editability requirements for Canva:
 - Canva AI อาจไม่รองรับ animation แบบ scrollytelling เต็มรูปแบบ ให้ใช้ prompt เพื่อให้ Canva สร้าง layout ที่จำลองประสบการณ์การเลื่อนหน้าเว็บแทน
 - ห้ามวางข้อมูลส่วนบุคคลที่ไม่ต้องการเผยแพร่ลงใน Canva ก่อนตรวจสอบ privacy ของบัญชีและทีม`;
             }
-            return `How to use these files with Canva AI / Magic Design
+            if (exportMode === 'resume') {
+                return `How to use this Resume Prompt package with Canva AI / Magic Design
+
+Package mode: Resume / A4 CV
+
+Very important steps:
+1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
+2. If available, choose a function related to Code, Design from prompt, Document design, or an AI tool that can create an A4 document.
+3. Open canva_prompt_resume_en.txt and paste the full prompt into Canva AI.
+4. Make sure Canva generates an editable A4 Resume / CV, not a website, not a poster, and not one flattened full-page image.
+5. After generation, verify that every text area is editable: name, role, summary, experience, skills, and contact details.
+6. If Canva limits prompt length, start with the English prompt, then add only important missing details from portfolio_data_snapshot.json.
+7. canva_prompt_resume_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
+8. Check print-safe margins before exporting the resume as PDF.
+
+Data files:
+- portfolio_data_snapshot.json is the complete data snapshot from the moment you downloaded this package. Use it as backup data or as a source to copy more details into Canva.
+- .json files can be opened with Notepad: right click > Open with > Notepad. You can also open them with VS Code or a browser.
+- If the JSON appears as a long block of text, enable Word Wrap in Notepad or open it in VS Code for easier reading.
+
+Notes:
+- This package does not use Canva API or Canva SDK, so there is no API cost.
+- Resume mode does not include Theme selector, Mode selector, Language switcher, Print, or Export controls inside the A4 document.
+- Review privacy and team sharing settings before pasting sensitive personal data into Canva.`;
+            }
+            return `How to use this Portfolio Prompt package with Canva AI / Magic Design
+
+Package mode: Portfolio / Scrollytelling Website
 
 Very important steps:
 1. Open Canva and go to Canva AI / Magic Studio / Magic Design, depending on what your account provides.
 2. Choose the Code, Website Code, Code for website, or AI website creation function that can generate a web page from a prompt.
 3. Do not start from a normal presentation / poster / document template, because Canva will usually not recreate the scrollytelling website layout correctly.
-4. Open canva_prompt_en.txt and paste the full prompt into Canva's Code/Website AI function.
+4. Open canva_prompt_portfolio_en.txt and paste the full prompt into Canva's Code/Website AI function.
 5. Confirm that the prompt keeps the Theme selector, Dark/Light mode selector, Layout/Mode selector, and Language switcher, but removes Print/Export/Download controls.
-6. canva_prompt_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
-7. If Canva limits prompt length, start with canva_prompt_en.txt, then add only the most important missing details from portfolio_data_snapshot.json.
+6. canva_prompt_portfolio_th.txt is included for Thai-language understanding, but the English prompt should be used first because Canva follows English prompts more accurately.
+7. If Canva limits prompt length, start with the English prompt, then add only the most important missing details from portfolio_data_snapshot.json.
 8. After Canva generates the design, carefully review the name, role, experience, images, and contact information before publishing.
 
 Data files:
@@ -835,19 +998,21 @@ Notes:
 - Review privacy and team sharing settings before pasting sensitive personal data into Canva.`;
         }
 
-        function buildCanvaDataSnapshot(data = StorageHandler.load()) {
+
+        function buildCanvaDataSnapshot(data = StorageHandler.load(), requestedMode = getCanvaExportMode(data)) {
             const clean = JSON.parse(JSON.stringify(data || {}));
             delete clean._isFirstRunDemo;
             delete clean._hasStoredCache;
             return {
                 exported_at: new Date().toISOString(),
-                export_type: 'canva_ai_prompt_package_no_api_no_sdk',
+                export_type: `canva_ai_${requestedMode === 'resume' ? 'resume_a4' : 'portfolio_website'}_prompt_package_no_api_no_sdk`,
+                prompt_mode: requestedMode,
                 app_note: 'Snapshot of portfolio data at download time. This file is generated locally in the browser.',
                 canva_package_files: [
-                    'canva_prompt_en.txt',
-                    'canva_prompt_th.txt',
-                    'canva_instruction_en.txt',
-                    'canva_instruction_th.txt',
+                    `canva_prompt_${requestedMode}_en.txt`,
+                    `canva_prompt_${requestedMode}_th.txt`,
+                    `canva_instruction_${requestedMode}_en.txt`,
+                    `canva_instruction_${requestedMode}_th.txt`,
                     'portfolio_data_snapshot.json'
                 ],
                 data: clean
@@ -870,13 +1035,14 @@ Notes:
         async function downloadCanvaPackage() {
             const data = StorageHandler.load();
             const stamp = getCanvaTimestamp();
-            const folderName = `canva-ai-pack-${stamp}`;
+            const exportMode = getCanvaExportMode(data);
+            const folderName = `canva-ai-pack-${exportMode}-${stamp}`;
             const files = {
-                'canva_prompt_en.txt': buildCanvaPrompt(data, 'en'),
-                'canva_prompt_th.txt': buildCanvaPrompt(data, 'th'),
-                'canva_instruction_en.txt': buildCanvaInstruction('en'),
-                'canva_instruction_th.txt': buildCanvaInstruction('th'),
-                'portfolio_data_snapshot.json': JSON.stringify(buildCanvaDataSnapshot(data), null, 2)
+                [`canva_prompt_${exportMode}_en.txt`]: buildCanvaPrompt(data, 'en', exportMode),
+                [`canva_prompt_${exportMode}_th.txt`]: buildCanvaPrompt(data, 'th', exportMode),
+                [`canva_instruction_${exportMode}_en.txt`]: buildCanvaInstruction('en', exportMode),
+                [`canva_instruction_${exportMode}_th.txt`]: buildCanvaInstruction('th', exportMode),
+                'portfolio_data_snapshot.json': JSON.stringify(buildCanvaDataSnapshot(data, exportMode), null, 2)
             };
 
             if (!window.JSZip) {
@@ -900,14 +1066,16 @@ Notes:
             a.click();
             a.remove();
             setTimeout(() => URL.revokeObjectURL(url), 1500);
-            showCanvaToast('Canva AI Pack ZIP downloaded');
+            showCanvaToast(`${getCanvaModeLabel(exportMode, 'en')} Canva Pack ZIP downloaded`);
         }
 
         async function copyCanvaPrompt(lang = 'en') {
-            const prompt = buildCanvaPrompt(StorageHandler.load(), lang === 'th' ? 'th' : 'en');
+            const data = StorageHandler.load();
+            const exportMode = getCanvaExportMode(data);
+            const prompt = buildCanvaPrompt(data, lang === 'th' ? 'th' : 'en', exportMode);
             try {
                 await navigator.clipboard.writeText(prompt);
-                showCanvaToast(lang === 'th' ? 'Thai Canva prompt copied' : 'English Canva prompt copied');
+                showCanvaToast(lang === 'th' ? `Thai ${getCanvaModeLabel(exportMode, 'en')} prompt copied` : `English ${getCanvaModeLabel(exportMode, 'en')} prompt copied`);
             } catch (err) {
                 const textarea = document.createElement('textarea');
                 textarea.value = prompt;
@@ -918,7 +1086,7 @@ Notes:
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                showCanvaToast(lang === 'th' ? 'Thai Canva prompt copied' : 'English Canva prompt copied');
+                showCanvaToast(lang === 'th' ? `Thai ${getCanvaModeLabel(exportMode, 'en')} prompt copied` : `English ${getCanvaModeLabel(exportMode, 'en')} prompt copied`);
             }
         }
 
@@ -1396,7 +1564,7 @@ Notes:
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
             const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
-            const data = { projectVersion: 'v38', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            const data = { projectVersion: 'v49', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
             StorageHandler.save(data); render(data); toggleModal();
         }
 
@@ -1492,16 +1660,13 @@ Notes:
                         case 'esports': decorationsHTML = `<div class="absolute inset-0 opacity-45"><div class="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,transparent_46%,rgba(139,92,246,.16)_48%,rgba(34,211,238,.12)_52%,transparent_56%,transparent_100%)] animate-[esports-sweep_5s_ease-in-out_infinite] will-change-transform"></div><div class="absolute left-[8%] top-[18%] w-[36vw] h-[36vw] bg-[conic-gradient(from_90deg,transparent,rgba(34,211,238,.16),transparent,rgba(139,92,246,.14),transparent)] blur-2xl animate-[esports-spin_14s_linear_infinite] will-change-transform"></div></div>`; break;
                     }
                 }
-                if (layout === 'portfolio') {
-                    const gridCells = Array.from({ length: 9 }, (_, i) => `<span class="mouse-cell" data-cell="${i + 1}"></span>`).join('');
-                    decorationContainer.innerHTML = `${decorationsHTML}<div id="mouse-grid-field" aria-hidden="true">${gridCells}</div>`;
-                    requestAnimationFrame(initMicroInteractions);
-                } else {
-                    decorationContainer.innerHTML = decorationsHTML;
-                }
+                const oldMouseGrid = document.getElementById('mouse-grid-field');
+                if (oldMouseGrid) oldMouseGrid.remove();
+                decorationContainer.innerHTML = decorationsHTML;
+                requestAnimationFrame(initMicroInteractions);
             }
 
-            if (layout === 'resume') { app.className = `container mx-auto py-12 px-10 max-w-4xl shadow-2xl border my-10 min-h-[1000px] rounded-sm fade-in ${colorMode === 'dark' ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200'}`; } else { app.className = "container mx-auto py-24 px-6 fade-in w-full max-w-full"; }
+            if (layout === 'resume') { app.className = `resume-a4-preview fade-in`; } else { app.className = "container mx-auto py-24 px-6 fade-in w-full max-w-full"; }
 
             let appContent = '';
             if (layout === 'resume') {
@@ -1523,7 +1688,7 @@ Notes:
                     resumeVis.testimonials ? TestimonialsComponent.render(localizedData.testimonials, layout, colorMode, pStyle, lang) : ''
                 ].join('');
                 appContent = `
-                    <div class="resume-cv-shell print-layout-wrapper resume-fixed-map">
+                    <div class="resume-cv-shell print-layout-wrapper resume-fixed-map resume-a4-sheet">
                         <aside class="resume-cv-sidebar">${sideProfile}${sideContact}${sideSkills}</aside>
                         <main class="resume-cv-main">
                             <div class="print-order-4 resume-section-card">${mainTop}</div>
@@ -1596,57 +1761,75 @@ Notes:
         }
 
 
-        function initMicroInteractions() {
+                function initMicroInteractions() {
             if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
             const grid = document.getElementById('mouse-grid-field');
             const cells = grid ? Array.from(grid.querySelectorAll('.mouse-cell')) : [];
             if (!grid || cells.length !== 9) return;
 
             if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+            if (window._portfolioMouseMove) window.removeEventListener('mousemove', window._portfolioMouseMove);
             if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioMouseLeave) document.removeEventListener('mouseleave', window._portfolioMouseLeave);
 
             let raf = null;
-            let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+            let tx = window.innerWidth / 2, ty = Math.max(160, window.innerHeight / 2);
             let cx = tx, cy = ty;
-            const layout = [[-1,-1],[0,-1],[1,-1],[-1,0],[0,0],[1,0],[-1,1],[0,1],[1,1]];
+            const layoutCells = [[-1,-1],[0,-1],[1,-1],[-1,0],[0,0],[1,0],[-1,1],[0,1],[1,1]];
             const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
             const lerp = (a,b,t) => a + (b-a)*t;
 
             const update = () => {
                 raf = null;
-                cx = lerp(cx, tx, .18);
-                cy = lerp(cy, ty, .18);
-                const size = clamp(Math.min(window.innerWidth, window.innerHeight) * .105, 72, 128);
+                if (!document.body.classList.contains('layout-portfolio')) {
+                    grid.style.opacity = '0';
+                    return;
+                }
+                cx = lerp(cx, tx, .28);
+                cy = lerp(cy, ty, .28);
+                const size = clamp(Math.min(window.innerWidth, window.innerHeight) * .118, 86, 132);
                 grid.style.setProperty('--grid-x', `${cx}px`);
                 grid.style.setProperty('--grid-y', `${cy}px`);
                 grid.style.setProperty('--grid-size', `${size}px`);
-                grid.style.opacity = document.body.classList.contains('layout-portfolio') ? '1' : '0';
+                grid.style.opacity = '1';
                 cells.forEach((cell, i) => {
-                    const [gx, gy] = layout[i];
+                    const [gx, gy] = layoutCells[i];
                     const isCenter = i === 4;
                     const dist = Math.hypot(gx, gy) || 1;
-                    const rx = isCenter ? 0 : clamp(gy * -7.5 / dist, -8, 8);
-                    const ry = isCenter ? 0 : clamp(gx * 7.5 / dist, -8, 8);
+                    // Cell 5 is the cursor anchor. Neighbor cells tilt toward the cursor.
+                    const rx = isCenter ? 0 : clamp(gy * -10.5 / dist, -11, 11);
+                    const ry = isCenter ? 0 : clamp(gx * 10.5 / dist, -11, 11);
                     cell.style.setProperty('--cell-x', `${gx * size}px`);
                     cell.style.setProperty('--cell-y', `${gy * size}px`);
                     cell.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
                     cell.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
-                    cell.style.setProperty('--cell-opacity', isCenter ? .18 : .34);
+                    cell.style.setProperty('--cell-opacity', isCenter ? .34 : .56);
                     cell.classList.toggle('is-center', isCenter);
                 });
-                if (Math.abs(cx - tx) > .5 || Math.abs(cy - ty) > .5) raf = requestAnimationFrame(update);
+                if (Math.abs(cx - tx) > .45 || Math.abs(cy - ty) > .45) raf = requestAnimationFrame(update);
             };
 
-            window._portfolioPointerMove = (e) => {
-                tx = e.clientX;
-                ty = e.clientY;
+            const move = (e) => {
+                if (e && typeof e.clientX === 'number') {
+                    tx = e.clientX;
+                    ty = e.clientY;
+                }
+                grid.style.opacity = '1';
                 if (!raf) raf = requestAnimationFrame(update);
             };
-            window._portfolioPointerLeave = () => { grid.style.opacity = '0'; };
+            const leave = () => { grid.style.opacity = '0'; };
+
+            window._portfolioPointerMove = move;
+            window._portfolioMouseMove = move;
+            window._portfolioPointerLeave = leave;
+            window._portfolioMouseLeave = leave;
             window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+            window.addEventListener('mousemove', window._portfolioMouseMove, { passive: true });
             window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+            document.addEventListener('mouseleave', window._portfolioMouseLeave, { passive: true });
             update();
         }
+
 
         function playThemeTransition(theme, fromTheme) {
             if (document.body.classList.contains('is-downloaded')) return;
@@ -2001,7 +2184,7 @@ Notes:
                                 }
                                 maxTranslate = parseFloat(maxTranslate) || 0;
                                 if (imageWrapper) { if (progress <= 0.01 || progress >= 0.98) { imageWrapper.classList.add('cinematic-collapsed'); imageWrapper.classList.remove('cinematic-expanded'); } else { imageWrapper.classList.add('cinematic-expanded'); imageWrapper.classList.remove('cinematic-collapsed'); } }
-                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = 0.05; const endMove = 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.transform = `translate3d(-${currentTranslate}px, 0, 0)`; }
+                                if (maxTranslate > 0) { let scrollProgress = 0; const startMove = 0.05; const endMove = 0.85; if (progress > startMove && progress < endMove) { scrollProgress = (progress - startMove) / (endMove - startMove); } else if (progress >= endMove) { scrollProgress = 1; } const currentTranslate = scrollProgress * maxTranslate; track.style.setProperty('--scrolly-x', `-${currentTranslate}px`); }
                             }); isTicking = false;
                         }); isTicking = true;
                     }
@@ -2086,6 +2269,135 @@ Notes:
             }
         }
 
+        /* v43: robust cursor-local seamless 3x3 tilt grid
+           - No static center tile
+           - Shows only after pointer/mouse movement in Portfolio mode
+           - 9 cells follow the pointer; cell #5 is the cursor anchor
+           - Neighbor cells tilt toward the pointer
+        */
+        function ensureCursorLocalGrid() {
+            document.querySelectorAll('#mouse-grid-field, #cursor-local-grid').forEach((node, idx) => {
+                if (node.id === 'mouse-grid-field' || idx > 0) node.remove();
+            });
+            let grid = document.getElementById('cursor-local-grid');
+            if (!grid) {
+                grid = document.createElement('div');
+                grid.id = 'cursor-local-grid';
+                grid.setAttribute('aria-hidden', 'true');
+                grid.innerHTML = Array.from({ length: 9 }, (_, i) => `<span class="cursor-local-cell" data-cell="${i + 1}"></span>`).join('');
+                document.body.appendChild(grid);
+            }
+            return grid;
+        }
+
+        function initMicroInteractions() {
+            const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const nonHoverDevice = window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse), (max-width: 767px)').matches;
+            const grid = ensureCursorLocalGrid();
+            const cells = Array.from(grid.querySelectorAll('.cursor-local-cell'));
+
+            if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+            if (window._portfolioMouseMove) window.removeEventListener('mousemove', window._portfolioMouseMove);
+            if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioDocLeave) document.removeEventListener('mouseleave', window._portfolioDocLeave);
+
+            if (reduceMotion || nonHoverDevice || cells.length !== 9) {
+                grid.classList.remove('is-active');
+                return;
+            }
+
+            let raf = 0;
+            let targetX = 0, targetY = 0;
+            let currentX = 0, currentY = 0;
+            let hasPointer = false;
+            const map = [
+                [-1, -1], [0, -1], [1, -1],
+                [-1,  0], [0,  0], [1,  0],
+                [-1,  1], [0,  1], [1,  1]
+            ];
+            const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+            const lerp = (a, b, t) => a + (b - a) * t;
+
+            const hide = () => {
+                hasPointer = false;
+                grid.classList.remove('is-active');
+                if (raf) cancelAnimationFrame(raf);
+                raf = 0;
+            };
+
+            const draw = () => {
+                raf = 0;
+                if (!document.body.classList.contains('layout-portfolio') || document.body.classList.contains('is-printing')) {
+                    hide();
+                    return;
+                }
+                if (!hasPointer) return;
+
+                currentX = lerp(currentX, targetX, 0.42);
+                currentY = lerp(currentY, targetY, 0.42);
+
+                const cellSize = clamp(Math.min(window.innerWidth, window.innerHeight) * 0.082, 54, 92);
+                grid.style.setProperty('--cursor-grid-size', `${cellSize}px`);
+
+                cells.forEach((cell, i) => {
+                    const [gx, gy] = map[i];
+                    const isCenter = i === 4;
+                    const x = currentX + gx * cellSize;
+                    const y = currentY + gy * cellSize;
+                    const dx = currentX - x;
+                    const dy = currentY - y;
+                    const dist = Math.max(1, Math.hypot(dx, dy));
+                    const pullX = dx / dist;
+                    const pullY = dy / dist;
+                    const diagonal = Math.abs(gx) + Math.abs(gy) === 2;
+                    const strength = isCenter ? 0 : diagonal ? 12 : 9.25;
+
+                    cell.style.setProperty('--cell-left', `${x}px`);
+                    cell.style.setProperty('--cell-top', `${y}px`);
+                    cell.style.setProperty('--rx', `${(-pullY * strength).toFixed(2)}deg`);
+                    cell.style.setProperty('--ry', `${(pullX * strength).toFixed(2)}deg`);
+                    cell.style.setProperty('--tz', `${isCenter ? 0 : 14}px`);
+                    cell.style.setProperty('--cell-opacity', `${isCenter ? 0.20 : 0.50}`);
+                    cell.classList.toggle('is-center', isCenter);
+                });
+
+                grid.classList.add('is-active');
+                if (Math.abs(currentX - targetX) > 0.35 || Math.abs(currentY - targetY) > 0.35) {
+                    raf = requestAnimationFrame(draw);
+                }
+            };
+
+            const move = (ev) => {
+                if (!ev || typeof ev.clientX !== 'number') return;
+                if (!document.body.classList.contains('layout-portfolio')) {
+                    hide();
+                    return;
+                }
+                const modal = document.getElementById('edit-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    hide();
+                    return;
+                }
+                targetX = ev.clientX;
+                targetY = ev.clientY;
+                if (!hasPointer) {
+                    currentX = targetX;
+                    currentY = targetY;
+                    hasPointer = true;
+                }
+                if (!raf) raf = requestAnimationFrame(draw);
+            };
+
+            window._portfolioPointerMove = move;
+            window._portfolioMouseMove = move;
+            window._portfolioPointerLeave = hide;
+            window._portfolioDocLeave = hide;
+            window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+            window.addEventListener('mousemove', window._portfolioMouseMove, { passive: true });
+            window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+            document.addEventListener('mouseleave', window._portfolioDocLeave, { passive: true });
+        }
+
         let hasBootedPortfolioApp = false;
         function initializePortfolioApp() {
             if (hasBootedPortfolioApp) return;
@@ -2112,6 +2424,417 @@ Notes:
         }
         window.addEventListener('load', initializePortfolioApp, { once: true });
     </script>
+
+    <script>
+        /* v43: robust mobile/tablet scrollytelling fallback.
+           The Experience section must stay vertical-scroll driven on touch devices. */
+        (function () {
+            const rafThrottle = (fn) => {
+                let ticking = false;
+                return function throttled() {
+                    if (ticking) return;
+                    ticking = true;
+                    requestAnimationFrame(() => {
+                        ticking = false;
+                        fn();
+                    });
+                };
+            };
+
+            window.initScrollEffects = initScrollEffects = function initScrollEffectsV43() {
+                if (window._revealObserver && typeof window._revealObserver.disconnect === 'function') {
+                    window._revealObserver.disconnect();
+                }
+                window._revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) entry.target.classList.add('show');
+                    });
+                }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+                document.querySelectorAll('.scroll-reveal').forEach(el => window._revealObserver.observe(el));
+
+                if (window._scrollHandler) window.removeEventListener('scroll', window._scrollHandler);
+                if (window._scrollResizeHandler) window.removeEventListener('resize', window._scrollResizeHandler);
+                if (window._orientationScrollHandler) window.removeEventListener('orientationchange', window._orientationScrollHandler);
+                if (window.visualViewport && window._vvScrollHandler) {
+                    window.visualViewport.removeEventListener('resize', window._vvScrollHandler);
+                    window.visualViewport.removeEventListener('scroll', window._vvScrollHandler);
+                }
+
+                const wrappers = Array.from(document.querySelectorAll('body.layout-portfolio .experience-section .scrollytelling-wrapper'));
+                const progressBar = document.getElementById('scroll-progress');
+                const heroFrame = document.querySelector('.hero-frame');
+
+                const invalidateMeasurements = () => {
+                    wrappers.forEach(wrapper => {
+                        const track = wrapper.querySelector('.scrollytelling-track');
+                        if (track) track.removeAttribute('data-max-translate');
+                    });
+                };
+
+                const measureTranslate = (wrapper, track, imageWrapper) => {
+                    let cached = parseFloat(track.getAttribute('data-max-translate'));
+                    if (Number.isFinite(cached) && cached >= 0) return cached;
+
+                    const wasCollapsed = imageWrapper && imageWrapper.classList.contains('cinematic-collapsed');
+                    if (imageWrapper && wasCollapsed) {
+                        imageWrapper.classList.remove('cinematic-collapsed');
+                        imageWrapper.classList.add('cinematic-expanded');
+                    }
+
+                    // Use viewport width as fallback because collapsed parents can report 0px on some mobile browsers.
+                    const parentWidth = Math.max(
+                        1,
+                        track.parentElement ? track.parentElement.clientWidth : 0,
+                        wrapper.clientWidth || 0,
+                        window.innerWidth || 0
+                    );
+                    const maxTranslate = Math.max(0, Math.ceil(track.scrollWidth - parentWidth));
+                    track.setAttribute('data-max-translate', String(maxTranslate));
+
+                    if (imageWrapper && wasCollapsed) {
+                        imageWrapper.classList.add('cinematic-collapsed');
+                        imageWrapper.classList.remove('cinematic-expanded');
+                    }
+                    return maxTranslate;
+                };
+
+                const update = () => {
+                    const doc = document.documentElement;
+                    const viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight || 1;
+                    const maxDoc = Math.max(1, doc.scrollHeight - viewportHeight);
+                    const pageProgress = Math.min(1, Math.max(0, window.scrollY / maxDoc));
+
+                    if (progressBar) progressBar.style.width = `${pageProgress * 100}%`;
+                    if (heroFrame) {
+                        heroFrame.style.setProperty('--profile-scroll-angle', `${Math.round(pageProgress * 720)}deg`);
+                        heroFrame.style.setProperty('--profile-scroll-glow', `${0.45 + pageProgress * 0.45}`);
+                    }
+
+                    wrappers.forEach(wrapper => {
+                        const track = wrapper.querySelector('.scrollytelling-track');
+                        const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
+                        const stickyBox = wrapper.querySelector('.sticky');
+                        if (!track || !stickyBox) return;
+
+                        const rect = wrapper.getBoundingClientRect();
+                        const stickyStyle = window.getComputedStyle(stickyBox);
+                        const stickyTop = Number.parseFloat(stickyStyle.top) || Math.min(96, viewportHeight * 0.12);
+                        const stickyHeight = Math.max(1, stickyBox.offsetHeight || stickyBox.getBoundingClientRect().height || 1);
+                        const activeDistance = Math.max(1, rect.height - stickyHeight);
+
+                        let progress = (stickyTop - rect.top) / activeDistance;
+                        progress = Math.max(0, Math.min(1, progress));
+
+                        const maxTranslate = measureTranslate(wrapper, track, imageWrapper);
+                        const startMove = 0.045;
+                        const endMove = 0.86;
+                        const collapseAfter = 0.905;
+
+                        let moveProgress = 0;
+                        if (progress > startMove && progress < endMove) {
+                            moveProgress = (progress - startMove) / (endMove - startMove);
+                        } else if (progress >= endMove) {
+                            moveProgress = 1;
+                        }
+                        const currentTranslate = Math.max(0, Math.min(maxTranslate, moveProgress * maxTranslate));
+                        track.style.setProperty('--scrolly-x', `-${currentTranslate}px`);
+
+                        // v48: Mobile/tablet end-collapse fix.
+                        // Keep the image rail open while it is actively moving, then collapse it
+                        // before the wrapper reaches its terminal sticky position. This prevents
+                        // the next project from starting with the previous image card still open.
+                        const isInViewport = rect.bottom > stickyTop && rect.top < viewportHeight;
+                        const isOpeningWindow = progress > 0.018;
+                        const isBeforeTerminalCollapse = progress < collapseAfter;
+                        const isActive = isInViewport && isOpeningWindow && isBeforeTerminalCollapse;
+
+                        if (imageWrapper) {
+                            imageWrapper.classList.toggle('cinematic-expanded', isActive);
+                            imageWrapper.classList.toggle('cinematic-collapsed', !isActive);
+                            wrapper.classList.toggle('scrolly-terminal-collapsed', !isActive && progress >= collapseAfter);
+                        }
+                    });
+                };
+
+                const throttledUpdate = rafThrottle(update);
+                window._scrollHandler = throttledUpdate;
+                window._scrollResizeHandler = () => { invalidateMeasurements(); throttledUpdate(); setTimeout(throttledUpdate, 160); };
+                window._orientationScrollHandler = () => { invalidateMeasurements(); setTimeout(throttledUpdate, 240); setTimeout(throttledUpdate, 620); };
+                window._vvScrollHandler = window._scrollResizeHandler;
+
+                window.addEventListener('scroll', window._scrollHandler, { passive: true });
+                window.addEventListener('resize', window._scrollResizeHandler, { passive: true });
+                window.addEventListener('orientationchange', window._orientationScrollHandler, { passive: true });
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener('resize', window._vvScrollHandler, { passive: true });
+                    window.visualViewport.addEventListener('scroll', window._vvScrollHandler, { passive: true });
+                }
+
+                wrappers.forEach(wrapper => {
+                    wrapper.querySelectorAll('img').forEach(img => {
+                        if (!img.complete) {
+                            img.addEventListener('load', () => { invalidateMeasurements(); throttledUpdate(); }, { once: true });
+                            img.addEventListener('error', () => { invalidateMeasurements(); throttledUpdate(); }, { once: true });
+                        }
+                    });
+                });
+
+                invalidateMeasurements();
+                throttledUpdate();
+                setTimeout(throttledUpdate, 80);
+                setTimeout(() => { invalidateMeasurements(); throttledUpdate(); }, 320);
+            };
+        })();
+    </script>
+
+    <script>
+        /* v49: anchored background folding grid.
+           Interaction target:
+           - The grid stays locked to the page/background grid.
+           - Cursor does not drag the grid around like a tail.
+           - Inside the current cell, the center panel gradually leans toward the pointer.
+           - The panel in the direction of travel gradually folds closed as the cursor approaches it.
+           - When the cursor crosses into the next cell, the newly active 3x3 set eases in instead of snapping. */
+        (function () {
+            const CELL_MAP = [
+                [-1, -1], [0, -1], [1, -1],
+                [-1,  0], [0,  0], [1,  0],
+                [-1,  1], [0,  1], [1,  1]
+            ];
+            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+            const smoothstep = (edge0, edge1, value) => {
+                const t = clamp((value - edge0) / Math.max(0.0001, edge1 - edge0), 0, 1);
+                return t * t * (3 - 2 * t);
+            };
+            const sign = value => value < -0.001 ? -1 : value > 0.001 ? 1 : 0;
+
+            window.ensureCursorLocalGrid = function ensureCursorLocalGridV49() {
+                document.querySelectorAll('#mouse-grid-field').forEach(node => node.remove());
+                let grid = document.getElementById('cursor-local-grid');
+                if (!grid) {
+                    grid = document.createElement('div');
+                    grid.id = 'cursor-local-grid';
+                    grid.setAttribute('aria-hidden', 'true');
+                    document.body.appendChild(grid);
+                }
+                const existing = grid.querySelectorAll('.cursor-local-cell');
+                if (existing.length !== 9) {
+                    grid.innerHTML = Array.from({ length: 9 }, (_, i) => `<span class="cursor-local-cell" data-cell="${i + 1}"></span>`).join('');
+                }
+                return grid;
+            };
+
+            window.initMicroInteractions = function initMicroInteractionsV49() {
+                const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const noHover = window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse), (max-width: 767px)').matches;
+                const grid = window.ensureCursorLocalGrid();
+                const cells = Array.from(grid.querySelectorAll('.cursor-local-cell'));
+
+                if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+                if (window._portfolioMouseMove) window.removeEventListener('mousemove', window._portfolioMouseMove);
+                if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+                if (window._portfolioDocLeave) document.removeEventListener('mouseleave', window._portfolioDocLeave);
+                if (window._portfolioScrollGrid) window.removeEventListener('scroll', window._portfolioScrollGrid);
+                if (window._portfolioResizeGrid) window.removeEventListener('resize', window._portfolioResizeGrid);
+
+                const hide = () => {
+                    grid.classList.remove('is-active');
+                    grid.style.removeProperty('--cursor-x');
+                    grid.style.removeProperty('--cursor-y');
+                };
+
+                if (reduceMotion || noHover || cells.length !== 9) {
+                    hide();
+                    return;
+                }
+
+                let pointerClientX = 0;
+                let pointerClientY = 0;
+                let hasPointer = false;
+                let raf = 0;
+                let lastCol = null;
+                let lastRow = null;
+                let switchTimer = 0;
+
+                const cellSize = () => clamp(Math.min(window.innerWidth || 1280, window.innerHeight || 720) * 0.105, 92, 136);
+
+                const setCellClasses = (cell, classes) => {
+                    cell.classList.toggle('is-center', classes.center);
+                    cell.classList.toggle('is-folding', classes.folding);
+                    cell.classList.toggle('is-soft', classes.soft);
+                    cell.classList.toggle('is-switching', classes.switching);
+                };
+
+                const draw = () => {
+                    raf = 0;
+                    if (!hasPointer || !document.body.classList.contains('layout-portfolio') || document.body.classList.contains('is-printing')) {
+                        hide();
+                        return;
+                    }
+                    const modal = document.getElementById('edit-modal');
+                    if (modal && !modal.classList.contains('hidden')) {
+                        hide();
+                        return;
+                    }
+
+                    const size = cellSize();
+                    const pageX = pointerClientX + window.scrollX;
+                    const pageY = pointerClientY + window.scrollY;
+
+                    const centerCellCol = Math.floor(pageX / size);
+                    const centerCellRow = Math.floor(pageY / size);
+                    const centerPageX = centerCellCol * size + size / 2;
+                    const centerPageY = centerCellRow * size + size / 2;
+
+                    const localX = clamp((pageX - centerCellCol * size) / size, 0, 1);
+                    const localY = clamp((pageY - centerCellRow * size) / size, 0, 1);
+                    const cellNX = (localX - 0.5) * 2;
+                    const cellNY = (localY - 0.5) * 2;
+                    const dirX = sign(cellNX);
+                    const dirY = sign(cellNY);
+                    const absX = Math.abs(cellNX);
+                    const absY = Math.abs(cellNY);
+                    const dominantX = absX >= absY;
+                    const dominantY = absY > absX;
+
+                    const changedCell = lastCol !== null && (centerCellCol !== lastCol || centerCellRow !== lastRow);
+                    if (changedCell) {
+                        grid.classList.add('is-switching');
+                        clearTimeout(switchTimer);
+                        switchTimer = setTimeout(() => grid.classList.remove('is-switching'), 190);
+                    }
+                    lastCol = centerCellCol;
+                    lastRow = centerCellRow;
+
+                    const offsetX = -((window.scrollX % size) + size) % size;
+                    const offsetY = -((window.scrollY % size) + size) % size;
+                    grid.style.setProperty('--cursor-grid-size', `${size}px`);
+                    grid.style.setProperty('--cursor-x', `${pointerClientX}px`);
+                    grid.style.setProperty('--cursor-y', `${pointerClientY}px`);
+                    grid.style.setProperty('--grid-offset-x', `${offsetX}px`);
+                    grid.style.setProperty('--grid-offset-y', `${offsetY}px`);
+
+                    const foldX = smoothstep(0.18, 0.98, absX);
+                    const foldY = smoothstep(0.18, 0.98, absY);
+                    const centerLeanX = smoothstep(0.05, 0.95, absX) * sign(cellNX);
+                    const centerLeanY = smoothstep(0.05, 0.95, absY) * sign(cellNY);
+
+                    cells.forEach((cell, index) => {
+                        const [gx, gy] = CELL_MAP[index];
+                        const isCenter = index === 4;
+                        const cellPageX = centerPageX + gx * size;
+                        const cellPageY = centerPageY + gy * size;
+                        const cellClientX = cellPageX - window.scrollX;
+                        const cellClientY = cellPageY - window.scrollY;
+
+                        let rx = 0;
+                        let ry = 0;
+                        let depth = 0;
+                        let opacity = 0.14;
+                        let originX = '50%';
+                        let originY = '50%';
+                        let folding = false;
+                        let soft = false;
+
+                        if (isCenter) {
+                            // Center panel follows the pointer before the next panel closes.
+                            // Moving right => the center panel leans right; moving down => it leans down.
+                            ry = -centerLeanX * 17;
+                            rx = centerLeanY * 13;
+                            depth = 2 + Math.max(absX, absY) * 7;
+                            opacity = 0.10 + Math.max(absX, absY) * 0.055;
+                            soft = true;
+                        } else {
+                            const inXDirection = dirX !== 0 && gx === dirX;
+                            const inYDirection = dirY !== 0 && gy === dirY;
+                            const oppositeX = dirX !== 0 && gx === -dirX;
+                            const oppositeY = dirY !== 0 && gy === -dirY;
+
+                            // Edge nearest to the current cursor cell becomes the hinge.
+                            originX = gx > 0 ? '0%' : gx < 0 ? '100%' : '50%';
+                            originY = gy > 0 ? '0%' : gy < 0 ? '100%' : '50%';
+
+                            const xInfluence = gx === 0 ? 0 : (inXDirection ? foldX : oppositeX ? (1 - foldX) * 0.16 : 0.26 * foldX);
+                            const yInfluence = gy === 0 ? 0 : (inYDirection ? foldY : oppositeY ? (1 - foldY) * 0.16 : 0.26 * foldY);
+                            const xAngle = clamp(xInfluence * 86, 0, 84);
+                            const yAngle = clamp(yInfluence * 78, 0, 76);
+
+                            // Direction panels close toward the cursor. Opposite panels stay nearly flat,
+                            // so the eye reads it as the old side closing and the new side opening.
+                            ry = gx === 0 ? 0 : -gx * xAngle;
+                            rx = gy === 0 ? 0 : gy * yAngle;
+
+                            // Avoid over-twisting side-only panels.
+                            if (gy === 0) rx *= 0.08;
+                            if (gx === 0) ry *= 0.08;
+
+                            // For pure horizontal movement, vertical neighbors should only breathe subtly.
+                            if (dominantX && gx === 0 && gy !== 0) rx *= 0.22;
+                            if (dominantY && gy === 0 && gx !== 0) ry *= 0.22;
+
+                            const closeAmount = Math.max(inXDirection ? foldX : 0, inYDirection ? foldY : 0);
+                            folding = closeAmount > 0.24;
+                            const cornerBonus = gx !== 0 && gy !== 0 ? 0.04 : 0;
+                            opacity = clamp(0.12 + closeAmount * 0.30 + cornerBonus, 0.10, 0.42);
+                            depth = 6 + closeAmount * 20;
+                        }
+
+                        cell.style.setProperty('--cell-left', `${cellClientX}px`);
+                        cell.style.setProperty('--cell-top', `${cellClientY}px`);
+                        cell.style.setProperty('--origin-x', originX);
+                        cell.style.setProperty('--origin-y', originY);
+                        cell.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
+                        cell.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
+                        cell.style.setProperty('--tz', `${depth.toFixed(1)}px`);
+                        cell.style.setProperty('--cell-opacity', opacity.toFixed(3));
+                        cell.style.setProperty('--shine-x', `${clamp(localX * 100, 10, 90).toFixed(1)}%`);
+                        cell.style.setProperty('--shine-y', `${clamp(localY * 100, 10, 90).toFixed(1)}%`);
+                        setCellClasses(cell, { center: isCenter, folding, soft, switching: changedCell });
+                    });
+
+                    grid.classList.add('is-active');
+                };
+
+                const scheduleDraw = () => {
+                    if (!raf) raf = requestAnimationFrame(draw);
+                };
+
+                const move = (event) => {
+                    if (!event || typeof event.clientX !== 'number') return;
+                    pointerClientX = event.clientX;
+                    pointerClientY = event.clientY;
+                    hasPointer = true;
+                    scheduleDraw();
+                };
+
+                const scrollOrResize = () => {
+                    if (!hasPointer) return;
+                    scheduleDraw();
+                };
+
+                window._portfolioPointerMove = move;
+                window._portfolioMouseMove = move;
+                window._portfolioPointerLeave = () => { hasPointer = false; hide(); };
+                window._portfolioDocLeave = window._portfolioPointerLeave;
+                window._portfolioScrollGrid = scrollOrResize;
+                window._portfolioResizeGrid = scrollOrResize;
+
+                window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+                window.addEventListener('mousemove', window._portfolioMouseMove, { passive: true });
+                window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+                document.addEventListener('mouseleave', window._portfolioDocLeave, { passive: true });
+                window.addEventListener('scroll', window._portfolioScrollGrid, { passive: true });
+                window.addEventListener('resize', window._portfolioResizeGrid, { passive: true });
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    if (document.body.classList.contains('layout-portfolio')) window.initMicroInteractions();
+                }, 90);
+            }, { once: true });
+        })();
+    </script>
+
 </body>
 
 </html>
