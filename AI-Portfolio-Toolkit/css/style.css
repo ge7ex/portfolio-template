@@ -4144,13 +4144,13 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
 /* ==================================
    v39 Cursor-local seamless tilt grid + full A4 resume layout
 ===================================== */
-:root{--project-version:'v45'}
+:root{--project-version:'v49'}
 #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
   z-index:1!important;
   pointer-events:none!important;
-  perspective:900px!important;
+  perspective:1050px!important;
   opacity:0!important;
   transition:opacity .24s ease!important;
   contain:layout paint style!important;
@@ -4209,7 +4209,7 @@ body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;obje
    - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
 ===================================== */
 :root{
-  --project-version:'v45';
+  --project-version:'v49';
   --resume-a4-width:210mm;
   --resume-a4-height:297mm;
   --resume-left-col:64mm;
@@ -4571,7 +4571,7 @@ body.layout-resume .resume-cv-main .font-mono{
    v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
    The grid is intentionally above portfolio content but below the fixed nav.
 ===================================== */
-:root{--project-version:'v45'}
+:root{--project-version:'v49'}
 body.layout-portfolio #mouse-grid-field{
   position:fixed!important;
   inset:0!important;
@@ -4836,7 +4836,7 @@ body:not(.layout-portfolio) #cursor-local-grid{
 
 
 /* ==================================
-   v45 Mobile Scrollytelling Transform + End Collapse Fix
+   v48 Mobile Scrollytelling Transform + End Collapse Fix
    Reason: previous mobile CSS used transform: translate3d(0,0,0)!important;
    that overrides JS inline transform on touch devices. The scroll engine now writes
    --scrolly-x and CSS applies it with !important, so project images move again.
@@ -4860,7 +4860,7 @@ body.layout-portfolio .scrollytelling-track {
 
 
 /* ==================================
-   v45 Mobile Scrollytelling End Collapse Fix
+   v48 Mobile Scrollytelling End Collapse Fix
    The image rail should collapse after its scroll-driven motion finishes,
    before the next project starts.
 ===================================== */
@@ -4872,5 +4872,243 @@ body.layout-portfolio .scrollytelling-track {
   body.layout-portfolio .experience-section .scrollytelling-wrapper.scrolly-terminal-collapsed .cinematic-image-inner {
     opacity: 0 !important;
     transform: translate3d(0, 10px, 0) scale(.985) !important;
+  }
+}
+
+
+/* ==================================
+   v48: anchored background tilt grid
+   - The grid is embedded into the page background, not a cursor-tail layer.
+   - Only 3x3 cells around the cursor's current background grid cell become visible.
+   - Cell positions snap to the fixed page grid; cells do not follow the cursor continuously.
+===================================== */
+body.layout-portfolio #app{
+  position:relative!important;
+  z-index:2!important;
+}
+body.layout-portfolio nav,
+body.layout-portfolio #theme-panel,
+body.layout-portfolio #public-export-branch,
+body.layout-portfolio #public-canva-branch,
+body.layout-portfolio #edit-modal{
+  z-index:50!important;
+}
+#cursor-local-grid{
+  --cursor-grid-size:88px;
+  position:fixed!important;
+  inset:0!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  overflow:hidden!important;
+  perspective:1400px!important;
+  transform-style:preserve-3d!important;
+  contain:layout paint style!important;
+  transition:opacity .14s ease, visibility .14s ease!important;
+  mix-blend-mode:screen!important;
+}
+body.layout-portfolio #cursor-local-grid.is-active{
+  opacity:1!important;
+  visibility:visible!important;
+}
+#cursor-local-grid::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  opacity:.045;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,.36) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,.36) 1px, transparent 1px);
+  background-size:var(--cursor-grid-size,88px) var(--cursor-grid-size,88px);
+  background-position:var(--grid-offset-x,0px) var(--grid-offset-y,0px);
+  mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 190px, transparent 280px);
+  -webkit-mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 190px, transparent 280px);
+}
+.cursor-local-cell{
+  position:fixed!important;
+  left:var(--cell-left,-9999px)!important;
+  top:var(--cell-top,-9999px)!important;
+  width:var(--cursor-grid-size,88px)!important;
+  height:var(--cursor-grid-size,88px)!important;
+  display:block!important;
+  border-radius:14px!important;
+  transform:
+    translate3d(-50%,-50%,0)
+    perspective(900px)
+    rotateX(var(--rx,0deg))
+    rotateY(var(--ry,0deg))
+    translateZ(var(--tz,0px))!important;
+  transform-origin:center center!important;
+  transform-style:preserve-3d!important;
+  opacity:var(--cell-opacity,.22)!important;
+  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 34%, transparent)!important;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.13) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,.13) 1px, transparent 1px),
+    linear-gradient(135deg, color-mix(in srgb,var(--print-accent,#a855f7) 9%, transparent), color-mix(in srgb,var(--print-accent-2,#22d3ee) 4%, transparent), transparent)!important;
+  background-size:50% 50%,50% 50%,auto!important;
+  box-shadow:
+    0 0 18px color-mix(in srgb,var(--print-accent,#a855f7) 13%, transparent),
+    inset 0 0 16px rgba(255,255,255,.032)!important;
+  backdrop-filter:none!important;
+  will-change:transform,opacity!important;
+  transition:opacity .11s ease, transform .055s linear!important;
+}
+.cursor-local-cell.is-center{
+  opacity:.10!important;
+  border-style:dashed!important;
+  border-color:color-mix(in srgb,var(--print-accent-2,#22d3ee) 30%, transparent)!important;
+  background:
+    linear-gradient(90deg, rgba(34,211,238,.09) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(34,211,238,.09) 1px, transparent 1px)!important;
+  background-size:50% 50%!important;
+  box-shadow:0 0 10px color-mix(in srgb,var(--print-accent-2,#22d3ee) 10%, transparent)!important;
+}
+body.layout-resume #cursor-local-grid,
+body.layout-resume .cursor-local-cell,
+body:not(.layout-portfolio) #cursor-local-grid{
+  display:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+}
+@media (hover:none),(pointer:coarse),(max-width:767px),print{
+  #cursor-local-grid,.cursor-local-cell{
+    display:none!important;
+    opacity:0!important;
+    visibility:hidden!important;
+  }
+}
+
+/* ==================================
+   v49: anchored progressive folding background grid
+   - Fixed to the page/background grid, not a cursor tail.
+   - Only 3x3 nearby cells become visible.
+   - Center panel leans toward the cursor; direction panels fold closed progressively.
+===================================== */
+#cursor-local-grid{
+  --cursor-grid-size:104px;
+  position:fixed!important;
+  inset:0!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+  overflow:hidden!important;
+  perspective:1050px!important;
+  transform-style:preserve-3d!important;
+  contain:layout paint style!important;
+  transition:opacity .14s ease, visibility .14s ease!important;
+  mix-blend-mode:screen!important;
+}
+body.layout-portfolio #cursor-local-grid.is-active{
+  opacity:1!important;
+  visibility:visible!important;
+}
+#cursor-local-grid::before{
+  content:""!important;
+  position:fixed!important;
+  inset:0!important;
+  pointer-events:none!important;
+  opacity:.035!important;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,.42) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,.42) 1px, transparent 1px)!important;
+  background-size:var(--cursor-grid-size,104px) var(--cursor-grid-size,104px)!important;
+  background-position:var(--grid-offset-x,0px) var(--grid-offset-y,0px)!important;
+  mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 210px, transparent 310px)!important;
+  -webkit-mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 210px, transparent 310px)!important;
+}
+.cursor-local-cell{
+  position:fixed!important;
+  left:var(--cell-left,-9999px)!important;
+  top:var(--cell-top,-9999px)!important;
+  width:var(--cursor-grid-size,104px)!important;
+  height:var(--cursor-grid-size,104px)!important;
+  display:block!important;
+  border-radius:10px!important;
+  transform:
+    translate3d(-50%,-50%,0)
+    perspective(760px)
+    rotateX(var(--rx,0deg))
+    rotateY(var(--ry,0deg))
+    translateZ(var(--tz,0px))!important;
+  transform-origin:var(--origin-x,50%) var(--origin-y,50%)!important;
+  transform-style:preserve-3d!important;
+  opacity:var(--cell-opacity,.24)!important;
+  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 42%, transparent)!important;
+  background:
+    radial-gradient(circle at var(--shine-x,50%) var(--shine-y,50%), rgba(255,255,255,.18), transparent 38%),
+    linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,.12) 1px, transparent 1px),
+    linear-gradient(135deg, color-mix(in srgb,var(--print-accent,#a855f7) 10%, transparent), color-mix(in srgb,var(--print-accent-2,#22d3ee) 6%, transparent), transparent)!important;
+  background-size:auto, 50% 50%, 50% 50%, auto!important;
+  box-shadow:
+    0 0 22px color-mix(in srgb,var(--print-accent,#a855f7) 18%, transparent),
+    inset 0 0 0 1px rgba(255,255,255,.04),
+    inset 0 0 24px rgba(255,255,255,.035)!important;
+  backface-visibility:hidden!important;
+  will-change:transform,opacity,box-shadow!important;
+  transition:left .16s cubic-bezier(.16,1,.3,1), top .16s cubic-bezier(.16,1,.3,1), opacity .16s ease, transform .135s cubic-bezier(.16,1,.3,1), box-shadow .16s ease!important;
+}
+.cursor-local-cell::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  border-radius:inherit!important;
+  border:1px solid rgba(255,255,255,.055)!important;
+  transform:translateZ(2px)!important;
+  pointer-events:none!important;
+}
+.cursor-local-cell::after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  border-radius:inherit!important;
+  background:linear-gradient(135deg, rgba(255,255,255,.18), transparent 48%, rgba(255,255,255,.035))!important;
+  opacity:.34!important;
+  transform:translateZ(3px)!important;
+  pointer-events:none!important;
+}
+
+.cursor-local-cell.is-folding{
+  border-color:color-mix(in srgb,var(--print-accent,#a855f7) 62%, transparent)!important;
+  box-shadow:
+    0 0 30px color-mix(in srgb,var(--print-accent,#a855f7) 24%, transparent),
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    inset 0 0 28px rgba(255,255,255,.055)!important;
+}
+.cursor-local-cell.is-soft{
+  transition-duration:.18s,.18s,.18s,.16s,.18s!important;
+}
+#cursor-local-grid.is-switching .cursor-local-cell{
+  transition-duration:.20s,.20s,.16s,.18s,.16s!important;
+}
+.cursor-local-cell.is-center{
+  opacity:.10!important;
+  border-style:dashed!important;
+  border-color:color-mix(in srgb,var(--print-accent-2,#22d3ee) 32%, transparent)!important;
+  background:
+    linear-gradient(90deg, rgba(34,211,238,.10) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(34,211,238,.10) 1px, transparent 1px)!important;
+  background-size:50% 50%!important;
+  box-shadow:0 0 12px color-mix(in srgb,var(--print-accent-2,#22d3ee) 12%, transparent)!important;
+}
+body.layout-portfolio #app{
+  position:relative!important;
+  z-index:2!important;
+}
+body.layout-resume #cursor-local-grid,
+body.layout-resume .cursor-local-cell,
+body:not(.layout-portfolio) #cursor-local-grid{
+  display:none!important;
+  opacity:0!important;
+  visibility:hidden!important;
+}
+@media (hover:none),(pointer:coarse),(max-width:767px),print{
+  #cursor-local-grid,.cursor-local-cell{
+    display:none!important;
+    opacity:0!important;
+    visibility:hidden!important;
   }
 }

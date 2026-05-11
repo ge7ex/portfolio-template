@@ -1564,7 +1564,7 @@ Notes:
             if (document.getElementById('new-exp-title-th') && (document.getElementById('new-exp-title-th').value || document.getElementById('new-exp-title-en').value)) { try { const sy = document.getElementById('new-exp-start-year').value; if (sy) addExperience(false); } catch (e) { } }
             const currentData = StorageHandler.load();
             const val = (id) => (document.getElementById(id) ? document.getElementById(id).value : '');
-            const data = { projectVersion: 'v45', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
+            const data = { projectVersion: 'v49', resumeVisibility: getResumeVisibilityFromUI(currentData.resumeVisibility), layout: currentData.layout || 'portfolio', colorMode: currentData.colorMode || 'dark', lang: currentData.lang || 'th', portfolioStyle: currentData.portfolioStyle || 'tech', name_th: document.getElementById('in-name-th').value, name_en: document.getElementById('in-name-en').value, role_th: document.getElementById('in-role-th').value, role_en: document.getElementById('in-role-en').value, bio_th: document.getElementById('in-bio-th').value, bio_en: document.getElementById('in-bio-en').value, skills_th: document.getElementById('in-skills-th').value, skills_en: document.getElementById('in-skills-en').value, email: document.getElementById('in-email').value, phone: document.getElementById('in-phone').value, linkedin: document.getElementById('in-linkedin').value, education_th: val('in-education-th'), education_en: val('in-education-en'), certifications_th: val('in-certifications-th'), certifications_en: val('in-certifications-en'), awards_th: val('in-awards-th'), awards_en: val('in-awards-en'), caseStudies_th: val('in-caseStudies-th'), caseStudies_en: val('in-caseStudies-en'), services_th: val('in-services-th'), services_en: val('in-services-en'), testimonials_th: val('in-testimonials-th'), testimonials_en: val('in-testimonials-en'), clients_th: val('in-clients-th'), clients_en: val('in-clients-en'), cta_th: val('in-cta-th'), cta_en: val('in-cta-en'), articles_th: val('in-articles-th'), articles_en: val('in-articles-en'), avatar: currentAvatarBase64, exp: currentData.exp || [] };
             StorageHandler.save(data); render(data); toggleModal();
         }
 
@@ -2539,7 +2539,7 @@ Notes:
                         const currentTranslate = Math.max(0, Math.min(maxTranslate, moveProgress * maxTranslate));
                         track.style.setProperty('--scrolly-x', `-${currentTranslate}px`);
 
-                        // v45: Mobile/tablet end-collapse fix.
+                        // v48: Mobile/tablet end-collapse fix.
                         // Keep the image rail open while it is actively moving, then collapse it
                         // before the wrapper reaches its terminal sticky position. This prevents
                         // the next project from starting with the previous image card still open.
@@ -2586,6 +2586,255 @@ Notes:
             };
         })();
     </script>
+
+    <script>
+        /* v49: anchored background folding grid.
+           Interaction target:
+           - The grid stays locked to the page/background grid.
+           - Cursor does not drag the grid around like a tail.
+           - Inside the current cell, the center panel gradually leans toward the pointer.
+           - The panel in the direction of travel gradually folds closed as the cursor approaches it.
+           - When the cursor crosses into the next cell, the newly active 3x3 set eases in instead of snapping. */
+        (function () {
+            const CELL_MAP = [
+                [-1, -1], [0, -1], [1, -1],
+                [-1,  0], [0,  0], [1,  0],
+                [-1,  1], [0,  1], [1,  1]
+            ];
+            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+            const smoothstep = (edge0, edge1, value) => {
+                const t = clamp((value - edge0) / Math.max(0.0001, edge1 - edge0), 0, 1);
+                return t * t * (3 - 2 * t);
+            };
+            const sign = value => value < -0.001 ? -1 : value > 0.001 ? 1 : 0;
+
+            window.ensureCursorLocalGrid = function ensureCursorLocalGridV49() {
+                document.querySelectorAll('#mouse-grid-field').forEach(node => node.remove());
+                let grid = document.getElementById('cursor-local-grid');
+                if (!grid) {
+                    grid = document.createElement('div');
+                    grid.id = 'cursor-local-grid';
+                    grid.setAttribute('aria-hidden', 'true');
+                    document.body.appendChild(grid);
+                }
+                const existing = grid.querySelectorAll('.cursor-local-cell');
+                if (existing.length !== 9) {
+                    grid.innerHTML = Array.from({ length: 9 }, (_, i) => `<span class="cursor-local-cell" data-cell="${i + 1}"></span>`).join('');
+                }
+                return grid;
+            };
+
+            window.initMicroInteractions = function initMicroInteractionsV49() {
+                const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const noHover = window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse), (max-width: 767px)').matches;
+                const grid = window.ensureCursorLocalGrid();
+                const cells = Array.from(grid.querySelectorAll('.cursor-local-cell'));
+
+                if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
+                if (window._portfolioMouseMove) window.removeEventListener('mousemove', window._portfolioMouseMove);
+                if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+                if (window._portfolioDocLeave) document.removeEventListener('mouseleave', window._portfolioDocLeave);
+                if (window._portfolioScrollGrid) window.removeEventListener('scroll', window._portfolioScrollGrid);
+                if (window._portfolioResizeGrid) window.removeEventListener('resize', window._portfolioResizeGrid);
+
+                const hide = () => {
+                    grid.classList.remove('is-active');
+                    grid.style.removeProperty('--cursor-x');
+                    grid.style.removeProperty('--cursor-y');
+                };
+
+                if (reduceMotion || noHover || cells.length !== 9) {
+                    hide();
+                    return;
+                }
+
+                let pointerClientX = 0;
+                let pointerClientY = 0;
+                let hasPointer = false;
+                let raf = 0;
+                let lastCol = null;
+                let lastRow = null;
+                let switchTimer = 0;
+
+                const cellSize = () => clamp(Math.min(window.innerWidth || 1280, window.innerHeight || 720) * 0.105, 92, 136);
+
+                const setCellClasses = (cell, classes) => {
+                    cell.classList.toggle('is-center', classes.center);
+                    cell.classList.toggle('is-folding', classes.folding);
+                    cell.classList.toggle('is-soft', classes.soft);
+                    cell.classList.toggle('is-switching', classes.switching);
+                };
+
+                const draw = () => {
+                    raf = 0;
+                    if (!hasPointer || !document.body.classList.contains('layout-portfolio') || document.body.classList.contains('is-printing')) {
+                        hide();
+                        return;
+                    }
+                    const modal = document.getElementById('edit-modal');
+                    if (modal && !modal.classList.contains('hidden')) {
+                        hide();
+                        return;
+                    }
+
+                    const size = cellSize();
+                    const pageX = pointerClientX + window.scrollX;
+                    const pageY = pointerClientY + window.scrollY;
+
+                    const centerCellCol = Math.floor(pageX / size);
+                    const centerCellRow = Math.floor(pageY / size);
+                    const centerPageX = centerCellCol * size + size / 2;
+                    const centerPageY = centerCellRow * size + size / 2;
+
+                    const localX = clamp((pageX - centerCellCol * size) / size, 0, 1);
+                    const localY = clamp((pageY - centerCellRow * size) / size, 0, 1);
+                    const cellNX = (localX - 0.5) * 2;
+                    const cellNY = (localY - 0.5) * 2;
+                    const dirX = sign(cellNX);
+                    const dirY = sign(cellNY);
+                    const absX = Math.abs(cellNX);
+                    const absY = Math.abs(cellNY);
+                    const dominantX = absX >= absY;
+                    const dominantY = absY > absX;
+
+                    const changedCell = lastCol !== null && (centerCellCol !== lastCol || centerCellRow !== lastRow);
+                    if (changedCell) {
+                        grid.classList.add('is-switching');
+                        clearTimeout(switchTimer);
+                        switchTimer = setTimeout(() => grid.classList.remove('is-switching'), 190);
+                    }
+                    lastCol = centerCellCol;
+                    lastRow = centerCellRow;
+
+                    const offsetX = -((window.scrollX % size) + size) % size;
+                    const offsetY = -((window.scrollY % size) + size) % size;
+                    grid.style.setProperty('--cursor-grid-size', `${size}px`);
+                    grid.style.setProperty('--cursor-x', `${pointerClientX}px`);
+                    grid.style.setProperty('--cursor-y', `${pointerClientY}px`);
+                    grid.style.setProperty('--grid-offset-x', `${offsetX}px`);
+                    grid.style.setProperty('--grid-offset-y', `${offsetY}px`);
+
+                    const foldX = smoothstep(0.18, 0.98, absX);
+                    const foldY = smoothstep(0.18, 0.98, absY);
+                    const centerLeanX = smoothstep(0.05, 0.95, absX) * sign(cellNX);
+                    const centerLeanY = smoothstep(0.05, 0.95, absY) * sign(cellNY);
+
+                    cells.forEach((cell, index) => {
+                        const [gx, gy] = CELL_MAP[index];
+                        const isCenter = index === 4;
+                        const cellPageX = centerPageX + gx * size;
+                        const cellPageY = centerPageY + gy * size;
+                        const cellClientX = cellPageX - window.scrollX;
+                        const cellClientY = cellPageY - window.scrollY;
+
+                        let rx = 0;
+                        let ry = 0;
+                        let depth = 0;
+                        let opacity = 0.14;
+                        let originX = '50%';
+                        let originY = '50%';
+                        let folding = false;
+                        let soft = false;
+
+                        if (isCenter) {
+                            // Center panel follows the pointer before the next panel closes.
+                            // Moving right => the center panel leans right; moving down => it leans down.
+                            ry = -centerLeanX * 17;
+                            rx = centerLeanY * 13;
+                            depth = 2 + Math.max(absX, absY) * 7;
+                            opacity = 0.10 + Math.max(absX, absY) * 0.055;
+                            soft = true;
+                        } else {
+                            const inXDirection = dirX !== 0 && gx === dirX;
+                            const inYDirection = dirY !== 0 && gy === dirY;
+                            const oppositeX = dirX !== 0 && gx === -dirX;
+                            const oppositeY = dirY !== 0 && gy === -dirY;
+
+                            // Edge nearest to the current cursor cell becomes the hinge.
+                            originX = gx > 0 ? '0%' : gx < 0 ? '100%' : '50%';
+                            originY = gy > 0 ? '0%' : gy < 0 ? '100%' : '50%';
+
+                            const xInfluence = gx === 0 ? 0 : (inXDirection ? foldX : oppositeX ? (1 - foldX) * 0.16 : 0.26 * foldX);
+                            const yInfluence = gy === 0 ? 0 : (inYDirection ? foldY : oppositeY ? (1 - foldY) * 0.16 : 0.26 * foldY);
+                            const xAngle = clamp(xInfluence * 86, 0, 84);
+                            const yAngle = clamp(yInfluence * 78, 0, 76);
+
+                            // Direction panels close toward the cursor. Opposite panels stay nearly flat,
+                            // so the eye reads it as the old side closing and the new side opening.
+                            ry = gx === 0 ? 0 : -gx * xAngle;
+                            rx = gy === 0 ? 0 : gy * yAngle;
+
+                            // Avoid over-twisting side-only panels.
+                            if (gy === 0) rx *= 0.08;
+                            if (gx === 0) ry *= 0.08;
+
+                            // For pure horizontal movement, vertical neighbors should only breathe subtly.
+                            if (dominantX && gx === 0 && gy !== 0) rx *= 0.22;
+                            if (dominantY && gy === 0 && gx !== 0) ry *= 0.22;
+
+                            const closeAmount = Math.max(inXDirection ? foldX : 0, inYDirection ? foldY : 0);
+                            folding = closeAmount > 0.24;
+                            const cornerBonus = gx !== 0 && gy !== 0 ? 0.04 : 0;
+                            opacity = clamp(0.12 + closeAmount * 0.30 + cornerBonus, 0.10, 0.42);
+                            depth = 6 + closeAmount * 20;
+                        }
+
+                        cell.style.setProperty('--cell-left', `${cellClientX}px`);
+                        cell.style.setProperty('--cell-top', `${cellClientY}px`);
+                        cell.style.setProperty('--origin-x', originX);
+                        cell.style.setProperty('--origin-y', originY);
+                        cell.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
+                        cell.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
+                        cell.style.setProperty('--tz', `${depth.toFixed(1)}px`);
+                        cell.style.setProperty('--cell-opacity', opacity.toFixed(3));
+                        cell.style.setProperty('--shine-x', `${clamp(localX * 100, 10, 90).toFixed(1)}%`);
+                        cell.style.setProperty('--shine-y', `${clamp(localY * 100, 10, 90).toFixed(1)}%`);
+                        setCellClasses(cell, { center: isCenter, folding, soft, switching: changedCell });
+                    });
+
+                    grid.classList.add('is-active');
+                };
+
+                const scheduleDraw = () => {
+                    if (!raf) raf = requestAnimationFrame(draw);
+                };
+
+                const move = (event) => {
+                    if (!event || typeof event.clientX !== 'number') return;
+                    pointerClientX = event.clientX;
+                    pointerClientY = event.clientY;
+                    hasPointer = true;
+                    scheduleDraw();
+                };
+
+                const scrollOrResize = () => {
+                    if (!hasPointer) return;
+                    scheduleDraw();
+                };
+
+                window._portfolioPointerMove = move;
+                window._portfolioMouseMove = move;
+                window._portfolioPointerLeave = () => { hasPointer = false; hide(); };
+                window._portfolioDocLeave = window._portfolioPointerLeave;
+                window._portfolioScrollGrid = scrollOrResize;
+                window._portfolioResizeGrid = scrollOrResize;
+
+                window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+                window.addEventListener('mousemove', window._portfolioMouseMove, { passive: true });
+                window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
+                document.addEventListener('mouseleave', window._portfolioDocLeave, { passive: true });
+                window.addEventListener('scroll', window._portfolioScrollGrid, { passive: true });
+                window.addEventListener('resize', window._portfolioResizeGrid, { passive: true });
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    if (document.body.classList.contains('layout-portfolio')) window.initMicroInteractions();
+                }, 90);
+            }, { once: true });
+        })();
+    </script>
+
 </body>
 
 </html>
