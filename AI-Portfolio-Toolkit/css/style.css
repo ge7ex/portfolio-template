@@ -3028,7 +3028,7 @@ body > nav.fixed {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 28px color-mix(in srgb, var(--theme-accent) 22%, transparent);
 }
 .public-export-branch button:hover { transform: translateY(-2px) scale(1.04); background: color-mix(in srgb, var(--theme-accent) 32%, rgba(15,23,42,.9)); }
-.public-export-branch button span { font-size: 9.5px; font-weight: 900; letter-spacing: .08em; }
+.public-export-branch button span { font-size: 9px; font-weight: 900; letter-spacing: .08em; }
 @keyframes exportBranchIn { from { opacity: 0; transform: translateY(-6px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 .theme-mode-branch {
@@ -3826,1289 +3826,1000 @@ body.is-first-run-demo .portfolio-hero .hero-chip {
 }
 
 /* ==================================
-   v30 Free Canva AI Package
-   No API / no SDK: downloads EN/TH prompts, instructions, and data snapshot.
-===================================== */
-.canva-icon-button .canva-mark {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 950;
-  color: #ffffff;
-  letter-spacing: -0.04em;
-  background: linear-gradient(135deg, #00c4cc 0%, #7d2ae8 52%, #ff66c4 100%);
-  box-shadow: 0 0 18px rgba(125, 42, 232, .45), inset 0 0 0 1px rgba(255,255,255,.28);
-}
-
-.public-canva-branch.hidden,
-.canva-copy-toast.hidden { display: none !important; }
-
-.public-canva-branch {
-  position: fixed;
-  top: 82px;
-  right: 38px;
-  z-index: 119;
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, .88);
-  border: 1px solid rgba(255,255,255,.12);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 18px 50px rgba(0,0,0,.28);
-  transform-origin: top right;
-  animation: exportBranchIn .22s cubic-bezier(.2,.9,.2,1) both;
-  pointer-events: auto !important;
-}
-
-.public-canva-branch button {
-  min-width: 92px;
-  height: 60px;
-  border-radius: 999px;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  color: white;
-  cursor: pointer;
-  pointer-events: auto !important;
-  background: linear-gradient(135deg, rgba(0,196,204,.22), rgba(125,42,232,.22), rgba(255,102,196,.16));
-  border: 1px solid rgba(255,255,255,.14);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 10px 28px rgba(125,42,232,.18);
-  transition: transform .2s ease, background .2s ease;
-}
-
-.public-canva-branch button:hover {
-  transform: translateY(-2px) scale(1.04);
-  background: linear-gradient(135deg, rgba(0,196,204,.34), rgba(125,42,232,.34), rgba(255,102,196,.24));
-}
-
-.public-canva-branch button span {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: .04em;
-  line-height: 1.05;
-  text-align: center;
-}
-
-.canva-copy-toast {
-  position: fixed;
-  top: 154px;
-  right: 42px;
-  z-index: 130;
-  padding: 10px 14px;
-  border-radius: 999px;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 900;
-  background: linear-gradient(135deg, #00c4cc, #7d2ae8);
-  box-shadow: 0 16px 42px rgba(0,0,0,.28);
-}
-
-@media (max-width: 768px) {
-  .public-canva-branch {
-    left: 12px;
-    right: 12px;
-    top: 138px;
-    border-radius: 26px;
-    overflow-x: auto;
-    justify-content: flex-start;
-  }
-  .public-canva-branch button { min-width: 82px; }
-  .canva-copy-toast { left: 16px; right: 16px; top: 220px; text-align: center; }
-}
-
-@media print {
-  .public-canva-branch,
-  .canva-copy-toast,
-  #btn-canva-branch { display: none !important; }
-}
-
-
-/* ==================================
-   v31 Responsive Scrollytelling
-   Goal: mobile/tablet keeps the same vertical-scroll feeling as desktop.
-   - Do not convert project visuals to horizontal swipe carousel.
-   - Keep sticky story card and drive image track by page scroll.
-   - Compact hero/nav for smaller screens.
-===================================== */
-@media (max-width: 1023px) {
-  body.layout-portfolio #app {
-    padding-left: clamp(12px, 3vw, 28px) !important;
-    padding-right: clamp(12px, 3vw, 28px) !important;
-    padding-top: 5.8rem !important;
-  }
-
-  nav {
-    left: 10px !important;
-    right: 10px !important;
-    top: 10px !important;
-    transform: none !important;
-    width: calc(100vw - 20px) !important;
-    max-width: calc(100vw - 20px) !important;
-    overflow-x: auto !important;
-    justify-content: flex-start !important;
-    border-radius: 22px !important;
-    padding: 7px !important;
-    gap: 8px !important;
-    scrollbar-width: none !important;
-  }
-  nav::-webkit-scrollbar { display: none !important; }
-  nav button { flex: 0 0 auto !important; }
-  nav button span { white-space: nowrap !important; }
-
-  .portfolio-hero {
-    margin-top: 1rem !important;
-    padding: 2rem 1.15rem !important;
-    border-radius: 28px !important;
-  }
-  .hero-title,
-  .portfolio-hero h1 {
-    font-size: clamp(2.25rem, 11vw, 4.4rem) !important;
-    line-height: 1.05 !important;
-  }
-  .hero-chip { font-size: .66rem !important; padding: .5rem .7rem !important; }
-  .hero-frame { width: min(76vw, 320px) !important; padding: 10px !important; }
-  .hero-floating-card { display: none !important; }
-
-  /* Restore desktop-like scrollytelling behavior on touch devices. */
-  .scrollytelling-wrapper {
-    height: calc((var(--scrolly-images, 3) * 72vh) + 185vh) !important;
-    min-height: 240vh !important;
-    margin-bottom: 16vh !important;
-  }
-  .scrollytelling-wrapper > .sticky,
-  body.layout-portfolio .scrollytelling-wrapper .sticky {
-    position: sticky !important;
-    top: 5.5rem !important;
-    height: auto !important;
-    padding-top: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-  .layout-portfolio .unified-card {
-    max-width: 100% !important;
-    border-radius: 28px !important;
-  }
-  .layout-portfolio .unified-card > div:first-child {
-    padding: 1.45rem 1.15rem !important;
-  }
-  .layout-portfolio .unified-card h4 {
-    font-size: clamp(1.65rem, 8vw, 3rem) !important;
-    line-height: 1.12 !important;
-    letter-spacing: -0.045em !important;
-  }
-  .layout-portfolio .unified-card h5 {
-    font-size: clamp(1rem, 4.6vw, 1.35rem) !important;
-    margin-bottom: .9rem !important;
-  }
-  .layout-portfolio .unified-card p,
-  .layout-portfolio .unified-card li {
-    font-size: .98rem !important;
-    line-height: 1.65 !important;
-  }
-  .cinematic-image-wrapper {
-    overflow: hidden !important;
-  }
-  .cinematic-image-wrapper.cinematic-expanded {
-    max-height: 54vh !important;
-  }
-  .cinematic-image-wrapper.cinematic-collapsed {
-    max-height: 0 !important;
-  }
-  .cinematic-image-inner {
-    opacity: 0 !important;
-    transform: scale(.97) translateY(16px) !important;
-  }
-  .cinematic-image-wrapper.cinematic-expanded .cinematic-image-inner {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  .scrollytelling-track {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow: visible !important;
-    scroll-snap-type: none !important;
-    scrollbar-width: auto !important;
-    padding: 1.25rem .75rem 1.5rem !important;
-    gap: 1rem !important;
-    will-change: transform !important;
-  }
-  .scrollytelling-track::-webkit-scrollbar { display: none !important; }
-  .scrolly-spacer {
-    display: block !important;
-    flex: 0 0 8vw !important;
-    width: 8vw !important;
-  }
-  .scrollytelling-track .scrolly-spacer:last-child {
-    flex-basis: 140vw !important;
-    width: 140vw !important;
-  }
-  .scrollytelling-track img,
-  .scrollytelling-track .scrolly-full-image {
-    scroll-snap-align: none !important;
-    flex: 0 0 auto !important;
-    width: auto !important;
-    max-width: 82vw !important;
-    height: clamp(190px, 33vh, 310px) !important;
-    max-height: 34vh !important;
-    object-fit: contain !important;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .portfolio-hero { padding: 3rem 2rem !important; }
-  .hero-frame { width: min(42vw, 390px) !important; }
-  .scrollytelling-wrapper {
-    height: calc((var(--scrolly-images, 3) * 78vh) + 210vh) !important;
-    min-height: 270vh !important;
-  }
-  .scrollytelling-wrapper > .sticky,
-  body.layout-portfolio .scrollytelling-wrapper .sticky {
-    top: 6.2rem !important;
-  }
-  .layout-portfolio .unified-card > div:first-child {
-    padding: 2rem 2.25rem !important;
-  }
-  .cinematic-image-wrapper.cinematic-expanded { max-height: 58vh !important; }
-  .scrollytelling-track img,
-  .scrollytelling-track .scrolly-full-image {
-    max-width: 62vw !important;
-    height: clamp(240px, 36vh, 360px) !important;
-    max-height: 38vh !important;
-  }
-}
-
-
-/* ==================================
-   v32 Mobile spacing fix
-   - Reduce oversized gaps between project cards on phones.
-   - Keep vertical scrollytelling, but shorten the scroll stage.
-===================================== */
-@media (max-width: 767px) {
-  .experience-section .experience-title-wrap { margin-bottom: .75rem !important; }
-  .experience-section .experience-rows { margin-top: .75rem !important; }
-
-  .story-section,
-  .scrollytelling-wrapper {
-    margin-bottom: 2.5rem !important;
-  }
-
-  .scrollytelling-wrapper {
-    height: calc((var(--scrolly-images, 1) * 34vh) + 82vh) !important;
-    min-height: 112vh !important;
-  }
-
-  .scrollytelling-wrapper > .sticky,
-  body.layout-portfolio .scrollytelling-wrapper .sticky {
-    top: 5rem !important;
-  }
-
-  .layout-portfolio .unified-card > div:first-child {
-    padding-top: 1.25rem !important;
-    padding-bottom: 1.25rem !important;
-  }
-
-  .cinematic-image-wrapper.cinematic-expanded {
-    max-height: 48vh !important;
-  }
-
-  .scrollytelling-track {
-    padding-top: .85rem !important;
-    padding-bottom: 1rem !important;
-  }
-
-  .scrollytelling-track img,
-  .scrollytelling-track .scrolly-full-image {
-    height: clamp(170px, 29vh, 260px) !important;
-    max-height: 30vh !important;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .story-section,
-  .scrollytelling-wrapper {
-    margin-bottom: 4rem !important;
-  }
-  .scrollytelling-wrapper {
-    height: calc((var(--scrolly-images, 1) * 46vh) + 118vh) !important;
-    min-height: 150vh !important;
-  }
-}
-
-/* ==================================
-   v39 Cursor-local seamless tilt grid + full A4 resume layout
-===================================== */
-:root{--project-version:'v49'}
-#mouse-grid-field{
-  position:fixed!important;
-  inset:0!important;
-  z-index:1!important;
-  pointer-events:none!important;
-  perspective:1050px!important;
-  opacity:0!important;
-  transition:opacity .24s ease!important;
-  contain:layout paint style!important;
-}
-body.layout-portfolio #mouse-grid-field{display:block!important;}
-.mouse-cell{
-  position:fixed!important;
-  left:var(--grid-x,50vw)!important;
-  top:var(--grid-y,50vh)!important;
-  width:var(--grid-size,96px)!important;
-  height:var(--grid-size,96px)!important;
-  display:block!important;
-  opacity:var(--cell-opacity,.25)!important;
-  transform:translate3d(calc(-50% + var(--cell-x,0px)),calc(-50% + var(--cell-y,0px)),0) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important;
-  transform-style:preserve-3d!important;
-  border:1px solid color-mix(in srgb,var(--print-accent,#8b5cf6) 58%,transparent)!important;
-  border-radius:14px!important;
-  background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.01))!important;
-  box-shadow:0 0 18px color-mix(in srgb,var(--print-accent,#8b5cf6) 18%,transparent), inset 0 0 18px rgba(255,255,255,.025)!important;
-  backdrop-filter:blur(.6px)!important;
-  transition:opacity .18s ease, border-color .18s ease, transform .08s linear!important;
-  will-change:transform,opacity!important;
-}
-.mouse-cell.is-center{
-  border-style:dashed!important;
-  background:transparent!important;
-  box-shadow:0 0 10px color-mix(in srgb,var(--print-accent-2,#22d3ee) 16%,transparent)!important;
-}
-@media (hover:none),(pointer:coarse),(max-width:1023px){#mouse-grid-field,.mouse-cell{display:none!important}}
-.resume-toggle-grid label{
-  display:flex;align-items:center;gap:.65rem;padding:.85rem 1rem;border:1px solid rgba(148,163,184,.22);border-radius:1rem;background:rgba(15,23,42,.72);color:#e2e8f0;font-weight:800;font-size:.9rem
-}
-.resume-toggle-grid input{width:1rem;height:1rem;accent-color:#22d3ee}
-body.layout-resume #app{max-width:1120px!important;width:min(1120px,calc(100vw - 32px))!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
-body.layout-resume .resume-fixed-map.resume-cv-shell{width:100%!important;min-height:1120px;grid-template-columns:minmax(260px,31%) 1fr!important;border-radius:0!important;box-shadow:0 30px 100px rgba(0,0,0,.22)!important}
-body.layout-resume .resume-cv-sidebar header img{object-fit:cover!important;object-position:center!important;aspect-ratio:1/1!important}
-@media print{
-  body.layout-resume #app{width:210mm!important;max-width:210mm!important;margin:0 auto!important;padding:0!important}
-  body.layout-resume .resume-fixed-map.resume-cv-shell{width:210mm!important;min-height:297mm!important;grid-template-columns:68mm 142mm!important;border:0!important;box-shadow:none!important;border-radius:0!important;overflow:visible!important}
-  body.layout-resume .resume-cv-sidebar{padding:12mm 7mm!important;min-height:297mm!important}
-  body.layout-resume .resume-cv-main{padding:12mm 11mm!important;min-height:297mm!important}
-  body.layout-resume .resume-cv-sidebar header img{width:30mm!important;height:30mm!important;margin:0 0 6mm 0!important;border-radius:8mm!important;object-fit:cover!important;object-position:center!important}
-  body.layout-resume .resume-cv-sidebar header h1{font-size:18pt!important;line-height:1.14!important}
-  body.layout-resume .resume-cv-sidebar header p{font-size:9pt!important;line-height:1.35!important}
-  body.layout-resume .resume-cv-main section{margin-bottom:5mm!important;break-inside:avoid!important}
-  body.layout-resume .resume-cv-main h3{font-size:13pt!important;margin:0 0 4mm 0!important;padding-bottom:2mm!important}
-  body.layout-resume .resume-cv-main h4{font-size:11pt!important;line-height:1.3!important}
-  body.layout-resume .resume-cv-main p,body.layout-resume .resume-cv-main li,body.layout-resume .resume-cv-main span{font-size:9.5pt!important;line-height:1.45!important}
-  body.layout-resume .extra-card{padding:3mm!important;margin-bottom:3mm!important;break-inside:avoid!important}
-}
-
-
-/* ==================================
-   v39 final override: true full-sheet A4 resume + visible seamless cursor grid
-   - Resume mode uses the whole 210mm x 297mm sheet, not a cropped card.
-   - Component positions remain locked: profile/contact/skills left, summary/work/extra content right.
+   v50 Impeccable UI/UX ProMax Layer
+   Goal: premium, consistent, export-safe visual system without touching data/export logic.
 ===================================== */
 :root{
-  --project-version:'v49';
-  --resume-a4-width:210mm;
-  --resume-a4-height:297mm;
-  --resume-left-col:64mm;
-  --resume-right-col:146mm;
-  --resume-screen-shadow:0 32px 110px rgba(0,0,0,.34);
+  --uiux-surface: rgba(255,255,255,.075);
+  --uiux-surface-strong: rgba(255,255,255,.12);
+  --uiux-stroke: rgba(255,255,255,.14);
+  --uiux-text-muted: rgba(226,232,240,.78);
+  --uiux-shadow: 0 32px 110px rgba(2,6,23,.34);
+  --uiux-radius-xl: 34px;
+  --uiux-radius-lg: 24px;
+  --uiux-focus: color-mix(in srgb, var(--theme-accent, #3b82f6) 42%, white);
 }
-
-/* Put the cursor grid above the background but below nav/modals. */
-body.layout-portfolio #mouse-grid-field{
-  position:fixed!important;
-  inset:0!important;
-  z-index:18!important;
-  pointer-events:none!important;
-  perspective:920px!important;
-  opacity:1!important;
-  display:block!important;
-  transition:opacity .18s ease!important;
-  contain:layout paint style!important;
+body.mode-light{
+  --uiux-surface: rgba(255,255,255,.82);
+  --uiux-surface-strong: rgba(255,255,255,.94);
+  --uiux-stroke: rgba(15,23,42,.10);
+  --uiux-text-muted: rgba(51,65,85,.82);
+  --uiux-shadow: 0 28px 90px rgba(15,23,42,.14);
 }
-body.layout-portfolio .mouse-cell{
-  position:fixed!important;
-  left:var(--grid-x,50vw)!important;
-  top:var(--grid-y,50vh)!important;
-  width:var(--grid-size,96px)!important;
-  height:var(--grid-size,96px)!important;
-  display:block!important;
-  opacity:var(--cell-opacity,.38)!important;
-  transform:translate3d(calc(-50% + var(--cell-x,0px)),calc(-50% + var(--cell-y,0px)),0) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important;
-  transform-style:preserve-3d!important;
-  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 72%,transparent)!important;
-  border-radius:16px!important;
-  background:linear-gradient(135deg,rgba(255,255,255,.060),rgba(255,255,255,.012))!important;
-  box-shadow:0 0 22px color-mix(in srgb,var(--print-accent,#a855f7) 24%,transparent), inset 0 0 22px rgba(255,255,255,.035)!important;
-  backdrop-filter:blur(.4px)!important;
-  transition:opacity .16s ease, transform .08s linear!important;
-  will-change:transform,opacity!important;
-}
-body.layout-portfolio .mouse-cell.is-center{
-  opacity:.24!important;
-  border-style:dashed!important;
-  background:rgba(255,255,255,.012)!important;
-  box-shadow:0 0 14px color-mix(in srgb,var(--print-accent-2,#22d3ee) 22%,transparent)!important;
-}
-body.layout-resume #mouse-grid-field,
-body.layout-resume .mouse-cell{display:none!important;}
-@media (hover:none),(pointer:coarse),(max-width:1023px){
-  #mouse-grid-field,.mouse-cell{display:none!important;}
-}
-
-/* Resume page preview: a real A4 sheet, not a container card. */
-body.layout-resume{
-  background:#101827!important;
-  overflow-x:auto!important;
-}
-body.layout-resume #app,
-body.layout-resume .resume-a4-preview{
-  width:var(--resume-a4-width)!important;
-  max-width:none!important;
-  min-width:var(--resume-a4-width)!important;
-  min-height:var(--resume-a4-height)!important;
-  margin:6.8rem auto 3rem!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:#ffffff!important;
-  box-shadow:var(--resume-screen-shadow)!important;
-  overflow:visible!important;
-}
-body.layout-resume .resume-fixed-map.resume-cv-shell,
-body.layout-resume .resume-a4-sheet{
-  width:var(--resume-a4-width)!important;
-  min-width:var(--resume-a4-width)!important;
-  min-height:var(--resume-a4-height)!important;
-  display:grid!important;
-  grid-template-columns:var(--resume-left-col) var(--resume-right-col)!important;
-  align-items:stretch!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  overflow:visible!important;
-  background:#ffffff!important;
-}
-body.layout-resume .resume-cv-sidebar{
-  min-height:var(--resume-a4-height)!important;
-  padding:14mm 7mm 13mm!important;
-  background:linear-gradient(160deg,var(--resume-sidebar-1,#0f766e) 0%,var(--resume-sidebar-2,#134e4a) 45%,var(--resume-sidebar-3,#0f172a) 100%)!important;
-  color:#ffffff!important;
-  display:block!important;
-}
-body.layout-resume .resume-cv-main{
-  min-height:var(--resume-a4-height)!important;
-  padding:13mm 13mm 13mm 12mm!important;
-  background:#ffffff!important;
-  color:#0f172a!important;
-  display:block!important;
-}
-body.layout-resume .resume-section-card,
-body.layout-resume .resume-cv-main > div,
-body.layout-resume .resume-cv-main section,
-body.layout-resume .resume-cv-sidebar section,
-body.layout-resume .resume-sidebar-block{
-  background:transparent!important;
-  border:0!important;
-  box-shadow:none!important;
-  border-radius:0!important;
-  padding:0!important;
-}
-
-/* Sidebar: compact, full-height CV column similar to standard A4 resume templates. */
-body.layout-resume .resume-cv-sidebar header{
-  display:block!important;
-  text-align:left!important;
-  padding:0 0 8mm!important;
-  margin:0 0 8mm!important;
-  border:0!important;
-  border-bottom:1px solid rgba(255,255,255,.32)!important;
-}
-body.layout-resume .resume-cv-sidebar header img{
-  width:34mm!important;
-  height:34mm!important;
-  min-width:34mm!important;
-  min-height:34mm!important;
-  margin:0 0 5.5mm!important;
-  border-radius:999px!important;
-  border:2mm solid rgba(255,255,255,.90)!important;
-  object-fit:cover!important;
-  object-position:center!important;
-  box-shadow:none!important;
-}
-body.layout-resume .resume-cv-sidebar header h1{
-  font-size:20pt!important;
-  line-height:1.04!important;
-  letter-spacing:.04em!important;
-  margin:0!important;
-  color:#ffffff!important;
-  word-break:break-word!important;
-}
-body.layout-resume .resume-cv-sidebar header p{
-  font-size:9.3pt!important;
-  line-height:1.35!important;
-  letter-spacing:.10em!important;
-  margin:3mm 0 0!important;
-  color:rgba(255,255,255,.86)!important;
-}
-body.layout-resume .resume-cv-sidebar h3{
-  font-size:10.5pt!important;
-  line-height:1.25!important;
-  margin:0 0 4mm!important;
-  padding:0 0 2mm!important;
-  border-left:0!important;
-  border-bottom:1px solid rgba(255,255,255,.36)!important;
-  background:transparent!important;
-  color:#ffffff!important;
-  letter-spacing:.08em!important;
-}
-body.layout-resume .resume-cv-sidebar .contact-section,
-body.layout-resume .resume-cv-sidebar .skills-section{
-  margin:0 0 8mm!important;
-}
-body.layout-resume .resume-cv-sidebar p,
-body.layout-resume .resume-cv-sidebar li,
-body.layout-resume .resume-cv-sidebar span,
-body.layout-resume .resume-cv-sidebar a,
-body.layout-resume .resume-cv-sidebar div{
-  font-size:8.5pt!important;
-  line-height:1.42!important;
-  color:rgba(255,255,255,.90)!important;
-}
-body.layout-resume .resume-cv-sidebar .flex.flex-wrap{
-  gap:2.2mm!important;
-}
-body.layout-resume .resume-cv-sidebar .flex.flex-wrap span{
-  border:1px solid rgba(255,255,255,.28)!important;
-  background:rgba(255,255,255,.08)!important;
-  color:#ffffff!important;
-  box-shadow:none!important;
-  border-radius:999px!important;
-  padding:1.4mm 2.4mm!important;
-  font-size:7.6pt!important;
-  line-height:1.25!important;
-}
-
-/* Main column: use available area with smaller spacing and a professional A4 rhythm. */
-body.layout-resume .resume-cv-main section{
-  margin:0 0 6.2mm!important;
-  break-inside:avoid!important;
-  page-break-inside:avoid!important;
-}
-body.layout-resume .resume-cv-main h3{
-  display:flex!important;
-  align-items:center!important;
-  min-height:auto!important;
-  font-size:12.5pt!important;
-  line-height:1.18!important;
-  margin:0 0 4mm!important;
-  padding:0 0 2mm!important;
-  border-left:0!important;
-  border-bottom:1.2pt solid var(--resume-accent,#0f766e)!important;
-  background:transparent!important;
-  color:var(--resume-accent,#0f766e)!important;
-  letter-spacing:.055em!important;
-}
-body.layout-resume .resume-cv-main p,
-body.layout-resume .resume-cv-main li,
-body.layout-resume .resume-cv-main span,
-body.layout-resume .resume-cv-main div:not(.glow-point){
-  font-size:9pt!important;
-  line-height:1.44!important;
-  color:#334155!important;
-}
-body.layout-resume .resume-cv-main h4{
-  font-size:11.2pt!important;
-  line-height:1.24!important;
-  margin:1mm 0 .6mm!important;
-  color:#0f172a!important;
-}
-body.layout-resume .resume-cv-main h5{
-  font-size:9.2pt!important;
-  line-height:1.28!important;
-  margin:.6mm 0 1.4mm!important;
-  color:var(--resume-accent,#0f766e)!important;
-}
-body.layout-resume .resume-cv-main ul{
-  margin-top:2mm!important;
-  padding-left:5.5mm!important;
-  gap:0!important;
-}
-body.layout-resume .resume-cv-main li{
-  margin:0 0 1.2mm!important;
-  padding-left:0!important;
-}
-body.layout-resume .resume-cv-main .resume-card,
-body.layout-resume .resume-cv-main .print-exp-item{
-  margin:0 0 5.6mm!important;
-  padding:1mm 0 1mm 7mm!important;
-  border-left:1.2pt solid var(--resume-accent,#0f766e)!important;
-  background:transparent!important;
-  box-shadow:none!important;
-  border-radius:0!important;
-  break-inside:avoid!important;
-  page-break-inside:avoid!important;
-}
-body.layout-resume .resume-cv-main .glow-point{
-  width:2.8mm!important;
-  height:2.8mm!important;
-  left:-1.55mm!important;
-  top:2.6mm!important;
-  border-radius:999px!important;
-  box-shadow:none!important;
-  ring:0!important;
-  background:var(--resume-accent-2,#14b8a6)!important;
-}
-body.layout-resume .resume-cv-main .resume-card > span,
-body.layout-resume .resume-cv-main .print-exp-item > span,
-body.layout-resume .resume-cv-main .font-mono{
-  font-size:8.2pt!important;
-  letter-spacing:.02em!important;
-  color:var(--resume-accent,#0f766e)!important;
-}
-
-/* Screen fallback: keep A4 proportions but allow mobile users to inspect it without broken columns. */
-@media screen and (max-width: 900px){
-  body.layout-resume #app,
-  body.layout-resume .resume-a4-preview{
-    width:calc(100vw - 24px)!important;
-    min-width:0!important;
-    margin:5.5rem 12px 2rem!important;
-  }
-  body.layout-resume .resume-fixed-map.resume-cv-shell,
-  body.layout-resume .resume-a4-sheet{
-    width:100%!important;
-    min-width:0!important;
-    grid-template-columns:1fr!important;
-  }
-  body.layout-resume .resume-cv-sidebar,
-  body.layout-resume .resume-cv-main{
-    min-height:auto!important;
-    padding:24px 20px!important;
-  }
-  body.layout-resume .resume-cv-sidebar header img{
-    width:92px!important;
-    height:92px!important;
-    min-width:92px!important;
-    min-height:92px!important;
-  }
-}
-
-@page{
-  size:A4 portrait;
-  margin:0;
-}
-@media print{
-  html,body{
-    width:210mm!important;
-    min-height:297mm!important;
-    margin:0!important;
-    padding:0!important;
-    background:#ffffff!important;
-    -webkit-print-color-adjust:exact!important;
-    print-color-adjust:exact!important;
-  }
-  body.layout-resume #app,
-  body.layout-resume .resume-a4-preview{
-    width:210mm!important;
-    max-width:210mm!important;
-    min-width:210mm!important;
-    min-height:297mm!important;
-    margin:0!important;
-    padding:0!important;
-    border:0!important;
-    box-shadow:none!important;
-    background:#ffffff!important;
-  }
-  body.layout-resume .resume-fixed-map.resume-cv-shell,
-  body.layout-resume .resume-a4-sheet{
-    width:210mm!important;
-    min-width:210mm!important;
-    min-height:297mm!important;
-    grid-template-columns:64mm 146mm!important;
-    box-shadow:none!important;
-    border:0!important;
-    border-radius:0!important;
-  }
-  body.layout-resume .resume-cv-sidebar{
-    min-height:297mm!important;
-    padding:14mm 7mm 13mm!important;
-  }
-  body.layout-resume .resume-cv-main{
-    min-height:297mm!important;
-    padding:13mm 13mm 13mm 12mm!important;
-  }
-  body.layout-resume .resume-section-card,
-  body.layout-resume .resume-cv-main section,
-  body.layout-resume .resume-cv-sidebar section,
-  body.layout-resume .resume-sidebar-block{
-    page-break-inside:avoid!important;
-    break-inside:avoid!important;
-  }
-  body.layout-resume .resume-cv-sidebar header,
-  body.layout-resume .resume-cv-main > .resume-section-card:first-child,
-  body.layout-resume .resume-cv-main > section:first-child{
-    break-after:auto!important;
-    page-break-after:auto!important;
-  }
-  body.layout-resume nav,
-  body.layout-resume #export-panel,
-  body.layout-resume #canva-panel,
-  body.layout-resume #theme-panel,
-  body.layout-resume #scroll-progress,
-  body.layout-resume #theme-decorations,
-  body.layout-resume #mouse-grid-field,
-  body.layout-resume .no-print{
-    display:none!important;
-  }
-}
-
-
-/* ==================================
-   v40: mode-aware Canva prompt + stronger visible 3x3 cursor grid
-   The grid is intentionally above portfolio content but below the fixed nav.
-===================================== */
-:root{--project-version:'v49'}
-body.layout-portfolio #mouse-grid-field{
-  position:fixed!important;
-  inset:0!important;
-  z-index:49!important;
-  pointer-events:none!important;
-  display:block!important;
-  opacity:1!important;
-  perspective:1000px!important;
-  transform-style:preserve-3d!important;
-  contain:layout paint style!important;
-  mix-blend-mode:screen!important;
-}
-body.layout-portfolio #mouse-grid-field::before{
-  content:''!important;
-  position:fixed!important;
-  left:var(--grid-x,50vw)!important;
-  top:var(--grid-y,50vh)!important;
-  width:calc(var(--grid-size,104px) * 3.18)!important;
-  height:calc(var(--grid-size,104px) * 3.18)!important;
-  transform:translate(-50%,-50%)!important;
-  border-radius:22px!important;
-  background:radial-gradient(circle at center, color-mix(in srgb,var(--print-accent-2,#22d3ee) 18%,transparent) 0%, transparent 58%)!important;
-  opacity:.42!important;
-  filter:blur(10px)!important;
-}
-body.layout-portfolio #mouse-grid-field .mouse-cell{
-  position:fixed!important;
-  left:var(--grid-x,50vw)!important;
-  top:var(--grid-y,50vh)!important;
-  width:var(--grid-size,104px)!important;
-  height:var(--grid-size,104px)!important;
-  display:block!important;
-  opacity:var(--cell-opacity,.52)!important;
-  transform:translate3d(calc(-50% + var(--cell-x,0px)),calc(-50% + var(--cell-y,0px)),0) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))!important;
-  transform-style:preserve-3d!important;
-  transform-origin:center center!important;
-  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 78%,transparent)!important;
-  border-radius:14px!important;
-  background:
-    linear-gradient(90deg, color-mix(in srgb,var(--print-accent-2,#22d3ee) 15%,transparent) 1px, transparent 1px),
-    linear-gradient(0deg, color-mix(in srgb,var(--print-accent-2,#22d3ee) 15%,transparent) 1px, transparent 1px),
-    linear-gradient(135deg,rgba(255,255,255,.070),rgba(255,255,255,.012))!important;
-  background-size:calc(var(--grid-size,104px) / 2) calc(var(--grid-size,104px) / 2), calc(var(--grid-size,104px) / 2) calc(var(--grid-size,104px) / 2), auto!important;
-  box-shadow:0 0 22px color-mix(in srgb,var(--print-accent,#a855f7) 30%,transparent), inset 0 0 22px rgba(255,255,255,.045)!important;
-  backdrop-filter:blur(.3px)!important;
-  transition:opacity .12s ease, transform .045s linear!important;
-  will-change:transform,opacity!important;
-}
-body.layout-portfolio #mouse-grid-field .mouse-cell.is-center{
-  opacity:.34!important;
-  border-style:dashed!important;
-  border-color:color-mix(in srgb,var(--print-accent-2,#22d3ee) 80%,transparent)!important;
-  background:transparent!important;
-  box-shadow:0 0 18px color-mix(in srgb,var(--print-accent-2,#22d3ee) 30%,transparent)!important;
-}
-body.layout-resume #mouse-grid-field,
-body.layout-resume #mouse-grid-field .mouse-cell{display:none!important;opacity:0!important;}
-@media (hover:none),(pointer:coarse),(max-width:1023px){
-  #mouse-grid-field,#mouse-grid-field .mouse-cell{display:none!important;opacity:0!important;}
-}
-@media print{#mouse-grid-field,#mouse-grid-field .mouse-cell{display:none!important;}}
-
-
-/* ==================================
-   v43: robust cursor-local seamless 3x3 tilt grid
-   Shows only 3x3 cells around the cursor. No static tile.
-===================================== */
-#mouse-grid-field,
-#mouse-grid-field .mouse-cell{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-}
-#cursor-local-grid{
-  --cursor-grid-size:72px;
-  position:fixed!important;
-  inset:0!important;
-  z-index:45!important;
-  pointer-events:none!important;
-  opacity:0!important;
-  transition:opacity .12s ease!important;
-  perspective:1200px!important;
-  transform-style:preserve-3d!important;
-  contain:layout paint style!important;
-}
-body.layout-portfolio #cursor-local-grid.is-active{
-  opacity:1!important;
-}
-.cursor-local-cell{
-  position:fixed!important;
-  left:var(--cell-left,-9999px)!important;
-  top:var(--cell-top,-9999px)!important;
-  width:var(--cursor-grid-size,72px)!important;
-  height:var(--cursor-grid-size,72px)!important;
-  display:block!important;
-  border-radius:10px!important;
-  transform:
-    translate3d(-50%,-50%,0)
-    perspective(760px)
-    rotateX(var(--rx,0deg))
-    rotateY(var(--ry,0deg))
-    translateZ(var(--tz,0px))!important;
-  transform-origin:center center!important;
-  transform-style:preserve-3d!important;
-  opacity:var(--cell-opacity,.5)!important;
-  border:1px solid rgba(236,72,253,.34)!important;
-  background:
-    linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255,255,255,.18) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(236,72,253,.08), rgba(34,211,238,.035), transparent)!important;
-  background-size:50% 50%,50% 50%,auto!important;
-  box-shadow:
-    0 0 16px rgba(236,72,253,.22),
-    inset 0 0 14px rgba(255,255,255,.045)!important;
-  backdrop-filter:blur(.2px)!important;
-  will-change:transform,opacity,left,top!important;
-}
-.cursor-local-cell.is-center{
-  opacity:.22!important;
-  border-style:dashed!important;
-  border-color:rgba(34,211,238,.36)!important;
-  background:
-    linear-gradient(90deg, rgba(34,211,238,.14) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(34,211,238,.14) 1px, transparent 1px)!important;
-  background-size:50% 50%!important;
-  box-shadow:0 0 14px rgba(34,211,238,.18)!important;
-}
-body.layout-resume #cursor-local-grid,
-body.layout-resume .cursor-local-cell,
-body:not(.layout-portfolio) #cursor-local-grid{
-  display:none!important;
-  opacity:0!important;
-}
-@media (hover:none),(pointer:coarse),(max-width:767px),print{
-  #cursor-local-grid,.cursor-local-cell{
-    display:none!important;
-    opacity:0!important;
-  }
-}
-
-/* ==================================
-   v43 mobile/tablet scrollytelling hardening
-   Fix: keep Experience project visuals driven by vertical page scroll on touch devices.
-===================================== */
-@media screen and (max-width: 1023px) {
-  body.layout-portfolio .experience-section {
-    overflow: visible !important;
-    touch-action: pan-y !important;
-  }
-  body.layout-portfolio .experience-section .experience-rows,
-  body.layout-portfolio .experience-section .quick-edit-zone {
-    overflow: visible !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-wrapper {
-    position: relative !important;
-    overflow: visible !important;
-    contain: none !important;
-    height: max(158vh, calc((var(--scrolly-images, 1) * 44vh) + 112vh)) !important;
-    min-height: 158vh !important;
-    margin-bottom: clamp(2.25rem, 8vh, 5.5rem) !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-wrapper > .sticky,
-  body.layout-portfolio .experience-section .scrollytelling-wrapper .sticky {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: calc(env(safe-area-inset-top, 0px) + 5.25rem) !important;
-    z-index: 12 !important;
-    width: 100% !important;
-    overflow: visible !important;
-    transform: translateZ(0) !important;
-  }
-  body.layout-portfolio .experience-section .cinematic-image-wrapper {
-    display: block !important;
-    width: 100% !important;
-    overflow: hidden !important;
-    transition: max-height .22s ease, opacity .18s ease !important;
-  }
-  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-collapsed {
-    max-height: 0 !important;
-    opacity: 0 !important;
-  }
-  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded {
-    max-height: 49vh !important;
-    opacity: 1 !important;
-  }
-  body.layout-portfolio .experience-section .cinematic-image-inner {
-    width: 100% !important;
-    overflow: visible !important;
-    opacity: 0 !important;
-    transform: translate3d(0, 10px, 0) scale(.985) !important;
-    transition: opacity .2s ease, transform .2s ease !important;
-  }
-  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded .cinematic-image-inner {
-    opacity: 1 !important;
-    transform: translate3d(0, 0, 0) scale(1) !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-track {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    width: max-content !important;
-    max-width: none !important;
-    min-width: 100% !important;
-    overflow: visible !important;
-    scroll-snap-type: none !important;
-    transform: translate3d(0,0,0) !important;
-    will-change: transform !important;
-    backface-visibility: hidden !important;
-    gap: clamp(.75rem, 3vw, 1.15rem) !important;
-    padding: .9rem .65rem 1.05rem !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-track img,
-  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
-    flex: 0 0 auto !important;
-    width: auto !important;
-    max-width: 82vw !important;
-    height: clamp(172px, 30vh, 270px) !important;
-    max-height: 31vh !important;
-    object-fit: contain !important;
-    object-position: center !important;
-  }
-  body.layout-portfolio .experience-section .scrolly-spacer {
-    display: block !important;
-    flex: 0 0 10vw !important;
-    width: 10vw !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-spacer:last-child {
-    flex-basis: 160vw !important;
-    width: 160vw !important;
-  }
-}
-
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-  body.layout-portfolio .experience-section .scrollytelling-wrapper {
-    height: max(190vh, calc((var(--scrolly-images, 1) * 54vh) + 136vh)) !important;
-    min-height: 190vh !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-wrapper > .sticky,
-  body.layout-portfolio .experience-section .scrollytelling-wrapper .sticky {
-    top: calc(env(safe-area-inset-top, 0px) + 6.1rem) !important;
-  }
-  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded {
-    max-height: 58vh !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-track img,
-  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
-    max-width: 64vw !important;
-    height: clamp(240px, 36vh, 370px) !important;
-    max-height: 38vh !important;
-  }
-}
-
-@media print {
-  body.layout-portfolio .experience-section .scrollytelling-wrapper,
-  body.layout-portfolio .experience-section .scrollytelling-wrapper > .sticky,
-  body.layout-portfolio .experience-section .scrollytelling-wrapper .sticky {
-    height: auto !important;
-    min-height: 0 !important;
-    position: static !important;
-    top: auto !important;
-  }
-}
-
-
-/* ==================================
-   v48 Mobile Scrollytelling Transform + End Collapse Fix
-   Reason: previous mobile CSS used transform: translate3d(0,0,0)!important;
-   that overrides JS inline transform on touch devices. The scroll engine now writes
-   --scrolly-x and CSS applies it with !important, so project images move again.
-===================================== */
-body.layout-portfolio .experience-section .scrollytelling-track,
-body.layout-portfolio .scrollytelling-track {
-  transform: translate3d(var(--scrolly-x, 0px), 0, 0) !important;
-  will-change: transform !important;
-}
-@media (max-width: 1023px) {
-  body.layout-portfolio .experience-section .scrollytelling-track,
-  body.layout-portfolio .scrollytelling-track {
-    transform: translate3d(var(--scrolly-x, 0px), 0, 0) !important;
-    transition: none !important;
-    touch-action: pan-y !important;
-  }
-  body.layout-portfolio .experience-section .cinematic-image-wrapper.cinematic-expanded {
-    max-height: min(49vh, 420px) !important;
-  }
-}
-
-
-/* ==================================
-   v48 Mobile Scrollytelling End Collapse Fix
-   The image rail should collapse after its scroll-driven motion finishes,
-   before the next project starts.
-===================================== */
-@media (max-width: 1023px) {
-  body.layout-portfolio .experience-section .scrollytelling-wrapper.scrolly-terminal-collapsed .cinematic-image-wrapper {
-    max-height: 0 !important;
-    opacity: 0 !important;
-  }
-  body.layout-portfolio .experience-section .scrollytelling-wrapper.scrolly-terminal-collapsed .cinematic-image-inner {
-    opacity: 0 !important;
-    transform: translate3d(0, 10px, 0) scale(.985) !important;
-  }
-}
-
-
-/* ==================================
-   v48: anchored background tilt grid
-   - The grid is embedded into the page background, not a cursor-tail layer.
-   - Only 3x3 cells around the cursor's current background grid cell become visible.
-   - Cell positions snap to the fixed page grid; cells do not follow the cursor continuously.
-===================================== */
-body.layout-portfolio #app{
-  position:relative!important;
-  z-index:2!important;
-}
-body.layout-portfolio nav,
-body.layout-portfolio #theme-panel,
-body.layout-portfolio #public-export-branch,
-body.layout-portfolio #public-canva-branch,
-body.layout-portfolio #edit-modal{
-  z-index:50!important;
-}
-#cursor-local-grid{
-  --cursor-grid-size:88px;
-  position:fixed!important;
-  inset:0!important;
-  z-index:1!important;
-  pointer-events:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-  overflow:hidden!important;
-  perspective:1400px!important;
-  transform-style:preserve-3d!important;
-  contain:layout paint style!important;
-  transition:opacity .14s ease, visibility .14s ease!important;
-  mix-blend-mode:screen!important;
-}
-body.layout-portfolio #cursor-local-grid.is-active{
-  opacity:1!important;
-  visibility:visible!important;
-}
-#cursor-local-grid::before{
+html{scroll-behavior:smooth;}
+body{font-feature-settings:'kern' 1;}
+body:not(.layout-resume)::after{
   content:"";
   position:fixed;
   inset:0;
-  opacity:.045;
-  background-image:
-    linear-gradient(90deg, rgba(255,255,255,.36) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255,255,255,.36) 1px, transparent 1px);
-  background-size:var(--cursor-grid-size,88px) var(--cursor-grid-size,88px);
-  background-position:var(--grid-offset-x,0px) var(--grid-offset-y,0px);
-  mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 190px, transparent 280px);
-  -webkit-mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 190px, transparent 280px);
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 16%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 18%, transparent), transparent 28%),
+    radial-gradient(circle at 86% 12%, color-mix(in srgb, var(--theme-accent, #3b82f6) 16%, transparent), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,.035), transparent 38%, rgba(0,0,0,.10));
+  opacity:.88;
 }
-.cursor-local-cell{
-  position:fixed!important;
-  left:var(--cell-left,-9999px)!important;
-  top:var(--cell-top,-9999px)!important;
-  width:var(--cursor-grid-size,88px)!important;
-  height:var(--cursor-grid-size,88px)!important;
-  display:block!important;
-  border-radius:14px!important;
+body.mode-light:not(.layout-resume)::after{opacity:.64;background:
+    radial-gradient(circle at 18% 16%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 17%, transparent), transparent 30%),
+    radial-gradient(circle at 86% 12%, color-mix(in srgb, var(--theme-accent, #3b82f6) 14%, transparent), transparent 32%);
+}
+#app{position:relative;z-index:1;}
+
+/* Premium navigation */
+nav{
+  gap:10px!important;
+  background: color-mix(in srgb, #020617 72%, transparent)!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  box-shadow:0 18px 60px rgba(2,6,23,.30), inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+body.mode-light nav{background:rgba(255,255,255,.78)!important;border-color:rgba(15,23,42,.10)!important;box-shadow:0 18px 60px rgba(15,23,42,.12)!important;}
+nav button,
+#public-export-branch button,
+.quick-edit-actions button{
+  outline:none!important;
+}
+nav button:focus-visible,
+#public-export-branch button:focus-visible,
+.quick-edit-actions button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible{
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--uiux-focus) 30%, transparent)!important;
+}
+#public-export-branch{
+  position:fixed;
+  right:22px;
+  top:82px;
+  z-index:49;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:12px;
+  border-radius:24px;
+  background:color-mix(in srgb,#020617 78%, transparent);
+  border:1px solid rgba(255,255,255,.13);
+  backdrop-filter:blur(22px);
+  box-shadow:var(--uiux-shadow);
+}
+#public-export-branch.hidden{display:none!important;}
+#public-export-branch button{
+  min-width:92px;
+  justify-content:flex-start;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:10px 13px;
+  border-radius:16px;
+  font-weight:900;
+  letter-spacing:.06em;
+  color:#e2e8f0;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+}
+#public-export-branch button:hover{transform:translateY(-1px);background:color-mix(in srgb,var(--theme-accent,#3b82f6) 20%,rgba(255,255,255,.08));}
+
+/* Hero: impeccable first impression */
+.layout-portfolio .portfolio-hero{
+  min-height:clamp(560px, 78vh, 840px);
+  padding:clamp(54px, 8vw, 96px)!important;
+  border-radius:clamp(32px, 4vw, 56px)!important;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.035)),
+    radial-gradient(circle at 78% 22%, color-mix(in srgb,var(--theme-accent-2,#38bdf8) 26%, transparent), transparent 34%),
+    radial-gradient(circle at 18% 85%, color-mix(in srgb,var(--theme-accent,#3b82f6) 24%, transparent), transparent 38%)!important;
+  box-shadow:var(--uiux-shadow), inset 0 1px 0 rgba(255,255,255,.10)!important;
+  overflow:hidden;
+}
+.layout-portfolio .portfolio-hero::before{
+  content:"";
+  position:absolute;
+  inset:1px;
+  border-radius:inherit;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent),
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 40%);
+  mask-image:linear-gradient(#000, transparent 72%);
+}
+.layout-portfolio .hero-title{
+  letter-spacing:-.075em!important;
+  text-wrap:balance;
+  max-width:12ch;
+}
+.layout-portfolio .portfolio-hero p{
+  max-width:58ch;
+}
+.hero-chip{
+  background:linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.045))!important;
+  border-color:rgba(255,255,255,.16)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 10px 28px rgba(2,6,23,.16)!important;
+}
+.hero-frame{
+  border-radius:clamp(28px, 4vw, 46px)!important;
+  transform:translateZ(0);
+}
+.hero-frame::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(135deg, var(--theme-accent,#3b82f6), rgba(255,255,255,.28), var(--theme-accent-2,#38bdf8));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+}
+
+/* Content cards */
+.layout-portfolio .print-layout-wrapper{gap:clamp(42px, 6vw, 82px)!important;}
+.layout-portfolio section,
+.layout-portfolio .portfolio-extra-section,
+.layout-portfolio .resume-section-card{
+  scroll-margin-top:110px;
+}
+.layout-portfolio .print-order-2 > section,
+.layout-portfolio .print-order-3 > section,
+.layout-portfolio .portfolio-extra-section,
+.layout-portfolio .unified-card,
+.extra-card{
+  backdrop-filter:blur(18px);
+}
+.layout-portfolio .print-order-2 > section,
+.layout-portfolio .print-order-3 > section,
+.layout-portfolio .portfolio-extra-section:not(.cta-section){
+  border-radius:var(--uiux-radius-xl)!important;
+}
+.layout-portfolio .print-order-3{
+  align-items:stretch;
+}
+.layout-portfolio .print-order-3 > section,
+.layout-portfolio .print-order-extra > section{
+  background:var(--uiux-surface)!important;
+  border:1px solid var(--uiux-stroke)!important;
+  box-shadow:0 22px 70px rgba(2,6,23,.16)!important;
+  padding:clamp(22px, 3vw, 34px)!important;
+}
+.layout-portfolio .print-order-3 > section:hover,
+.layout-portfolio .portfolio-extra-section:hover,
+.layout-portfolio .unified-card:hover{
+  transform:translateY(-2px);
+  transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+  border-color:color-mix(in srgb,var(--theme-accent,#3b82f6) 42%, var(--uiux-stroke))!important;
+}
+.section-title,
+.layout-portfolio h3{
+  letter-spacing:.12em!important;
+}
+.section-title::after,
+.layout-portfolio section h3::after{
+  content:"";
+  display:block;
+  width:48px;
+  height:3px;
+  margin-top:10px;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--theme-accent,#3b82f6),var(--theme-accent-2,#38bdf8));
+}
+
+/* Skills: impeccable skill wall */
+.layout-portfolio .print-order-3 span[class*="border"],
+.layout-portfolio section span[class*="border"],
+.layout-resume .resume-cv-sidebar span{
+  position:relative;
+  overflow:hidden;
+}
+.layout-portfolio .print-order-3 span[class*="border"]::before,
+.layout-portfolio section span[class*="border"]::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.22), transparent);
+  transform:translateX(-130%);
+  transition:transform .65s ease;
+}
+.layout-portfolio .print-order-3 span[class*="border"]:hover::before,
+.layout-portfolio section span[class*="border"]:hover::before{transform:translateX(130%);}
+.layout-portfolio .print-order-3 span[class*="border"]:hover,
+.layout-portfolio section span[class*="border"]:hover{
+  transform:translateY(-2px) scale(1.015);
+  border-color:var(--theme-accent,#3b82f6)!important;
+}
+
+/* Experience: premium case-study rhythm */
+.layout-portfolio .unified-card{
+  border-radius:42px!important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.035)),
+    color-mix(in srgb,#020617 46%, transparent)!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  box-shadow:0 30px 110px rgba(2,6,23,.28)!important;
+}
+body.mode-light.layout-portfolio .unified-card{
+  background:linear-gradient(145deg, rgba(255,255,255,.96), rgba(255,255,255,.78))!important;
+  border-color:rgba(15,23,42,.10)!important;
+}
+.layout-portfolio .unified-card h4{
+  letter-spacing:-.055em!important;
+  text-wrap:balance;
+}
+.layout-portfolio .unified-card h5{
+  letter-spacing:.04em!important;
+}
+.layout-portfolio .scrollytelling-track img,
+.layout-portfolio .scrolly-full-image{
+  border-radius:24px!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  box-shadow:0 24px 80px rgba(2,6,23,.30)!important;
+}
+body.mode-light.layout-portfolio .scrollytelling-track img,
+body.mode-light.layout-portfolio .scrolly-full-image{border-color:rgba(15,23,42,.10)!important;box-shadow:0 20px 55px rgba(15,23,42,.14)!important;}
+
+/* Extra sections */
+.extra-card{
+  border-radius:22px!important;
+  border-color:color-mix(in srgb,var(--theme-accent,#3b82f6) 22%, #cbd5e1)!important;
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.extra-card:hover{transform:translateY(-3px);box-shadow:0 18px 45px rgba(15,23,42,.16)!important;border-color:var(--theme-accent,#3b82f6)!important;}
+.client-logo-grid span{transition:transform .22s ease, border-color .22s ease, background .22s ease;}
+.client-logo-grid span:hover{transform:translateY(-2px);border-color:var(--theme-accent,#3b82f6)!important;background:color-mix(in srgb,var(--theme-accent,#3b82f6) 10%, white)!important;}
+
+/* CTA */
+.cta-section{margin-top:64px!important;}
+.cta-box{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.16);
+  background:
+    radial-gradient(circle at 80% 15%, color-mix(in srgb,var(--theme-accent-2,#38bdf8) 36%, transparent), transparent 32%),
+    linear-gradient(135deg, var(--theme-accent,#0f766e), color-mix(in srgb,var(--theme-accent,#0f766e) 50%, #020617))!important;
+}
+.cta-box::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:conic-gradient(from 180deg, transparent, rgba(255,255,255,.18), transparent 26%);
+  animation:uiux-cta-spin 11s linear infinite;
+}
+.cta-box > *{position:relative;z-index:1;}
+.cta-box a{transition:transform .22s ease, box-shadow .22s ease;}
+.cta-box a:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,.22);}
+@keyframes uiux-cta-spin{to{transform:rotate(360deg)}}
+
+/* Modal / form polish */
+#edit-modal > div,
+.quick-edit-card,
+#theme-panel{
+  border-color:rgba(255,255,255,.13)!important;
+  box-shadow:0 30px 100px rgba(2,6,23,.42)!important;
+}
+#edit-modal input,
+#edit-modal textarea,
+#edit-modal select,
+.quick-edit-grid textarea{
+  transition:border-color .22s ease, box-shadow .22s ease, background .22s ease;
+}
+#edit-modal input:focus,
+#edit-modal textarea:focus,
+#edit-modal select:focus,
+.quick-edit-grid textarea:focus{
+  border-color:var(--theme-accent,#3b82f6)!important;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--theme-accent,#3b82f6) 18%, transparent)!important;
+}
+
+/* Resume ProMax */
+body.layout-resume #app{max-width:1180px!important;}
+body.layout-resume .resume-cv-shell{
+  border-radius:34px!important;
+  box-shadow:0 36px 120px rgba(2,6,23,.28)!important;
+}
+body.layout-resume .resume-cv-sidebar{
+  position:relative;
+  overflow:hidden;
+}
+body.layout-resume .resume-cv-sidebar::after{
+  content:"";
+  position:absolute;
+  inset:auto -24% -18% auto;
+  width:260px;
+  height:260px;
+  border-radius:999px;
+  background:radial-gradient(circle, rgba(255,255,255,.16), transparent 62%);
+}
+body.layout-resume .resume-cv-main{
+  background:linear-gradient(180deg,#ffffff,#f8fafc)!important;
+}
+body.layout-resume .resume-card,
+body.layout-resume .extra-card{
+  border-radius:16px!important;
+}
+
+/* Responsive upgrade */
+@media (max-width: 1023px){
+  #public-export-branch{right:12px;top:76px;}
+  .layout-portfolio #app{padding-left:16px!important;padding-right:16px!important;}
+  .layout-portfolio .portfolio-hero{min-height:auto;padding:42px 22px!important;border-radius:30px!important;}
+  .layout-portfolio .hero-title{font-size:clamp(3rem, 15vw, 5.2rem)!important;max-width:100%;}
+  .layout-portfolio .print-order-3{margin-top:36px!important;gap:22px!important;}
+  .layout-portfolio .print-order-3 > section,
+  .layout-portfolio .print-order-extra > section{padding:22px!important;}
+  .layout-portfolio .unified-card{border-radius:28px!important;}
+  .layout-portfolio .scrollytelling-track img,
+  .layout-portfolio .scrolly-full-image{border-radius:18px!important;width:82vw!important;max-width:82vw!important;}
+}
+@media (max-width: 640px){
+  nav{top:10px!important;left:10px!important;right:10px!important;padding:7px!important;}
+  nav button span{font-size:11px!important;}
+  #btn-pill-portfolio,#btn-pill-resume{padding-left:12px!important;padding-right:12px!important;}
+  .hero-chip{font-size:.67rem!important;padding:.55rem .75rem!important;}
+  .layout-portfolio .print-layout-wrapper{gap:34px!important;margin-top:76px!important;}
+  .extra-grid,.extra-grid.three{grid-template-columns:1fr!important;}
+}
+
+/* Print must remain clean and predictable */
+@media print{
+  body::after,.cta-box::before{display:none!important;}
+  .layout-portfolio .print-order-3 > section,
+  .layout-portfolio .print-order-extra > section,
+  .layout-portfolio .unified-card,
+  .extra-card{box-shadow:none!important;transform:none!important;backdrop-filter:none!important;}
+  .section-title::after,
+  .layout-portfolio section h3::after{display:none!important;}
+  .cta-box{background:var(--print-accent,#0f766e)!important;}
+  body.layout-resume .resume-cv-shell{border-radius:0!important;box-shadow:none!important;}
+}
+
+
+/* ==================================
+   v51 Locked 9-Panel Background Grid + Human Theme Gradients
+   - True 3x3 locked field anchored to the background, not a folding/book grid
+   - Panels flip from mouse movement direction with fixed hinge/axis cues
+   - Softer human color systems for all themes
+===================================== */
+:root {
+  --human-bg-1: #061225;
+  --human-bg-2: #0f2747;
+  --human-bg-3: #1f6feb;
+  --human-surface: rgba(255,255,255,.085);
+  --human-warm: rgba(255,242,218,.12);
+  --grid-line: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 26%, transparent);
+  --grid-panel: color-mix(in srgb, var(--theme-accent, #3b82f6) 8%, rgba(255,255,255,.045));
+}
+body.theme-tech { --human-bg-1:#07111f; --human-bg-2:#10233f; --human-bg-3:#2563eb; --human-warm:rgba(125,211,252,.10); }
+body.theme-educ { --human-bg-1:#06251d; --human-bg-2:#0f3b31; --human-bg-3:#10b981; --human-warm:rgba(236,253,245,.13); }
+body.theme-gov { --human-bg-1:#21160a; --human-bg-2:#3a2712; --human-bg-3:#d97706; --human-warm:rgba(255,244,210,.16); }
+body.theme-creative { --human-bg-1:#231033; --human-bg-2:#43205f; --human-bg-3:#d946ef; --human-warm:rgba(255,214,245,.12); }
+body.theme-minimal { --human-bg-1:#0d1117; --human-bg-2:#202632; --human-bg-3:#64748b; --human-warm:rgba(255,255,255,.075); }
+body.theme-eco { --human-bg-1:#042522; --human-bg-2:#0f3c35; --human-bg-3:#14b8a6; --human-warm:rgba(204,251,241,.12); }
+body.theme-bold { --human-bg-1:#2a0e14; --human-bg-2:#501927; --human-bg-3:#e11d48; --human-warm:rgba(255,228,230,.13); }
+body.theme-luxury { --human-bg-1:#161221; --human-bg-2:#342317; --human-bg-3:#f59e0b; --human-warm:rgba(254,243,199,.16); }
+body.theme-health { --human-bg-1:#06202a; --human-bg-2:#0d3942; --human-bg-3:#22d3ee; --human-warm:rgba(209,250,229,.13); }
+body.theme-esports { --human-bg-1:#120c27; --human-bg-2:#24164b; --human-bg-3:#8b5cf6; --human-warm:rgba(207,250,254,.10); }
+
+body.layout-portfolio.mode-dark {
+  background:
+    radial-gradient(circle at 18% 16%, color-mix(in srgb, var(--human-bg-3) 22%, transparent), transparent 34%),
+    radial-gradient(circle at 78% 22%, var(--human-warm), transparent 30%),
+    radial-gradient(circle at 62% 86%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 16%, transparent), transparent 36%),
+    linear-gradient(135deg, var(--human-bg-1), var(--human-bg-2) 54%, color-mix(in srgb, var(--human-bg-1) 72%, #000) 100%) !important;
+}
+
+body.layout-portfolio.mode-light {
+  background:
+    radial-gradient(circle at 12% 14%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 20%, transparent), transparent 34%),
+    radial-gradient(circle at 82% 12%, rgba(255,255,255,.92), transparent 34%),
+    linear-gradient(135deg, color-mix(in srgb, var(--human-bg-3) 10%, #ffffff), #f8fafc 58%, color-mix(in srgb, var(--theme-accent, #3b82f6) 7%, #ffffff)) !important;
+}
+
+#theme-decorations::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg, transparent 0 34%, rgba(255,255,255,.055) 48%, transparent 62%),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.035), transparent 52%);
+  opacity:.72;
+  mix-blend-mode: soft-light;
+}
+
+#mouse-grid-field {
+  --grid-energy: .18;
+  --grid-anchor-x: 50vw;
+  --grid-anchor-y: 50vh;
+  --grid-flow-x: 0;
+  --grid-flow-y: 0;
+  --grid-drift-x: 0;
+  --grid-drift-y: 0;
+  position: fixed !important;
+  inset: clamp(18px, 3.2vw, 54px) !important;
+  width: auto !important;
+  height: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(7px, .9vw, 14px) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: calc(.24 + (var(--grid-energy) * .36)) !important;
+  perspective: 980px !important;
+  transform: none !important;
+  filter: none !important;
+  contain: layout paint !important;
+  transform-style: preserve-3d !important;
+}
+
+#mouse-grid-field::before {
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  inset: -1px !important;
+  pointer-events:none !important;
+  border-radius: 28px !important;
+  background:
+    linear-gradient(90deg, transparent calc(33.333% - .5px), var(--grid-line) calc(33.333% - .5px) calc(33.333% + .5px), transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), var(--grid-line) calc(66.666% - .5px) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+    linear-gradient(0deg, transparent calc(33.333% - .5px), var(--grid-line) calc(33.333% - .5px) calc(33.333% + .5px), transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), var(--grid-line) calc(66.666% - .5px) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent-2, #38bdf8) 18%, transparent), transparent 32%);
+  opacity: calc(.32 + (var(--grid-energy) * .42)) !important;
+  mask-image: linear-gradient(#000, rgba(0,0,0,.78));
+}
+
+#mouse-grid-field::after {
+  content:"" !important;
+  position:absolute !important;
+  inset: -7px !important;
+  pointer-events:none !important;
+  border-radius: 32px !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) 18%, transparent) !important;
+  background:
+    radial-gradient(circle at 0 0, rgba(255,255,255,.10), transparent 18%),
+    radial-gradient(circle at 100% 0, rgba(255,255,255,.075), transparent 18%),
+    radial-gradient(circle at 0 100%, rgba(255,255,255,.065), transparent 18%),
+    radial-gradient(circle at 100% 100%, rgba(255,255,255,.09), transparent 18%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025), 0 30px 100px rgba(0,0,0,.12) !important;
+  opacity: .82 !important;
+}
+
+.mouse-cell {
+  --cell-i: 0;
+  --rx: 0deg;
+  --ry: 0deg;
+  --z: 0px;
+  --cell-scale: 1;
+  position: relative !important;
+  border-radius: clamp(18px, 2vw, 34px) !important;
   transform:
-    translate3d(-50%,-50%,0)
-    perspective(900px)
-    rotateX(var(--rx,0deg))
-    rotateY(var(--ry,0deg))
-    translateZ(var(--tz,0px))!important;
-  transform-origin:center center!important;
-  transform-style:preserve-3d!important;
-  opacity:var(--cell-opacity,.22)!important;
-  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 34%, transparent)!important;
+    perspective(820px)
+    rotateX(var(--rx))
+    rotateY(var(--ry))
+    translateZ(var(--z))
+    scale(var(--cell-scale)) !important;
+  transform-origin: center center !important;
+  transform-style: preserve-3d !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(10% + (var(--cell-i) * 34%)), rgba(255,255,255,.04)) !important;
   background:
-    linear-gradient(90deg, rgba(255,255,255,.13) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255,255,255,.13) 1px, transparent 1px),
-    linear-gradient(135deg, color-mix(in srgb,var(--print-accent,#a855f7) 9%, transparent), color-mix(in srgb,var(--print-accent-2,#22d3ee) 4%, transparent), transparent)!important;
-  background-size:50% 50%,50% 50%,auto!important;
+    radial-gradient(circle at var(--local-x, 50%) var(--local-y, 50%), rgba(255,255,255, calc(.035 + (var(--cell-i) * .18))), transparent 36%),
+    linear-gradient(145deg, color-mix(in srgb, var(--theme-accent, #3b82f6) calc(5% + (var(--cell-i) * 10%)), rgba(255,255,255,.055)), rgba(255,255,255,.012) 64%),
+    var(--grid-panel) !important;
+  opacity: calc(.16 + (var(--cell-i) * .38)) !important;
   box-shadow:
-    0 0 18px color-mix(in srgb,var(--print-accent,#a855f7) 13%, transparent),
-    inset 0 0 16px rgba(255,255,255,.032)!important;
-  backdrop-filter:none!important;
-  will-change:transform,opacity!important;
-  transition:opacity .11s ease, transform .055s linear!important;
+    inset 0 0 0 1px rgba(255,255,255, calc(.018 + (var(--cell-i) * .04))),
+    inset calc(var(--grid-flow-x) * -8px) calc(var(--grid-flow-y) * -8px) 26px rgba(255,255,255, calc(.012 + (var(--cell-i) * .05))),
+    calc(var(--shadow-x, 0px)) calc(var(--shadow-y, 0px)) calc(24px + (var(--cell-i) * 42px)) rgba(0,0,0, calc(.06 + (var(--cell-i) * .20))) !important;
+  backdrop-filter: blur(3px) saturate(1.06) !important;
+  transition:
+    border-color .38s cubic-bezier(.2,.8,.2,1),
+    opacity .42s cubic-bezier(.2,.8,.2,1),
+    background .42s cubic-bezier(.2,.8,.2,1),
+    box-shadow .42s cubic-bezier(.2,.8,.2,1) !important;
+  animation: none !important;
+  will-change: transform, opacity, box-shadow !important;
 }
-.cursor-local-cell.is-center{
-  opacity:.10!important;
-  border-style:dashed!important;
-  border-color:color-mix(in srgb,var(--print-accent-2,#22d3ee) 30%, transparent)!important;
+
+.mouse-cell::before,
+.mouse-cell::after {
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  opacity: calc(.22 + (var(--cell-i) * .42));
+}
+
+.mouse-cell::before {
+  inset: 12px;
+  border-radius: inherit;
+  border-top: 1px solid rgba(255,255,255,.12);
+  border-left: 1px solid rgba(255,255,255,.06);
+  transform: translateZ(2px);
+}
+
+.mouse-cell::after {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  right: 14px;
+  bottom: 14px;
+  background: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 64%, white);
+  box-shadow:
+    -18px 0 0 color-mix(in srgb, var(--theme-accent, #3b82f6) 36%, transparent),
+    0 -18px 0 color-mix(in srgb, var(--theme-accent, #3b82f6) 36%, transparent),
+    0 0 18px color-mix(in srgb, var(--theme-accent-2, #38bdf8) 30%, transparent);
+  transform: translateZ(4px);
+}
+
+.mouse-cell > i {
+  position:absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events:none;
   background:
-    linear-gradient(90deg, rgba(34,211,238,.09) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(34,211,238,.09) 1px, transparent 1px)!important;
-  background-size:50% 50%!important;
-  box-shadow:0 0 10px color-mix(in srgb,var(--print-accent-2,#22d3ee) 10%, transparent)!important;
+    linear-gradient(calc(135deg + (var(--grid-flow-x) * 22deg)), transparent 0 36%, rgba(255,255,255, calc(.035 + (var(--cell-i) * .16))) 48%, transparent 62%),
+    radial-gradient(circle at calc(50% + (var(--grid-flow-x) * 18%)) calc(50% + (var(--grid-flow-y) * 18%)), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(8% + (var(--cell-i) * 18%)), transparent), transparent 44%);
+  opacity: calc(.24 + (var(--cell-i) * .58));
+  transform: translateZ(6px);
 }
-body.layout-resume #cursor-local-grid,
-body.layout-resume .cursor-local-cell,
-body:not(.layout-portfolio) #cursor-local-grid{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
+
+.mouse-cell.is-active-panel {
+  opacity: .72 !important;
+  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 56%, rgba(255,255,255,.18)) !important;
 }
-@media (hover:none),(pointer:coarse),(max-width:767px),print{
-  #cursor-local-grid,.cursor-local-cell{
-    display:none!important;
-    opacity:0!important;
-    visibility:hidden!important;
+
+.portfolio-hero {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.035)),
+    radial-gradient(circle at 84% 18%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 24%, transparent), transparent 34%),
+    radial-gradient(circle at 12% 82%, color-mix(in srgb, var(--theme-accent, #3b82f6) 19%, transparent), transparent 38%) !important;
+  border-color: rgba(255,255,255,.135) !important;
+}
+
+body.mode-light .portfolio-hero {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.72)),
+    radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 18%, transparent), transparent 34%),
+    radial-gradient(circle at 10% 88%, color-mix(in srgb, var(--theme-accent, #3b82f6) 13%, transparent), transparent 38%) !important;
+}
+
+@media print, (max-width: 1023px), (prefers-reduced-motion: reduce) {
+  #mouse-grid-field,
+  #cursor-orb {
+    display: none !important;
   }
 }
 
 /* ==================================
-   v49: anchored progressive folding background grid
-   - Fixed to the page/background grid, not a cursor tail.
-   - Only 3x3 nearby cells become visible.
-   - Center panel leans toward the cursor; direction panels fold closed progressively.
+   v53 Hinged Floor-Flap Cursor Grid
+   - Background grid remains locked to the page
+   - Only the 3x3 neighborhood around the cursor reacts
+   - Each panel kicks upward like a hinged floor plank
+   - Angle is driven mainly by cursor distance; outside the 9-rule panels settle flat
 ===================================== */
-#cursor-local-grid{
-  --cursor-grid-size:104px;
-  position:fixed!important;
-  inset:0!important;
-  z-index:1!important;
-  pointer-events:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-  overflow:hidden!important;
-  perspective:1050px!important;
-  transform-style:preserve-3d!important;
-  contain:layout paint style!important;
-  transition:opacity .14s ease, visibility .14s ease!important;
-  mix-blend-mode:screen!important;
-}
-body.layout-portfolio #cursor-local-grid.is-active{
-  opacity:1!important;
-  visibility:visible!important;
-}
-#cursor-local-grid::before{
-  content:""!important;
-  position:fixed!important;
-  inset:0!important;
-  pointer-events:none!important;
-  opacity:.035!important;
+#mouse-grid-field {
+  --grid-size: 156px;
+  --grid-gap: 12px;
+  --grid-step: 168px;
+  --grid-energy: .10;
+  --grid-anchor-x: 50vw;
+  --grid-anchor-y: 50vh;
+  --grid-flow-x: 0;
+  --grid-flow-y: 0;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: calc(.36 + (var(--grid-energy) * .16)) !important;
+  perspective: 1100px !important;
+  transform: none !important;
+  contain: layout paint !important;
+  overflow: hidden !important;
   background-image:
-    linear-gradient(90deg, rgba(255,255,255,.42) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255,255,255,.42) 1px, transparent 1px)!important;
-  background-size:var(--cursor-grid-size,104px) var(--cursor-grid-size,104px)!important;
-  background-position:var(--grid-offset-x,0px) var(--grid-offset-y,0px)!important;
-  mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 210px, transparent 310px)!important;
-  -webkit-mask-image:radial-gradient(circle at var(--cursor-x,50vw) var(--cursor-y,50vh), #000 0 210px, transparent 310px)!important;
-}
-.cursor-local-cell{
-  position:fixed!important;
-  left:var(--cell-left,-9999px)!important;
-  top:var(--cell-top,-9999px)!important;
-  width:var(--cursor-grid-size,104px)!important;
-  height:var(--cursor-grid-size,104px)!important;
-  display:block!important;
-  border-radius:10px!important;
-  transform:
-    translate3d(-50%,-50%,0)
-    perspective(760px)
-    rotateX(var(--rx,0deg))
-    rotateY(var(--ry,0deg))
-    translateZ(var(--tz,0px))!important;
-  transform-origin:var(--origin-x,50%) var(--origin-y,50%)!important;
-  transform-style:preserve-3d!important;
-  opacity:var(--cell-opacity,.24)!important;
-  border:1px solid color-mix(in srgb,var(--print-accent,#a855f7) 42%, transparent)!important;
-  background:
-    radial-gradient(circle at var(--shine-x,50%) var(--shine-y,50%), rgba(255,255,255,.18), transparent 38%),
-    linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255,255,255,.12) 1px, transparent 1px),
-    linear-gradient(135deg, color-mix(in srgb,var(--print-accent,#a855f7) 10%, transparent), color-mix(in srgb,var(--print-accent-2,#22d3ee) 6%, transparent), transparent)!important;
-  background-size:auto, 50% 50%, 50% 50%, auto!important;
-  box-shadow:
-    0 0 22px color-mix(in srgb,var(--print-accent,#a855f7) 18%, transparent),
-    inset 0 0 0 1px rgba(255,255,255,.04),
-    inset 0 0 24px rgba(255,255,255,.035)!important;
-  backface-visibility:hidden!important;
-  will-change:transform,opacity,box-shadow!important;
-  transition:left .16s cubic-bezier(.16,1,.3,1), top .16s cubic-bezier(.16,1,.3,1), opacity .16s ease, transform .135s cubic-bezier(.16,1,.3,1), box-shadow .16s ease!important;
-}
-.cursor-local-cell::before{
-  content:""!important;
-  position:absolute!important;
-  inset:0!important;
-  border-radius:inherit!important;
-  border:1px solid rgba(255,255,255,.055)!important;
-  transform:translateZ(2px)!important;
-  pointer-events:none!important;
-}
-.cursor-local-cell::after{
-  content:""!important;
-  position:absolute!important;
-  inset:0!important;
-  border-radius:inherit!important;
-  background:linear-gradient(135deg, rgba(255,255,255,.18), transparent 48%, rgba(255,255,255,.035))!important;
-  opacity:.34!important;
-  transform:translateZ(3px)!important;
-  pointer-events:none!important;
+    linear-gradient(color-mix(in srgb, var(--theme-accent-2, #38bdf8) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 10%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(7% + (var(--grid-energy) * 9%)), transparent), transparent 28%);
+  background-size: var(--grid-step) var(--grid-step), var(--grid-step) var(--grid-step), 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
-.cursor-local-cell.is-folding{
-  border-color:color-mix(in srgb,var(--print-accent,#a855f7) 62%, transparent)!important;
-  box-shadow:
-    0 0 30px color-mix(in srgb,var(--print-accent,#a855f7) 24%, transparent),
-    inset 0 0 0 1px rgba(255,255,255,.06),
-    inset 0 0 28px rgba(255,255,255,.055)!important;
-}
-.cursor-local-cell.is-soft{
-  transition-duration:.18s,.18s,.18s,.16s,.18s!important;
-}
-#cursor-local-grid.is-switching .cursor-local-cell{
-  transition-duration:.20s,.20s,.16s,.18s,.16s!important;
-}
-.cursor-local-cell.is-center{
-  opacity:.10!important;
-  border-style:dashed!important;
-  border-color:color-mix(in srgb,var(--print-accent-2,#22d3ee) 32%, transparent)!important;
+#mouse-grid-field::before {
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  pointer-events:none !important;
   background:
-    linear-gradient(90deg, rgba(34,211,238,.10) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(34,211,238,.10) 1px, transparent 1px)!important;
-  background-size:50% 50%!important;
-  box-shadow:0 0 12px color-mix(in srgb,var(--print-accent-2,#22d3ee) 12%, transparent)!important;
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent, #3b82f6) calc(8% + (var(--grid-energy) * 12%)), transparent), transparent 20%),
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent 30%, rgba(255,255,255,.015) 70%, transparent);
+  opacity: calc(.14 + (var(--grid-energy) * .20)) !important;
 }
-body.layout-portfolio #app{
-  position:relative!important;
-  z-index:2!important;
+
+#mouse-grid-field::after {
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  pointer-events:none !important;
+  background:
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), rgba(255,255,255,.08), transparent 9%),
+    radial-gradient(circle at calc(var(--grid-anchor-x) - var(--grid-step)) calc(var(--grid-anchor-y) - var(--grid-step)), rgba(255,255,255,.03), transparent 7%),
+    radial-gradient(circle at calc(var(--grid-anchor-x) + var(--grid-step)) calc(var(--grid-anchor-y) + var(--grid-step)), rgba(255,255,255,.03), transparent 7%);
+  opacity: calc(.12 + (var(--grid-energy) * .20)) !important;
 }
-body.layout-resume #cursor-local-grid,
-body.layout-resume .cursor-local-cell,
-body:not(.layout-portfolio) #cursor-local-grid{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
+
+.mouse-cell {
+  --cell-i: 0;
+  --lift: 0;
+  --rx: 0deg;
+  --ry: 0deg;
+  --rise: 0px;
+  --sink: 0px;
+  --cell-size: var(--grid-size);
+  --cell-x: 50vw;
+  --cell-y: 50vh;
+  --hinge-origin: 50% 50%;
+  --edge-glow: .08;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: var(--cell-size) !important;
+  height: var(--cell-size) !important;
+  border-radius: 12px !important;
+  transform:
+    translate3d(var(--cell-x), var(--cell-y), 0)
+    perspective(980px)
+    translateY(calc(var(--rise) * -1))
+    rotateX(var(--rx))
+    rotateY(var(--ry)) !important;
+  transform-origin: var(--hinge-origin) !important;
+  transform-style: preserve-3d !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(10% + (var(--lift) * 22%)), rgba(255,255,255,.06)) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.018 + (var(--lift) * .09))), rgba(255,255,255, calc(.004 + (var(--lift) * .02))) 22%, rgba(0,0,0, .02) 100%),
+    repeating-linear-gradient(0deg,
+      color-mix(in srgb, var(--theme-accent, #3b82f6) calc(2% + (var(--lift) * 2%)), rgba(255,255,255,.02)) 0 18px,
+      rgba(255,255,255, .012) 18px 19px,
+      rgba(0,0,0, .022) 19px 20px),
+    linear-gradient(145deg, color-mix(in srgb, var(--theme-accent, #3b82f6) calc(2% + (var(--lift) * 5%)), rgba(255,255,255,.03)), rgba(255,255,255,.01) 70%) !important;
+  opacity: calc(.01 + (var(--cell-i) * .74)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255, calc(.02 + (var(--lift) * .14))),
+    inset 0 calc(var(--sink) * -1) calc(12px + (var(--lift) * 18px)) rgba(255,255,255, calc(.015 + (var(--lift) * .05))),
+    inset 0 calc(var(--sink) * .7) calc(10px + (var(--lift) * 16px)) rgba(0,0,0, calc(.03 + (var(--lift) * .10))),
+    calc(var(--shadow-x, 0px)) calc(4px + var(--shadow-y, 0px)) calc(16px + (var(--lift) * 34px)) rgba(0,0,0, calc(.03 + (var(--lift) * .18))) !important;
+  transition:
+    border-color .28s cubic-bezier(.2,.8,.2,1),
+    opacity .30s cubic-bezier(.2,.8,.2,1),
+    background .30s cubic-bezier(.2,.8,.2,1),
+    box-shadow .30s cubic-bezier(.2,.8,.2,1) !important;
+  will-change: transform, opacity, box-shadow !important;
 }
-@media (hover:none),(pointer:coarse),(max-width:767px),print{
-  #cursor-local-grid,.cursor-local-cell{
-    display:none!important;
-    opacity:0!important;
-    visibility:hidden!important;
+
+.mouse-cell::before {
+  content:"" !important;
+  position:absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  border-top: 1px solid rgba(255,255,255, calc(.05 + (var(--lift) * .12))) !important;
+  border-left: 1px solid rgba(255,255,255, calc(.03 + (var(--lift) * .06))) !important;
+  border-right: 1px solid rgba(255,255,255, .02) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.018 + (var(--lift) * .08))), transparent 24%),
+    linear-gradient(90deg, transparent, rgba(255,255,255, calc(.012 + (var(--lift) * .04))) 50%, transparent) !important;
+  opacity: calc(.14 + (var(--lift) * .44)) !important;
+}
+
+.mouse-cell::after {
+  content:"" !important;
+  position:absolute !important;
+  inset:auto 10px 10px auto !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 999px !important;
+  background: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 44%, rgba(255,255,255,.35)) !important;
+  box-shadow:
+    -18px 0 0 rgba(255,255,255, calc(.02 + (var(--lift) * .08))),
+    0 -18px 0 rgba(255,255,255, calc(.02 + (var(--lift) * .08))),
+    0 0 12px color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(6% + (var(--lift) * 26%)), transparent) !important;
+  opacity: calc(.05 + (var(--lift) * .48)) !important;
+}
+
+.mouse-cell > i {
+  position:absolute !important;
+  inset: 0 !important;
+  border-radius: inherit !important;
+  pointer-events:none !important;
+  background:
+    linear-gradient(calc(110deg + (var(--grid-flow-x) * 18deg)), transparent 0 38%, rgba(255,255,255, calc(.015 + (var(--lift) * .06))) 50%, transparent 62%),
+    radial-gradient(circle at var(--local-x, 50%) var(--local-y, 50%), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(4% + (var(--lift) * 12%)), transparent), transparent 42%) !important;
+  opacity: calc(.10 + (var(--lift) * .40)) !important;
+}
+
+.mouse-cell.is-active-panel {
+  opacity: calc(.22 + (var(--lift) * .58)) !important;
+  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(22% + (var(--lift) * 40%)), rgba(255,255,255,.16)) !important;
+}
+
+body.mode-light #mouse-grid-field {
+  opacity: calc(.28 + (var(--grid-energy) * .14)) !important;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--theme-accent, #3b82f6) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent, #3b82f6) 10%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(6% + (var(--grid-energy) * 9%)), transparent), transparent 26%);
+}
+
+body.mode-light .mouse-cell {
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.28 + (var(--lift) * .24))), rgba(255,255,255, calc(.72 - (var(--lift) * .08))) 20%, rgba(226,232,240,.92) 100%),
+    repeating-linear-gradient(0deg,
+      color-mix(in srgb, var(--theme-accent, #3b82f6) calc(3% + (var(--lift) * 2%)), #ffffff) 0 18px,
+      rgba(255,255,255, .92) 18px 19px,
+      rgba(148,163,184, .15) 19px 20px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.75),
+    inset 0 calc(var(--sink) * .7) calc(10px + (var(--lift) * 12px)) rgba(148,163,184, calc(.08 + (var(--lift) * .08))),
+    calc(var(--shadow-x, 0px)) calc(4px + var(--shadow-y, 0px)) calc(14px + (var(--lift) * 24px)) rgba(15,23,42, calc(.04 + (var(--lift) * .10))) !important;
+}
+
+@media print, (max-width: 1023px), (prefers-reduced-motion: reduce) {
+  #mouse-grid-field,
+  #cursor-orb {
+    display: none !important;
   }
+}
+
+
+/* ==================================
+   v54 Premium Pressure Surface Grid
+   - softer, more luxurious motion
+   - near cursor stays flatter; outer cells in the 3x3 ring lift more
+   - 1px seam instead of visible gaps
+===================================== */
+#mouse-grid-field {
+  opacity: calc(.24 + (var(--grid-energy) * .18)) !important;
+  perspective: 1400px !important;
+  overflow: visible !important;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--theme-accent-2, #38bdf8) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 8%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(5% + (var(--grid-energy) * 8%)), transparent), transparent 24%);
+  background-size: var(--grid-step) var(--grid-step), var(--grid-step) var(--grid-step), 100% 100%;
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+
+#mouse-grid-field::before {
+  background:
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent, #3b82f6) calc(5% + (var(--grid-energy) * 8%)), transparent), transparent 18%),
+    linear-gradient(180deg, rgba(255,255,255,.02), transparent 34%, rgba(255,255,255,.012) 70%, transparent) !important;
+  opacity: calc(.10 + (var(--grid-energy) * .16)) !important;
+}
+
+#mouse-grid-field::after {
+  background:
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), rgba(255,255,255,.055), transparent 8%),
+    radial-gradient(circle at calc(var(--grid-anchor-x) - var(--grid-step)) calc(var(--grid-anchor-y) - var(--grid-step)), rgba(255,255,255,.022), transparent 7%),
+    radial-gradient(circle at calc(var(--grid-anchor-x) + var(--grid-step)) calc(var(--grid-anchor-y) + var(--grid-step)), rgba(255,255,255,.022), transparent 7%) !important;
+  opacity: calc(.10 + (var(--grid-energy) * .12)) !important;
+}
+
+.mouse-cell {
+  --pressure: 0;
+  border-radius: 8px !important;
+  transform:
+    translate3d(var(--cell-x), var(--cell-y), 0)
+    perspective(1300px)
+    translateY(calc(var(--rise) * -1))
+    rotateX(var(--rx))
+    rotateY(var(--ry))
+    scale(calc(1 + (var(--lift) * .008) - (var(--pressure) * .006))) !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(8% + (var(--lift) * 15%)), rgba(255,255,255,.045)) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.018 + (var(--lift) * .05))), rgba(255,255,255, calc(.005 + (var(--lift) * .018))) 20%, rgba(0,0,0,.018) 100%),
+    linear-gradient(145deg, color-mix(in srgb, var(--theme-accent, #3b82f6) calc(1.8% + (var(--lift) * 3.6%)), rgba(255,255,255,.018)), rgba(255,255,255,.008) 70%),
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.008) 0 19px,
+      rgba(255,255,255,.022) 19px 20px) !important;
+  opacity: calc(.006 + (var(--cell-i) * .72)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255, calc(.028 + (var(--lift) * .09))),
+    inset 0 calc(var(--sink) * -1) calc(10px + (var(--lift) * 10px)) rgba(255,255,255, calc(.010 + (var(--pressure) * .03))),
+    inset 0 calc(var(--sink) * .8) calc(10px + (var(--lift) * 12px)) rgba(0,0,0, calc(.022 + (var(--lift) * .07))),
+    calc(var(--shadow-x, 0px)) calc(6px + var(--shadow-y, 0px)) calc(18px + (var(--lift) * 26px)) rgba(0,0,0, calc(.028 + (var(--lift) * .12))),
+    0 0 calc(8px + (var(--lift) * 16px)) color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(2% + (var(--edge-glow) * 20%)), transparent) !important;
+  transition:
+    border-color .42s cubic-bezier(.22,1,.36,1),
+    opacity .46s cubic-bezier(.22,1,.36,1),
+    background .46s cubic-bezier(.22,1,.36,1),
+    box-shadow .46s cubic-bezier(.22,1,.36,1) !important;
+}
+
+.mouse-cell::before {
+  border-top: 1px solid rgba(255,255,255, calc(.035 + (var(--lift) * .08))) !important;
+  border-left: 1px solid rgba(255,255,255, calc(.018 + (var(--lift) * .04))) !important;
+  border-right: 1px solid rgba(255,255,255, .015) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.015 + (var(--lift) * .05))), transparent 22%),
+    linear-gradient(90deg, transparent, rgba(255,255,255, calc(.008 + (var(--lift) * .03))) 50%, transparent) !important;
+  opacity: calc(.10 + (var(--lift) * .30)) !important;
+}
+
+.mouse-cell::after {
+  inset: auto 9px 9px auto !important;
+  width: 8px !important;
+  height: 8px !important;
+  background: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 26%, rgba(255,255,255,.28)) !important;
+  box-shadow:
+    -18px 0 0 rgba(255,255,255, calc(.012 + (var(--lift) * .04))),
+    0 -18px 0 rgba(255,255,255, calc(.012 + (var(--lift) * .04))),
+    0 0 10px color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(3% + (var(--lift) * 16%)), transparent) !important;
+  opacity: calc(.035 + (var(--lift) * .22)) !important;
+}
+
+.mouse-cell > i {
+  background:
+    linear-gradient(calc(110deg + (var(--grid-flow-x) * 12deg)), transparent 0 42%, rgba(255,255,255, calc(.010 + (var(--lift) * .04))) 50%, transparent 58%),
+    radial-gradient(circle at var(--local-x, 50%) var(--local-y, 50%), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(2% + (var(--pressure) * 6%)), transparent), transparent 42%) !important;
+  opacity: calc(.08 + (var(--lift) * .20) + (var(--pressure) * .10)) !important;
+}
+
+.mouse-cell.is-active-panel {
+  opacity: calc(.16 + (var(--lift) * .42)) !important;
+  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(18% + (var(--lift) * 24%)), rgba(255,255,255,.10)) !important;
+}
+
+body.mode-light #mouse-grid-field {
+  opacity: calc(.22 + (var(--grid-energy) * .14)) !important;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--theme-accent, #3b82f6) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent, #3b82f6) 7%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(5% + (var(--grid-energy) * 8%)), transparent), transparent 24%) !important;
+}
+
+body.mode-light .mouse-cell {
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.40 + (var(--lift) * .16))), rgba(255,255,255, calc(.78 - (var(--pressure) * .06))) 18%, rgba(241,245,249,.96) 100%),
+    linear-gradient(145deg, color-mix(in srgb, var(--theme-accent, #3b82f6) calc(2% + (var(--lift) * 3%)), #ffffff), rgba(255,255,255,.95) 72%),
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,.92) 0 19px,
+      rgba(148,163,184,.12) 19px 20px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.88),
+    inset 0 calc(var(--sink) * .7) calc(10px + (var(--lift) * 8px)) rgba(148,163,184, calc(.06 + (var(--pressure) * .08))),
+    calc(var(--shadow-x, 0px)) calc(6px + var(--shadow-y, 0px)) calc(16px + (var(--lift) * 20px)) rgba(15,23,42, calc(.025 + (var(--lift) * .09))) !important;
+}
+
+
+/* ==================================
+   v55 Cursor-Facing Surface Grid
+   - replaces the previous bounce/flap feel
+   - panels rotate their face toward the cursor
+   - no jump, no lift, no hinged popping
+===================================== */
+#mouse-grid-field {
+  opacity: calc(.24 + (var(--grid-energy) * .16)) !important;
+  perspective: 1500px !important;
+  overflow: visible !important;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--theme-accent-2, #38bdf8) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent-2, #38bdf8) 7%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(4% + (var(--grid-energy) * 8%)), transparent), transparent 24%) !important;
+  background-size: var(--grid-step) var(--grid-step), var(--grid-step) var(--grid-step), 100% 100% !important;
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent) !important;
+}
+
+#mouse-grid-field::before {
+  background:
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent, #3b82f6) calc(4% + (var(--grid-energy) * 7%)), transparent), transparent 18%),
+    linear-gradient(180deg, rgba(255,255,255,.018), transparent 34%, rgba(255,255,255,.010) 70%, transparent) !important;
+  opacity: calc(.10 + (var(--grid-energy) * .13)) !important;
+}
+
+#mouse-grid-field::after {
+  background:
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), rgba(255,255,255,.050), transparent 8%),
+    radial-gradient(circle at calc(var(--grid-anchor-x) - var(--grid-step)) calc(var(--grid-anchor-y) - var(--grid-step)), rgba(255,255,255,.018), transparent 7%),
+    radial-gradient(circle at calc(var(--grid-anchor-x) + var(--grid-step)) calc(var(--grid-anchor-y) + var(--grid-step)), rgba(255,255,255,.018), transparent 7%) !important;
+  opacity: calc(.09 + (var(--grid-energy) * .11)) !important;
+}
+
+.mouse-cell {
+  --face: 0;
+  --pressure: 0;
+  border-radius: 7px !important;
+  transform:
+    translate3d(var(--cell-x), var(--cell-y), 0)
+    perspective(1500px)
+    rotateX(var(--rx))
+    rotateY(var(--ry))
+    scale(calc(1 + (var(--face, var(--cell-i)) * .006))) !important;
+  transform-origin: 50% 50% !important;
+  border: 1px solid color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(7% + (var(--face, var(--cell-i)) * 16%)), rgba(255,255,255,.042)) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.016 + (var(--face, var(--cell-i)) * .052))), rgba(255,255,255, calc(.005 + (var(--face, var(--cell-i)) * .018))) 22%, rgba(0,0,0,.016) 100%),
+    linear-gradient(145deg, color-mix(in srgb, var(--theme-accent, #3b82f6) calc(1.6% + (var(--face, var(--cell-i)) * 3.4%)), rgba(255,255,255,.018)), rgba(255,255,255,.007) 72%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.007) 0 19px, rgba(255,255,255,.020) 19px 20px) !important;
+  opacity: calc(.008 + (var(--face, var(--cell-i)) * .68)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255, calc(.026 + (var(--face, var(--cell-i)) * .085))),
+    inset 0 -1px 0 rgba(0,0,0, calc(.018 + (var(--face, var(--cell-i)) * .040))),
+    calc(var(--shadow-x, 0px)) calc(5px + var(--shadow-y, 0px)) calc(16px + (var(--face, var(--cell-i)) * 22px)) rgba(0,0,0, calc(.024 + (var(--face, var(--cell-i)) * .10))),
+    0 0 calc(8px + (var(--face, var(--cell-i)) * 14px)) color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(1.6% + (var(--edge-glow) * 18%)), transparent) !important;
+  transition:
+    border-color .44s cubic-bezier(.22,1,.36,1),
+    opacity .48s cubic-bezier(.22,1,.36,1),
+    background .48s cubic-bezier(.22,1,.36,1),
+    box-shadow .48s cubic-bezier(.22,1,.36,1) !important;
+}
+
+.mouse-cell::before {
+  border-top: 1px solid rgba(255,255,255, calc(.034 + (var(--face, var(--cell-i)) * .075))) !important;
+  border-left: 1px solid rgba(255,255,255, calc(.016 + (var(--face, var(--cell-i)) * .036))) !important;
+  border-right: 1px solid rgba(255,255,255, .014) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.014 + (var(--face, var(--cell-i)) * .050))), transparent 22%),
+    linear-gradient(90deg, transparent, rgba(255,255,255, calc(.008 + (var(--face, var(--cell-i)) * .030))) 50%, transparent) !important;
+  opacity: calc(.10 + (var(--face, var(--cell-i)) * .28)) !important;
+}
+
+.mouse-cell::after {
+  width: 7px !important;
+  height: 7px !important;
+  inset: auto 9px 9px auto !important;
+  background: color-mix(in srgb, var(--theme-accent-2, #38bdf8) 24%, rgba(255,255,255,.24)) !important;
+  box-shadow:
+    -18px 0 0 rgba(255,255,255, calc(.010 + (var(--face, var(--cell-i)) * .038))),
+    0 -18px 0 rgba(255,255,255, calc(.010 + (var(--face, var(--cell-i)) * .038))),
+    0 0 9px color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(3% + (var(--face, var(--cell-i)) * 14%)), transparent) !important;
+  opacity: calc(.030 + (var(--face, var(--cell-i)) * .20)) !important;
+}
+
+.mouse-cell > i {
+  background:
+    linear-gradient(calc(110deg + (var(--grid-flow-x) * 10deg)), transparent 0 42%, rgba(255,255,255, calc(.010 + (var(--face, var(--cell-i)) * .040))) 50%, transparent 58%),
+    radial-gradient(circle at var(--local-x, 50%) var(--local-y, 50%), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(2% + (var(--face, var(--cell-i)) * 7%)), transparent), transparent 42%) !important;
+  opacity: calc(.08 + (var(--face, var(--cell-i)) * .24)) !important;
+}
+
+.mouse-cell.is-active-panel {
+  opacity: calc(.14 + (var(--face, var(--cell-i)) * .44)) !important;
+  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(15% + (var(--face, var(--cell-i)) * 26%)), rgba(255,255,255,.10)) !important;
+}
+
+body.mode-light #mouse-grid-field {
+  opacity: calc(.22 + (var(--grid-energy) * .13)) !important;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--theme-accent, #3b82f6) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent, #3b82f6) 6%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--grid-anchor-x) var(--grid-anchor-y), color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(4% + (var(--grid-energy) * 7%)), transparent), transparent 24%) !important;
+}
+
+body.mode-light .mouse-cell {
+  background:
+    linear-gradient(180deg, rgba(255,255,255, calc(.40 + (var(--face, var(--cell-i)) * .14))), rgba(255,255,255,.78) 18%, rgba(241,245,249,.96) 100%),
+    linear-gradient(145deg, color-mix(in srgb, var(--theme-accent, #3b82f6) calc(1.7% + (var(--face, var(--cell-i)) * 2.8%)), #ffffff), rgba(255,255,255,.95) 72%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.92) 0 19px, rgba(148,163,184,.11) 19px 20px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.88),
+    inset 0 -1px 0 rgba(148,163,184, calc(.030 + (var(--face, var(--cell-i)) * .050))),
+    calc(var(--shadow-x, 0px)) calc(5px + var(--shadow-y, 0px)) calc(15px + (var(--face, var(--cell-i)) * 18px)) rgba(15,23,42, calc(.022 + (var(--face, var(--cell-i)) * .080))) !important;
 }
