@@ -1097,7 +1097,7 @@
                     }
                 }
                 if (layout === 'portfolio') {
-                    const gridCells = Array.from({ length: 54 }, (_, i) => `<span class="mouse-cell" data-cell="${i}"></span>`).join('');
+                    const gridCells = Array.from({ length: 9 }, (_, i) => `<span class="mouse-cell" data-cell="${i}"><i></i></span>`).join('');
                     decorationContainer.innerHTML = `${decorationsHTML}<div id="mouse-grid-field" aria-hidden="true">${gridCells}</div>`;
                     requestAnimationFrame(initMicroInteractions);
                 } else {
@@ -1212,21 +1212,29 @@
             const cells = grid ? Array.from(grid.querySelectorAll('.mouse-cell')) : [];
             if (!grid || cells.length === 0) return;
 
-            const cols = 9;
-            const rows = Math.ceil(cells.length / cols);
+            // v51: true locked 9-panel background grid.
+            // The field stays bolted to the viewport/background. Only the panel surface flips
+            // from the mouse movement vector and hover position; it is not a book/page fold.
+            const cols = 3;
+            const rows = 3;
             let raf = null;
             let targetX = window.innerWidth / 2;
             let targetY = window.innerHeight / 2;
             let currentX = targetX;
             let currentY = targetY;
+            let lastX = targetX;
+            let lastY = targetY;
             let vx = 0;
             let vy = 0;
             let lastMove = performance.now();
+            let pointerInside = false;
 
             cells.forEach((cell, i) => {
                 const col = i % cols;
                 const row = Math.floor(i / cols);
-                cell.style.setProperty('--cell-delay', `${col * 16 + row * 11}ms`);
+                cell.style.setProperty('--cell-delay', `${col * 24 + row * 18}ms`);
+                cell.style.setProperty('--cell-col', col);
+                cell.style.setProperty('--cell-row', row);
             });
 
             const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -1235,10 +1243,24 @@
 
             const update = () => {
                 raf = null;
-                currentX = lerp(currentX, targetX, 0.13);
-                currentY = lerp(currentY, targetY, 0.13);
-                const speed = clamp(Math.hypot(vx, vy) / 110, 0, 1);
-                grid.style.setProperty('--grid-energy', `${(0.18 + speed * 0.12).toFixed(3)}`);
+                lastX = currentX;
+                lastY = currentY;
+                currentX = lerp(currentX, targetX, 0.16);
+                currentY = lerp(currentY, targetY, 0.16);
+
+                const speed = clamp(Math.hypot(vx, vy) / 92, 0, 1);
+                const movementX = clamp(vx / 42, -1, 1);
+                const movementY = clamp(vy / 42, -1, 1);
+                const driftX = clamp((currentX - window.innerWidth / 2) / (window.innerWidth / 2), -1, 1);
+                const driftY = clamp((currentY - window.innerHeight / 2) / (window.innerHeight / 2), -1, 1);
+
+                grid.style.setProperty('--grid-energy', `${(pointerInside ? 0.28 + speed * 0.44 : 0.12).toFixed(3)}`);
+                grid.style.setProperty('--grid-anchor-x', `${currentX.toFixed(1)}px`);
+                grid.style.setProperty('--grid-anchor-y', `${currentY.toFixed(1)}px`);
+                grid.style.setProperty('--grid-flow-x', movementX.toFixed(3));
+                grid.style.setProperty('--grid-flow-y', movementY.toFixed(3));
+                grid.style.setProperty('--grid-drift-x', driftX.toFixed(3));
+                grid.style.setProperty('--grid-drift-y', driftY.toFixed(3));
 
                 const heroFrame = document.querySelector('.hero-frame');
                 if (heroFrame) {
@@ -1263,40 +1285,49 @@
                     const dy = currentY - centerY;
                     const gridDx = Math.abs(col - activeCol);
                     const gridDy = Math.abs(row - activeRow);
-                    const inNineZone = gridDx <= 1 && gridDy <= 1;
 
-                    // Only the 3x3 area around the cursor reacts.
-                    // The panel position remains locked; each panel tilts toward the cursor.
+                    // Keep the 9-panel rule: every panel belongs to the locked 3x3 field,
+                    // with a strong active panel, softer neighbors, and stable corner panels.
                     const localDist = Math.hypot(dx / cellW, dy / cellH);
-                    const influence = inNineZone ? ease(clamp(1 - (localDist / 1.55), 0, 1)) : 0;
-                    const dxN = clamp(dx / (cellW * 0.58), -1, 1);
-                    const dyN = clamp(dy / (cellH * 0.58), -1, 1);
+                    const hoverInfluence = ease(clamp(1 - (localDist / 1.42), 0, 1));
+                    const neighborFalloff = ease(clamp(1 - ((gridDx + gridDy) / 3.25), 0, 1));
+                    const influence = pointerInside ? clamp((hoverInfluence * 0.72) + (neighborFalloff * 0.34) + (speed * 0.16), 0, 1) : 0;
 
-                    // Sign corrected: panels lean inward toward the mouse, not away from it.
-                    const maxTilt = 18;
-                    const rx = clamp(-dyN * maxTilt * influence, -maxTilt, maxTilt);
-                    const ry = clamp(dxN * maxTilt * influence, -maxTilt, maxTilt);
-                    const z = influence * 18;
-                    const shadowX = clamp(dxN * 12 * influence, -12, 12);
-                    const shadowY = clamp(dyN * 14 * influence, -14, 14);
+                    const localX = clamp(((currentX - (col * cellW)) / cellW) * 100, 0, 100);
+                    const localY = clamp(((currentY - (row * cellH)) / cellH) * 100, 0, 100);
+
+                    // Flip follows mouse movement direction, while a small position bias keeps
+                    // each panel feeling physically attached to the background anchor.
+                    const positionBiasX = clamp(dx / cellW, -1, 1);
+                    const positionBiasY = clamp(dy / cellH, -1, 1);
+                    const rx = clamp((movementY * -16 + positionBiasY * -5) * influence, -20, 20);
+                    const ry = clamp((movementX * 16 + positionBiasX * 5) * influence, -20, 20);
+                    const z = clamp(8 + influence * 28 + speed * 10, 0, 42);
+                    const scale = 1 + influence * 0.012;
+                    const shadowX = clamp((movementX * 18 + positionBiasX * 8) * influence, -22, 22);
+                    const shadowY = clamp((movementY * 20 + positionBiasY * 8) * influence, -24, 24);
 
                     cell.style.setProperty('--cell-i', influence.toFixed(3));
                     cell.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
                     cell.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
                     cell.style.setProperty('--z', `${z.toFixed(2)}px`);
+                    cell.style.setProperty('--cell-scale', scale.toFixed(4));
+                    cell.style.setProperty('--local-x', `${localX.toFixed(1)}%`);
+                    cell.style.setProperty('--local-y', `${localY.toFixed(1)}%`);
                     cell.style.setProperty('--shadow-x', `${shadowX.toFixed(2)}px`);
                     cell.style.setProperty('--shadow-y', `${shadowY.toFixed(2)}px`);
+                    cell.classList.toggle('is-active-panel', col === activeCol && row === activeRow && pointerInside);
                 });
 
-                vx *= 0.80;
-                vy *= 0.80;
-                if (Math.abs(currentX - targetX) > 0.35 || Math.abs(currentY - targetY) > 0.35 || Math.hypot(vx, vy) > 0.35) {
-                    raf = requestAnimationFrame(update);
-                }
+                vx *= 0.82;
+                vy *= 0.82;
+                const moved = Math.abs(currentX - targetX) > 0.35 || Math.abs(currentY - targetY) > 0.35 || Math.hypot(vx, vy) > 0.35;
+                if (moved) raf = requestAnimationFrame(update);
             };
 
             if (window._portfolioPointerMove) window.removeEventListener('pointermove', window._portfolioPointerMove);
             if (window._portfolioPointerLeave) window.removeEventListener('pointerleave', window._portfolioPointerLeave);
+            if (window._portfolioPointerEnter) window.removeEventListener('pointerenter', window._portfolioPointerEnter);
 
             window._portfolioPointerMove = (e) => {
                 const now = performance.now();
@@ -1306,15 +1337,21 @@
                 targetX = e.clientX;
                 targetY = e.clientY;
                 lastMove = now;
+                pointerInside = true;
                 if (!raf) raf = requestAnimationFrame(update);
             };
+            window._portfolioPointerEnter = () => { pointerInside = true; if (!raf) raf = requestAnimationFrame(update); };
             window._portfolioPointerLeave = () => {
+                pointerInside = false;
                 targetX = window.innerWidth / 2;
                 targetY = window.innerHeight / 2;
+                vx = 0;
+                vy = 0;
                 if (!raf) raf = requestAnimationFrame(update);
             };
 
             window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
+            window.addEventListener('pointerenter', window._portfolioPointerEnter, { passive: true });
             window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
             update();
         }
