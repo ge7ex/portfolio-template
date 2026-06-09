@@ -1,0 +1,5 @@
+function _sectionHas(v){return !!(v && String(v).trim());}
+function _parts(line){return String(line||'').split('|').map(s=>s.trim());}
+function _safeText(v){return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+function _safeUrl(v){const u=String(v||'').trim();return /^https?:\/\//i.test(u)?u:'#';}
+const CTAComponent={render:(content,layout,colorMode,pStyle,lang)=>{if(!_sectionHas(content))return'';const [headline,desc,button,url]=_parts(content);const title=_safeText(headline|| (lang==='th'?'พร้อมเริ่มโปรเจกต์ถัดไป':'Ready to build the next project?'));const detail=_safeText(desc||'');const btn=_safeText(button|| (lang==='th'?'ติดต่อ / นัดคุย':'Start a conversation'));const href=_safeUrl(url);return `<section class="portfolio-extra-section cta-section"><div class="cta-box"><h3>${title}</h3>${detail?`<p>${detail}</p>`:''}${href !== '#'?`<a href="${href}" target="_blank" rel="noopener noreferrer">${btn}</a>`:`<span class="inline-flex px-5 py-2 rounded-full bg-white text-slate-900 font-black">${btn}</span>`}</div></section>`}};

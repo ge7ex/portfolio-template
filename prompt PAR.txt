@@ -1,0 +1,77 @@
+สวัสดีครับคุณลูกค้า! ในฐานะ **ats** ผมบอกเลยว่าคุณมาถูกทางแล้วครับ การจะสั่งให้ AI เขียนโค้ดระบบใหญ่ระดับที่มีทั้ง Scrollytelling, Theme Engine, 2 ภาษา และ Export System ได้โดยไม่ให้ AI งง หรือโค้ดขาดหาย **การแบ่ง Prompt อย่างมีกลยุทธ์คือหัวใจสำคัญครับ!**
+
+การใช้ **PAR Framework (Problem, Action, Result)** เป็นวิธีที่ยอดเยี่ยมมาก เพราะมันตีกรอบให้ AI เข้าใจบริบทอย่างชัดเจน ไม่คิดออกนอกลู่ทางครับ 
+
+ผมได้จัดเตรียม **"คัมภีร์ 4 Prompts สร้างโปรเจกต์"** ที่สรุปรวบยอดสิ่งที่เราทำมาทั้งหมด แบ่งเป็นเลเยอร์อย่างชัดเจน คัดลอกไปใช้ต่อยอด หรือสร้างโปรเจกต์ใหม่ได้เลยครับ!
+
+---
+
+### 🚀 คัมภีร์ 4 Prompts (PAR Framework) สำหรับ AI Portfolio Pro
+
+---
+
+#### 💬 Prompt ที่ 1: โครงสร้างหลัก, UI ภายนอก และระบบ 2 ภาษา (Data Layer & Shell)
+**💡 คำชี้แนะ:** Prompt นี้ใช้สร้าง "กระดูกสันหลัง" ของเว็บ คือหน้า `index.html` (Navbar, Modal) และ `storage.js` เพื่อให้ระบบมีที่เก็บข้อมูลแบบ 2 ภาษาที่ถูกต้องแต่แรก
+
+> **Problem:** ฉันต้องการสร้างเว็บ AI Portfolio Generator ด้วย HTML, Tailwind CSS และ Vanilla JS แต่ปัญหาคือเว็บต้องรองรับ 2 ภาษา (TH/EN) อย่างสมบูรณ์แบบโดยไม่ต้องใช้ Database และต้องมี UI Navbar ที่ใช้งานง่าย ไม่ปะปนกับการตั้งค่าธีม
+> 
+> **Action:** > 1. สร้างไฟล์ `js/storage.js` ใช้ LocalStorage เพื่อเก็บข้อมูลผู้ใช้ โดยกำหนด Key สำหรับข้อมูลที่มี 2 ภาษาแยกกันชัดเจน (เช่น `name_th`, `name_en`, `company_th`, `company_en`) 
+> 2. สร้างไฟล์ `index.html` ที่มี Navbar แบบลอยตัว (Fixed) 
+> 3. ใน Navbar ให้ทำปุ่ม "Pill Toggle" สำหรับสลับโหมด Portfolio/Resume และทำปุ่ม "Appearance (จานสี)" สำหรับเปิด Dropdown Panel เล็กๆ ที่มีปุ่มสลับ Dark/Light Mode และวงกลม 8 สีเพื่อเลือกธีม (Tech, Educ, Gov, Creative, Minimal, Eco, Bold, Luxury)
+> 4. สร้าง Edit Modal ให้มีช่อง Input 2 ฝั่ง (ซ้าย-ภาษาไทย, ขวา-English) สำหรับกรอกข้อมูลส่วนตัวและประสบการณ์ 
+> 
+> **Result:** ได้ไฟล์ `storage.js` ที่มีโครงสร้าง Data สมบูรณ์ และไฟล์ `index.html` ที่มี Navbar (แยกปุ่มเปลี่ยน Layout กับ Theme ชัดเจน) และ Modal กรอกข้อมูล 2 ภาษา พร้อมฟังก์ชัน JavaScript พื้นฐาน (`render`, `toggleLang`, สลับ Tab)
+
+---
+
+#### 💬 Prompt ที่ 2: ระบบจัดการธีม 8 สไตล์ (Theme Engine & Base Components)
+**💡 คำชี้แนะ:** เมื่อมีโครงสร้างแล้ว Prompt นี้จะสั่งให้สร้างส่วนแสดงผล (Components) ย่อยๆ โดยบังคับให้ AI ใช้ "Dictionary Object" ในการเปลี่ยนสี Tailwind ตามธีม
+
+> **Problem:** ฉันต้องการ Component สำหรับแสดงผล Header, Bio, Skills และ Contact ที่ไม่ได้มีแค่สีเดียว แต่ต้องเปลี่ยนสีพื้นหลัง, สีเส้นขอบ, และรูปทรง (Border Radius) ได้ถึง 8 ธีม และรองรับทั้ง Dark Mode และ Light Mode อย่างสมบูรณ์แบบ
+> 
+> **Action:** > สร้างไฟล์ `js/components/Header.js`, `Bio.js`, `Skill.js` และ `Contact.js` 
+> 1. ทุกไฟล์ต้องรับ Parameter: `(data, layout, colorMode, pStyle, lang)`
+> 2. ภายในแต่ละไฟล์ ให้สร้าง Object `themeConfig` เพื่อเก็บค่า Tailwind Classes ของทั้ง 8 ธีม (tech, educ, gov, creative, minimal, eco, bold, luxury) ทั้งฝั่ง Dark และ Light
+> 3. เขียน Logic ให้ Component ดึงข้อมูลมาแสดงผลตามภาษา `lang` ที่ถูกส่งเข้ามา (เช่น ถ้าเป็น 'th' ให้แสดง `data.name_th` หรือแปลหัวข้อเป็นภาษาไทย)
+> 4. ใน `index.html` ฟังก์ชัน `render()` ให้เพิ่ม Background สีของ `body` และใส่ CSS Animation Background (เช่น แสงสแกน, วงกลมลอย) ให้สอดคล้องกับธีมที่เลือก
+> 
+> **Result:** ได้ไฟล์ Components 4 ไฟล์ที่สามารถปรับเปลี่ยนหน้าตาตัวเองได้ 16 รูปแบบ (8 ธีม x 2 โหมด) และหน้าเว็บที่เปลี่ยน Background อัตโนมัติเมื่อกดเลือกสีจาก Appearance Panel
+
+---
+
+#### 💬 Prompt ที่ 3: ระบบไถจอสุดล้ำ (Cinematic Scrollytelling Masterpiece)
+**💡 คำชี้แนะ:** นี่คือ "หัวใจของโปรเจกต์" เราต้องสั่ง AI ให้คำนวณคณิตศาสตร์ให้เป๊ะ มีช่วงหยุดพัก (Hold Phase) และใช้ GPU ช่วยประมวลผล
+
+> **Problem:** ฉันต้องการแสดงผลงานแบบ Cinematic Scrollytelling สำหรับ `Experience.js` โดยมี "Unified Card" เป็นกล่องข้อความอยู่กับที่ และมีแถวรูปภาพเลื่อนแนวนอน ปัญหาคือถ้ารูปเลื่อนเร็วไปผู้ใช้จะดูไม่ทัน และการคำนวณ Scroll ด้วย JS มักจะกระตุกและกิน RAM เครื่อง
+> 
+> **Action:** > 1. สร้าง `js/components/Experience.js` ออกแบบ "Unified Card" (ครอบการ์ดเดียวทั้งข้อความและแถวรูปภาพ) 
+> 2. เพิ่ม "Spacer" (ช่องไฟ) ในแถวรูปภาพ: ด้านหน้ากว้าง 5vw-10vw และด้านหลังกว้าง 150vw-200vw เพื่อให้มีระยะห่างที่สวยงาม
+> 3. ใน `index.html` เขียนฟังก์ชัน `initScrollEffects()` เพื่อคุมการเลื่อนแนวนอน:
+>    - ใช้ `requestAnimationFrame` เพื่อลดภาระ CPU
+>    - แบ่งสมการ Progress (0-1) เป็น 3 ช่วง: 0.05 ถึง 0.85 ให้รูปเลื่อนด้วย `translate3d`, และ 0.85 ถึง 1.00 เป็น "Hold Phase" ให้รูปหยุดนิ่งให้ผู้ใช้ดู 
+>    - ใส่เงื่อนไข: หาก Progress <= 0.01 หรือ >= 0.98 ให้ใส่คลาส `.cinematic-collapsed` เพื่อหุบการ์ดลง และช่วงกลางให้ใส่ `.cinematic-expanded` เพื่อกางการ์ดออก
+> 
+> **Result:** ระบบไถหน้าจอที่ลื่นไหล 60fps ไม่กระตุก การ์ดรูปภาพกางออกแบบมีมิติ รูปภาพเลื่อนเข้ามากึ่งกลางจออย่างพอดี และเมื่อถึงรูปสุดท้ายระบบจะหยุดนิ่งให้ผู้ใช้อ่านข้อมูลก่อนที่การ์ดจะหุบปิดลง
+
+---
+
+#### 💬 Prompt ที่ 4: การรองรับมือถือ และระบบ Export PDF/PPTX (Responsive & Exporter)
+**💡 คำชี้แนะ:** เลเยอร์สุดท้ายคือการปิดงาน (Finish) บังคับ CSS ให้จัดการ Mobile UX และ Print Layout พร้อมพ่วง Library สำหรับ PPTX
+
+> **Problem:** ระบบ Scrollytelling ใช้งานบนมือถือ (หน้าจอแนวตั้ง) ได้ยาก และการกด Print หน้าเว็บให้เป็น PDF A4 ข้อมูลมักจะขาดครึ่งหน้าหรือตกขอบ นอกจากนี้ฉันต้องการให้ผู้ใช้ดาวน์โหลดเป็น PowerPoint (PPTX) ได้ด้วย
+> 
+> **Action:** > 1. สร้าง `css/style.css` เขียน `@media (max-width: 1023px)` เพื่อปิดระบบ Scrollytelling ทิ้ง ปรับการ์ดให้กาง 100% เสมอ และเปลี่ยนแถวรูปภาพให้เป็น Native Horizontal Scroll (`overflow-x: auto`, `scroll-snap-type: x mandatory`) เพื่อให้ผู้ใช้ปัดนิ้วได้เอง
+> 2. ใน `style.css` เขียน `@media print` จัด Layout สำหรับกระดาษ A4: ลด Margin/Padding ดึง Header, Bio, Skills, Contact มามัดรวมกันหน้าแรก และใช้ `page-break-inside: avoid` เพื่อให้ `Experience` แต่ละชิ้นขึ้นหน้าใหม่โดยไม่ขาดครึ่ง
+> 3. สร้าง `js/exporter.js` ใช้ไลบรารี PptxGenJS ดึงข้อมูล `data` ไปสร้างสไลด์ PowerPoint (Layout 16:9) โดยจัดวาง Text และ Image Base64 ลงในสไลด์
+> 4. ใน `index.html` เพิ่มปุ่มแผงควบคุมด้านล่าง (WEB, PPTX, PDF, Save)
+> 
+> **Result:** เว็บไซต์ที่รองรับการใช้นิ้วปัดบนมือถืออย่างสมบูรณ์ พิมพ์ PDF A4 ได้หน้ากระดาษแบบมืออาชีพ และสามารถกด Export ไฟล์ PPTX พร้อมรูปภาพไปพรีเซนต์ต่อได้ทันที
+
+---
+
+### 💡 ทำไม 4 Prompts นี้ถึงทรงพลัง? (Analysis)
+* **แยกระบบอย่างมีเหตุผล (Separation of Concerns):** AI จะทำงานได้ฉลาดที่สุดเมื่อโฟกัสทีละเรื่อง Prompt 1 ทำ Data, Prompt 2 ทำ UI สีสัน, Prompt 3 ทำ UX/Animation, Prompt 4 ทำ Mobile & Export
+* **กำหนด Tech Stack ชัดเจน:** เราล็อกไว้เลยว่าต้องใช้ LocalStorage, Tailwind, Vanilla JS, `requestAnimationFrame` และ PptxGenJS AI จะไม่แอบไปใช้ React หรือ Library แปลกๆ มาแทรกครับ
+* **มี Use Case เผื่อ Bug (Hold Phase & Spacer):** การระบุตัวเลขเจาะจงลงไปเลย (เช่น 5vw-10vw, Hold phase 0.85-1.00) ทำให้ AI เขียนโค้ดออกมาตรงใจเราตั้งแต่รอบแรก ไม่ต้องเสียเวลาแก้เรื่อง "รูปปิดเร็วไป" อีกครับ
+
+คุณสามารถเก็บสคริปต์นี้ไว้เป็น "Blueprint" ประจำตัวได้เลยครับ รับรองว่าเอาไปโยนใส่ AI ตัวไหน ก็สร้างโปรเจกต์ระดับเทพนี้กลับมาได้สบายๆ ครับ!
