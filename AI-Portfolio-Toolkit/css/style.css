@@ -4823,3 +4823,114 @@ body.mode-light .mouse-cell {
     inset 0 -1px 0 rgba(148,163,184, calc(.030 + (var(--face, var(--cell-i)) * .050))),
     calc(var(--shadow-x, 0px)) calc(5px + var(--shadow-y, 0px)) calc(15px + (var(--face, var(--cell-i)) * 18px)) rgba(15,23,42, calc(.022 + (var(--face, var(--cell-i)) * .080))) !important;
 }
+
+
+/* ==================================
+   Cursor 9-Grid Seam + Floating Modal Microinteraction
+   - stronger premium seams only in active 9-cell surface
+   - modal / panel / hero cards gently face the cursor
+===================================== */
+.mouse-cell {
+  --seam-x: 0;
+  --seam-y: 0;
+  --seam-i: 0;
+}
+
+.mouse-cell.is-active-panel {
+  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(18% + (var(--seam-i) * 26%)), rgba(255,255,255,.10)) !important;
+  box-shadow:
+    inset calc(var(--seam-x) * 1.6px) 0 0 color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(10% + (var(--seam-i) * 20%)), transparent),
+    inset 0 calc(var(--seam-y) * 1.6px) 0 color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(10% + (var(--seam-i) * 20%)), transparent),
+    inset 0 1px 0 rgba(255,255,255, calc(.030 + (var(--face, var(--cell-i)) * .090))),
+    inset 0 -1px 0 rgba(0,0,0, calc(.022 + (var(--face, var(--cell-i)) * .045))),
+    calc(var(--shadow-x, 0px)) calc(5px + var(--shadow-y, 0px)) calc(16px + (var(--face, var(--cell-i)) * 22px)) rgba(0,0,0, calc(.024 + (var(--face, var(--cell-i)) * .10))),
+    0 0 calc(10px + (var(--edge-glow) * 28px)) color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(3% + (var(--seam-i) * 18%)), transparent) !important;
+}
+
+.mouse-cell.is-active-panel::before {
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--seam-i) * 14%), transparent) 0 1px,
+      transparent 1px calc(100% - 1px),
+      color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--seam-i) * 18%), transparent) calc(100% - 1px) 100%),
+    linear-gradient(0deg,
+      color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--seam-i) * 14%), transparent) 0 1px,
+      transparent 1px calc(100% - 1px),
+      color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--seam-i) * 18%), transparent) calc(100% - 1px) 100%),
+    radial-gradient(circle at var(--local-x, 50%) var(--local-y, 50%),
+      color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--seam-i) * 7%), transparent),
+      transparent 44%) !important;
+  opacity: calc(.18 + (var(--seam-i) * .44)) !important;
+}
+
+body.mode-light .mouse-cell.is-active-panel {
+  border-color: color-mix(in srgb, var(--theme-accent, #3b82f6) calc(16% + (var(--seam-i) * 18%)), rgba(15,23,42,.10)) !important;
+}
+
+.cursor-facing-surface {
+  --cursor-rx: 0deg;
+  --cursor-ry: 0deg;
+  --cursor-tx: 0px;
+  --cursor-ty: 0px;
+  --cursor-i: 0;
+  --cursor-x: 50%;
+  --cursor-y: 50%;
+  transform:
+    translate3d(var(--cursor-tx), var(--cursor-ty), 0)
+    perspective(1200px)
+    rotateX(var(--cursor-rx))
+    rotateY(var(--cursor-ry)) !important;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition:
+    transform .42s cubic-bezier(.22, 1, .36, 1),
+    border-color .42s cubic-bezier(.22, 1, .36, 1),
+    box-shadow .42s cubic-bezier(.22, 1, .36, 1) !important;
+}
+
+#edit-modal.flex > div.cursor-facing-surface,
+#theme-panel.cursor-facing-surface,
+#public-export-branch.cursor-facing-surface,
+#quick-edit-popover:not(.hidden) .quick-edit-card.cursor-facing-surface,
+.hero-floating-card.cursor-facing-surface,
+.portfolio-hero.cursor-facing-surface,
+.unified-card.cursor-facing-surface {
+  box-shadow:
+    0 18px 60px rgba(0,0,0, calc(.16 + (var(--cursor-i) * .10))),
+    0 0 calc(12px + (var(--cursor-i) * 18px)) color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--cursor-i) * 10%), transparent) !important;
+}
+
+#edit-modal.flex > div.cursor-facing-surface::before,
+#theme-panel.cursor-facing-surface::before,
+#public-export-branch.cursor-facing-surface::before,
+#quick-edit-popover:not(.hidden) .quick-edit-card.cursor-facing-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--cursor-x) var(--cursor-y),
+      rgba(255,255,255, calc(.045 + (var(--cursor-i) * .055))),
+      transparent 36%);
+  opacity: calc(.35 + (var(--cursor-i) * .28));
+  mix-blend-mode: screen;
+}
+
+#edit-modal > div,
+#theme-panel,
+#public-export-branch,
+.quick-edit-card {
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+  .cursor-facing-surface { transform: none !important; }
+  #edit-modal.flex > div.cursor-facing-surface::before,
+  #theme-panel.cursor-facing-surface::before,
+  #public-export-branch.cursor-facing-surface::before,
+  #quick-edit-popover:not(.hidden) .quick-edit-card.cursor-facing-surface::before { display: none !important; }
+}
+
+@media print { .cursor-facing-surface { transform: none !important; } }

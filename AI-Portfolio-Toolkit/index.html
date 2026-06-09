@@ -1177,7 +1177,8 @@
             app.innerHTML = appContent;
 
             if (document.getElementById('btn-lang')) document.getElementById('btn-lang').innerText = lang === 'th' ? 'TH' : 'EN';
-            setTimeout(() => { createPortfolioIcons(); initThemeCarousel(); if (layout === 'portfolio') { initScrollEffects(); initMicroInteractions(); } initQuickEditHotspots(); }, 50);
+            setTimeout(() => { createPortfolioIcons(); initThemeCarousel(); if (layout === 'portfolio') { initScrollEffects(); initMicroInteractions();
+                initFloatingSurfaceMicroInteractions(); } initQuickEditHotspots(); }, 50);
         }
 
         async function handleExportWeb() {
@@ -1322,6 +1323,9 @@
                     const shadowX = clamp(faceX * 8 * influence, -8, 8);
                     const shadowY = clamp(faceY * 8 * influence, -8, 8);
                     const faceGlow = clamp(0.04 + influence * 0.30, 0.04, 0.34);
+                    const seamX = clamp(Math.abs(faceX) * influence, 0, 1);
+                    const seamY = clamp(Math.abs(faceY) * influence, 0, 1);
+                    const seamIntensity = clamp(0.12 + influence * 0.62, 0.10, 0.74);
 
                     cell.style.setProperty('--cell-x', `${x.toFixed(1)}px`);
                     cell.style.setProperty('--cell-y', `${y.toFixed(1)}px`);
@@ -1338,6 +1342,9 @@
                     cell.style.setProperty('--shadow-y', `${shadowY.toFixed(2)}px`);
                     cell.style.setProperty('--hinge-origin', '50% 50%');
                     cell.style.setProperty('--edge-glow', faceGlow.toFixed(3));
+                    cell.style.setProperty('--seam-x', seamX.toFixed(3));
+                    cell.style.setProperty('--seam-y', seamY.toFixed(3));
+                    cell.style.setProperty('--seam-i', seamIntensity.toFixed(3));
                     cell.style.setProperty('--local-x', `${localX.toFixed(1)}%`);
                     cell.style.setProperty('--local-y', `${localY.toFixed(1)}%`);
                     cell.classList.toggle('is-active-panel', influence > 0.04);
@@ -1379,6 +1386,79 @@
             window.addEventListener('pointermove', window._portfolioPointerMove, { passive: true });
             window.addEventListener('pointerleave', window._portfolioPointerLeave, { passive: true });
             window.addEventListener('pointerenter', window._portfolioPointerEnter, { passive: true });
+            update();
+        }
+
+        function initFloatingSurfaceMicroInteractions() {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+            const pickTargets = () => Array.from(document.querySelectorAll([
+                '#theme-panel:not(.hidden)',
+                '#public-export-branch:not(.hidden)',
+                '#edit-modal.flex > div',
+                '#quick-edit-popover:not(.hidden) .quick-edit-card',
+                '.hero-floating-card',
+                '.portfolio-hero',
+                '.unified-card'
+            ].join(','))).filter(el => !document.body.classList.contains('is-downloaded'));
+
+            let raf = null;
+            let mx = window.innerWidth / 2;
+            let my = window.innerHeight / 2;
+
+            const update = () => {
+                raf = null;
+                pickTargets().forEach((el) => {
+                    const rect = el.getBoundingClientRect();
+                    if (!rect.width || !rect.height) return;
+
+                    const cx = rect.left + rect.width / 2;
+                    const cy = rect.top + rect.height / 2;
+                    const dx = mx - cx;
+                    const dy = my - cy;
+                    const range = Math.max(220, Math.min(window.innerWidth, window.innerHeight) * 0.46);
+                    const dist = Math.hypot(dx, dy);
+                    const proximity = clamp(1 - dist / range, 0, 1);
+
+                    const nx = clamp(dx / Math.max(1, rect.width), -1, 1);
+                    const ny = clamp(dy / Math.max(1, rect.height), -1, 1);
+                    const isModal = el.matches('#edit-modal > div, .quick-edit-card');
+                    const isPanel = el.matches('#theme-panel, #public-export-branch');
+                    const strength = isModal ? 3.1 : (isPanel ? 4.2 : 5.2);
+
+                    const rx = clamp(-ny * strength * proximity, -5.5, 5.5);
+                    const ry = clamp(nx * strength * proximity, -5.5, 5.5);
+                    const tx = clamp(nx * 4 * proximity, -4, 4);
+                    const ty = clamp(ny * 4 * proximity, -4, 4);
+
+                    el.style.setProperty('--cursor-rx', `${rx.toFixed(2)}deg`);
+                    el.style.setProperty('--cursor-ry', `${ry.toFixed(2)}deg`);
+                    el.style.setProperty('--cursor-tx', `${tx.toFixed(2)}px`);
+                    el.style.setProperty('--cursor-ty', `${ty.toFixed(2)}px`);
+                    el.style.setProperty('--cursor-i', proximity.toFixed(3));
+                    el.style.setProperty('--cursor-x', `${clamp(((mx - rect.left) / rect.width) * 100, 0, 100).toFixed(1)}%`);
+                    el.style.setProperty('--cursor-y', `${clamp(((my - rect.top) / rect.height) * 100, 0, 100).toFixed(1)}%`);
+                    el.classList.add('cursor-facing-surface');
+                });
+            };
+
+            if (window._floatingSurfacePointerMove) {
+                window.removeEventListener('pointermove', window._floatingSurfacePointerMove);
+            }
+
+            window._floatingSurfacePointerMove = (e) => {
+                mx = e.clientX;
+                my = e.clientY;
+                if (!raf) raf = requestAnimationFrame(update);
+            };
+
+            window.addEventListener('pointermove', window._floatingSurfacePointerMove, { passive: true });
+
+            const observer = new MutationObserver(() => {
+                if (!raf) raf = requestAnimationFrame(update);
+            });
+            observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
             update();
         }
 
