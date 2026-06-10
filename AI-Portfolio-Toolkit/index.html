@@ -1400,7 +1400,12 @@
                 '#quick-edit-popover:not(.hidden) .quick-edit-card',
                 '.hero-floating-card',
                 '.portfolio-hero',
-                '.unified-card'
+                '.unified-card',
+                '.skills-section > div',
+                '.skills-section span',
+                '.contact-section > ul',
+                '.resume-sidebar-block .skills-section span',
+                '.resume-sidebar-block .contact-section > ul'
             ].join(','))).filter(el => !document.body.classList.contains('is-downloaded'));
 
             let raf = null;
@@ -1425,7 +1430,9 @@
                     const ny = clamp(dy / Math.max(1, rect.height), -1, 1);
                     const isModal = el.matches('#edit-modal > div, .quick-edit-card');
                     const isPanel = el.matches('#theme-panel, #public-export-branch');
-                    const strength = isModal ? 3.1 : (isPanel ? 4.2 : 5.2);
+                    const isSmallChip = el.matches('.skills-section span');
+                    const isContentPanel = el.matches('.skills-section > div, .contact-section > ul');
+                    const strength = isModal ? 3.1 : (isPanel ? 4.2 : (isSmallChip ? 4.8 : (isContentPanel ? 4.4 : 5.2)));
 
                     const rx = clamp(-ny * strength * proximity, -5.5, 5.5);
                     const ry = clamp(nx * strength * proximity, -5.5, 5.5);

@@ -4934,3 +4934,66 @@ body.mode-light .mouse-cell.is-active-panel {
 }
 
 @media print { .cursor-facing-surface { transform: none !important; } }
+
+
+/* ==================================
+   Skills / Contact Cursor Facing Extension
+   These sections use different component classes from the hero/unified cards,
+   so they need explicit targeting.
+===================================== */
+.skills-section > div.cursor-facing-surface,
+.contact-section > ul.cursor-facing-surface {
+  border-radius: 22px;
+  transform-origin: 50% 50%;
+  padding: 10px;
+  margin: -10px;
+  background: rgba(255,255,255,.018);
+  border: 1px solid rgba(255,255,255,.045);
+  box-shadow:
+    0 12px 32px rgba(0,0,0, calc(.06 + (var(--cursor-i) * .08))),
+    0 0 calc(8px + (var(--cursor-i) * 16px)) color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--cursor-i) * 8%), transparent) !important;
+}
+
+.skills-section span.cursor-facing-surface {
+  transform-origin: 50% 50%;
+  box-shadow:
+    0 8px 18px rgba(0,0,0, calc(.04 + (var(--cursor-i) * .08))),
+    inset 0 1px 0 rgba(255,255,255, calc(.04 + (var(--cursor-i) * .10))),
+    0 0 calc(4px + (var(--cursor-i) * 12px)) color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(var(--cursor-i) * 8%), transparent) !important;
+  border-color: color-mix(in srgb, var(--theme-accent-2, #38bdf8) calc(18% + (var(--cursor-i) * 28%)), rgba(255,255,255,.14)) !important;
+}
+
+.contact-section > ul.cursor-facing-surface {
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-section > ul.cursor-facing-surface::before,
+.skills-section > div.cursor-facing-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--cursor-x) var(--cursor-y), rgba(255,255,255, calc(.025 + (var(--cursor-i) * .060))), transparent 38%);
+  opacity: calc(.28 + (var(--cursor-i) * .28));
+  mix-blend-mode: screen;
+}
+
+.skills-section > div.cursor-facing-surface {
+  position: relative;
+}
+
+body.mode-light .skills-section > div.cursor-facing-surface,
+body.mode-light .contact-section > ul.cursor-facing-surface {
+  background: rgba(255,255,255,.46);
+  border-color: rgba(15,23,42,.06);
+}
+
+@media (max-width: 1023px), (prefers-reduced-motion: reduce) {
+  .skills-section > div.cursor-facing-surface,
+  .skills-section span.cursor-facing-surface,
+  .contact-section > ul.cursor-facing-surface {
+    transform: none !important;
+  }
+}
