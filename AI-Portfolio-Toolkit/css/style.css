@@ -4,7 +4,7 @@ body {
 }
 
 button {
-    transition: transform 0.2s active, background-color 0.3s ease;
+    transition: transform 0.2s ease, background-color 0.3s ease;
 }
 
 button:active {
@@ -4996,4 +4996,317 @@ body.mode-light .contact-section > ul.cursor-facing-surface {
   .contact-section > ul.cursor-facing-surface {
     transform: none !important;
   }
+}
+
+/* ==================================
+   Print-grade resume and portfolio polish
+   Balanced against common professional/Thai CV patterns: clear headshot,
+   restrained hierarchy, predictable image grids, and ink-safe print output.
+===================================== */
+:root {
+    --document-ink: #111827;
+    --document-muted: #4b5563;
+    --document-line: #d1d5db;
+    --document-soft: #f8fafc;
+}
+
+.resume-cv-shell {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.34fr) minmax(0, 0.66fr);
+    gap: clamp(1.25rem, 3vw, 2rem);
+    align-items: start;
+}
+
+.resume-cv-sidebar,
+.resume-cv-main {
+    min-width: 0;
+}
+
+.resume-cv-sidebar {
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    background: rgba(15, 23, 42, 0.18);
+    border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+body.mode-light .resume-cv-sidebar,
+body.text-slate-900 .resume-cv-sidebar {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+.resume-cv-main {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.resume-section-card,
+.resume-sidebar-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.resume-section-card {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(255, 255, 255, 0.035);
+    padding: 1.1rem;
+}
+
+body.mode-light .resume-section-card,
+body.text-slate-900 .resume-section-card {
+    background: #ffffff;
+    border-color: #e5e7eb;
+}
+
+.layout-resume header img[alt="Profile"] {
+    width: 112px !important;
+    height: 140px !important;
+    object-fit: cover !important;
+    border-radius: 6px !important;
+    background: #f3f4f6 !important;
+    flex: 0 0 auto;
+}
+
+.layout-resume header h1 {
+    letter-spacing: 0.06em !important;
+    line-height: 1.05 !important;
+}
+
+.layout-resume header p {
+    letter-spacing: 0.08em !important;
+    line-height: 1.35 !important;
+}
+
+.layout-portfolio .scrollytelling-track {
+    align-items: stretch !important;
+}
+
+.layout-portfolio .scrollytelling-track img.scrolly-full-image {
+    aspect-ratio: 16 / 10;
+    width: min(58vw, 760px) !important;
+    height: auto !important;
+    object-fit: contain !important;
+    background: rgba(15, 23, 42, 0.42);
+}
+
+body.text-slate-900.layout-portfolio .scrollytelling-track img.scrolly-full-image,
+body.mode-light.layout-portfolio .scrollytelling-track img.scrolly-full-image {
+    background: #f8fafc;
+}
+
+@media (max-width: 820px) {
+    .resume-cv-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .resume-cv-sidebar {
+        border-radius: 1rem;
+    }
+}
+
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 12mm 12mm 14mm;
+    }
+
+    html,
+    body {
+        width: 210mm !important;
+        min-height: 297mm !important;
+        color: var(--document-ink) !important;
+        font-size: 10.5pt !important;
+        line-height: 1.42 !important;
+    }
+
+    body::before,
+    .hero-orb,
+    .mouse-cell,
+    #mouse-grid-field,
+    .hero-floating-card,
+    .hero-chip,
+    .inline-project-edit {
+        display: none !important;
+    }
+
+    h1, h2, h3, h4, h5, p, li, span, a {
+        color: var(--document-ink) !important;
+    }
+
+    p, li {
+        color: var(--document-muted) !important;
+    }
+
+    a {
+        text-decoration: none !important;
+    }
+
+    body.layout-resume #app {
+        width: 186mm !important;
+        max-width: 186mm !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        background: #ffffff !important;
+    }
+
+    body.layout-resume .resume-cv-shell {
+        display: grid !important;
+        grid-template-columns: 58mm 1fr !important;
+        gap: 8mm !important;
+        align-items: start !important;
+    }
+
+    body.layout-resume .resume-cv-sidebar {
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+    }
+
+    body.layout-resume .resume-cv-main {
+        gap: 4mm !important;
+    }
+
+    body.layout-resume header {
+        display: block !important;
+        text-align: left !important;
+        border-bottom: 1.6pt solid var(--document-ink) !important;
+        padding-bottom: 4mm !important;
+        margin-bottom: 5mm !important;
+    }
+
+    body.layout-resume header img[alt="Profile"] {
+        width: 32mm !important;
+        height: 40mm !important;
+        margin: 0 0 4mm 0 !important;
+        border: 0.8pt solid var(--document-line) !important;
+        border-radius: 1.5mm !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+
+    body.layout-resume header h1 {
+        font-size: 19pt !important;
+        line-height: 1.05 !important;
+        letter-spacing: 0.04em !important;
+        margin: 0 !important;
+        text-transform: uppercase !important;
+        font-family: 'IBM Plex Sans Thai', Arial, sans-serif !important;
+    }
+
+    body.layout-resume header p {
+        font-size: 9.5pt !important;
+        line-height: 1.3 !important;
+        letter-spacing: 0.08em !important;
+        margin-top: 2mm !important;
+        color: var(--document-muted) !important;
+    }
+
+    body.layout-resume .resume-section-card,
+    body.layout-resume .resume-sidebar-block {
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 0 4.5mm 0 !important;
+    }
+
+    body.layout-resume h3 {
+        font-size: 10.5pt !important;
+        letter-spacing: 0.08em !important;
+        line-height: 1.25 !important;
+        margin: 0 0 2.8mm 0 !important;
+        padding: 0 0 1.8mm 0 !important;
+        border: 0 !important;
+        border-bottom: 1pt solid var(--document-line) !important;
+        background: transparent !important;
+        text-transform: uppercase !important;
+    }
+
+    body.layout-resume .resume-card,
+    body.layout-resume .print-exp-item {
+        padding: 0 0 0 3.2mm !important;
+        margin: 0 0 4.4mm 0 !important;
+        border-left: 1.2pt solid var(--document-line) !important;
+        border-radius: 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    body.layout-resume .print-exp-item h4 {
+        font-size: 11.5pt !important;
+        line-height: 1.25 !important;
+        margin: 0.7mm 0 0 !important;
+        font-family: 'IBM Plex Sans Thai', Arial, sans-serif !important;
+    }
+
+    body.layout-resume .print-exp-item h5,
+    body.layout-resume .print-exp-item span {
+        font-size: 8.8pt !important;
+        color: var(--document-muted) !important;
+    }
+
+    body.layout-resume .print-exp-item p,
+    body.layout-resume .print-exp-item li {
+        font-size: 9.2pt !important;
+        line-height: 1.38 !important;
+    }
+
+    body.layout-resume ul {
+        margin-top: 2mm !important;
+        padding-left: 4mm !important;
+    }
+
+    body.layout-portfolio #app {
+        width: 186mm !important;
+        max-width: 186mm !important;
+        padding: 0 !important;
+    }
+
+    body.layout-portfolio .portfolio-hero {
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        margin-bottom: 8mm !important;
+        padding: 0 0 6mm !important;
+        border-bottom: 1.4pt solid var(--document-line) !important;
+    }
+
+    body.layout-portfolio .portfolio-hero::after {
+        display: none !important;
+    }
+
+    body.layout-portfolio .unified-card {
+        border: 0.8pt solid var(--document-line) !important;
+        border-radius: 4mm !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+    }
+
+    body.layout-portfolio .scrollytelling-track {
+        display: grid !important;
+        grid-template-columns: repeat(var(--print-fit-cols, 2), minmax(0, 1fr)) !important;
+        gap: var(--print-fit-gap, 3mm) !important;
+        padding: 4mm !important;
+        margin: 0 !important;
+    }
+
+    body.layout-portfolio .scrolly-spacer {
+        display: none !important;
+    }
+
+    body.layout-portfolio .scrollytelling-track img.scrolly-full-image,
+    body.layout-portfolio .scrollytelling-track img {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: var(--print-fit-img-h, 34mm) !important;
+        max-height: var(--print-fit-img-h, 34mm) !important;
+        object-fit: contain !important;
+        border-radius: 2mm !important;
+        border: 0.6pt solid var(--document-line) !important;
+        background: var(--document-soft) !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
 }
