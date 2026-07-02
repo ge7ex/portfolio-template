@@ -1,9 +1,12 @@
 {
   "name": "portfolio-template-v2-ts-v49-parity",
   "version": "0.1.0",
-  "packageManager": "pnpm@9.15.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
