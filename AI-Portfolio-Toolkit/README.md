@@ -29,6 +29,20 @@ Recent confirmed capabilities on `main`:
 - WEB export support.
 - DOCX export is intentionally hidden/disabled in the current UI because previous offline behavior was unstable.
 
+## Project guides and skills
+
+Use these files when working with Codex or planning refactors:
+
+```text
+AI-Portfolio-Toolkit/docs/PERFORMANCE_REFACTOR_GUIDE_TH.md
+AI-Portfolio-Toolkit/skills/impeccable-redesign.md
+```
+
+Recommended use:
+
+- Use `docs/PERFORMANCE_REFACTOR_GUIDE_TH.md` when reducing resource usage, cleaning CSS, limiting cursor targets, or deciding whether TypeScript is needed.
+- Use `skills/impeccable-redesign.md` when asking Codex to redesign or polish UI while avoiding obvious AI-generated / vibe-code patterns.
+
 ## Folder structure
 
 ```text
@@ -54,6 +68,10 @@ AI-Portfolio-Toolkit/
 │       ├── ClientsComponent.js
 │       ├── CTAComponent.js
 │       └── ArticlesComponent.js
+├── docs/
+│   └── PERFORMANCE_REFACTOR_GUIDE_TH.md
+├── skills/
+│   └── impeccable-redesign.md
 ├── PROJECT_STATUS_AND_ROADMAP_TH.md
 └── README.md
 ```
@@ -214,7 +232,7 @@ High-cost areas:
 - Large base64 images in localStorage.
 - html2canvas / PPTX rendering.
 
-Prefer optimizing these before rewriting the project in TypeScript.
+Prefer optimizing these before rewriting the project in TypeScript. See `docs/PERFORMANCE_REFACTOR_GUIDE_TH.md` for the detailed plan.
 
 ## JavaScript vs TypeScript guidance
 
@@ -237,7 +255,7 @@ When asking Codex to edit this project, keep each task narrow.
 Good examples:
 
 ```text
-Refactor only the cursor microinteraction target list. Do not change export logic.
+Use /skill impeccable-redesign. Refactor only the cursor microinteraction target list. Do not change export logic.
 ```
 
 ```text
