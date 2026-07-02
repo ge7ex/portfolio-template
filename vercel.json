@@ -1,6 +1,6 @@
 {
   "framework": "vite",
-  "installCommand": "corepack enable && corepack prepare pnpm@9.15.0 --activate && pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm run build",
+  "installCommand": "echo Skipping install - using committed dist",
+  "buildCommand": "echo Skipping build - using committed dist",
   "outputDirectory": "dist"
 }

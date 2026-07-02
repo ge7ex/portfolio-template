@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI Portfolio Toolkit v2 TS — v49 Parity</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.11.0/dist/pptxgen.bundle.js"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            font-family: 'IBM Plex Sans Thai', sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .tab-active {
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        .tab-inactive {
+            border-color: transparent;
+            color: #94a3b8;
+        }
+
+        .tab-inactive:hover {
+            color: #e2e8f0;
+        }
+
+        .theme-swatch {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .theme-swatch:hover {
+            transform: scale(1.15);
+        }
+
+        .theme-swatch.active {
+            outline: 2px solid white;
+            outline-offset: 2px;
+            transform: scale(1.1);
+        }
+
+        #watermark {
+            display: none;
+        }
+
+        .is-downloaded #watermark {
+            display: block;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            opacity: 0.4;
+            z-index: 100;
+            pointer-events: none;
+            color: gray;
+        }
+
+        .is-downloaded nav button[onclick="toggleModal()"] {
+            display: none !important;
+        }
+
+        .is-downloaded #export-panel {
+            display: none !important;
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/index-Dj-tHRG0.js"></script>
+</head>
+
+<body class="bg-[#0f172a] text-white min-h-screen transition-all duration-500 relative">
+
+    <div id="dynamic-bg"
+        class="fixed inset-0 z-[-1] bg-cover bg-center bg-no-repeat transition-all duration-700 opacity-0 bg-blend-overlay bg-[#0f172a]/90">
+    </div>
+    <div id="theme-decorations" class="fixed inset-0 z-[0] pointer-events-none overflow-hidden"></div>
+    <div id="scroll-progress" class="fixed top-0 left-0 h-1 w-0 z-[80] bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 shadow-[0_0_18px_rgba(59,130,246,.65)] transition-[width] duration-150"></div>
+
+    <div id="watermark">Web Portfolio by Kasidech "Ge7ex" Settavanit</div>
+
+    <nav class="fixed top-6 right-6 z-50 flex items-center gap-3">
+        <button onclick="toggleLang()" id="btn-lang"
+            class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all font-bold uppercase text-sm flex items-center justify-center">
+            EN
+        </button>
+
+        <div
+            class="bg-slate-900/80 backdrop-blur-xl border border-white/10 p-1 rounded-full flex shadow-lg items-center relative">
+            <button onclick="setDirectLayout('portfolio')" id="btn-pill-portfolio"
+                class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all bg-blue-600 text-white shadow-md">Portfolio</button>
+            <button onclick="setDirectLayout('resume')" id="btn-pill-resume"
+                class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all text-slate-400 hover:text-white">Resume</button>
+        </div>
+
+        <button onclick="toggleThemePanel()" id="btn-appearance"
+            class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative">
+            <i data-lucide="palette" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        </button>
+
+        <button onclick="toggleExportBranch()" id="btn-export-branch"
+            class="bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative"
+            title="Export / Print">
+            <i data-lucide="printer" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+        </button>
+
+        <button onclick="toggleCanvaBranch()" id="btn-canva-branch"
+            class="canva-icon-button bg-slate-900/80 hover:bg-slate-800 text-white backdrop-blur-xl border border-white/10 w-11 h-11 rounded-full shadow-lg transition-all flex items-center justify-center group relative"
+            title="Download Canva AI prompt package">
+            <span class="canva-mark" aria-hidden="true">C</span>
+        </button>
+
+        <button onclick="toggleModal()"
+            class="bg-emerald-600/90 hover:bg-emerald-500 text-white backdrop-blur-xl border border-emerald-400/30 px-5 h-11 rounded-full font-bold shadow-lg transition-all flex items-center gap-2 group">
+            <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
+            <span class="text-sm">Edit</span>
+        </button>
+    </nav>
+
+    <div id="public-export-branch" class="hidden public-export-branch" aria-label="Quick export actions">
+        <button type="button" onclick="handleExportWeb()" title="Download WEB"><i data-lucide="download" class="w-4 h-4"></i><span>WEB</span></button>
+        <button type="button" onclick="handlePrint('portrait')" title="PDF Portrait"><i data-lucide="file-down" class="w-4 h-4"></i><span>PDF</span></button>
+        <button type="button" onclick="copyCanvaPrompt('en')" title="Copy Canva Design Brief"><i data-lucide="copy" class="w-4 h-4"></i><span>CANVA</span></button>
+    </div>
+
+    <div id="public-canva-branch" class="hidden public-canva-branch" aria-label="Canva AI export package">
+        <button type="button" onclick="downloadCanvaPackage()" title="Download Canva AI prompt package"><i data-lucide="package-down" class="w-4 h-4"></i><span>Canva AI Pack</span></button>
+        <button type="button" onclick="copyCanvaPrompt('en')" title="Copy English Canva Prompt"><i data-lucide="copy" class="w-4 h-4"></i><span>Copy EN</span></button>
+        <button type="button" onclick="copyCanvaPrompt('th')" title="Copy Thai Canva Prompt"><i data-lucide="copy-check" class="w-4 h-4"></i><span>Copy TH</span></button>
+    </div>
+
+    <div id="canva-copy-toast" class="hidden canva-copy-toast" role="status" aria-live="polite">Canva AI package ready</div>
+
+    <div id="theme-panel"
+        class="hidden fixed top-20 right-6 z-40 bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-700 rounded-3xl p-5 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] w-72 origin-top-right transition-all">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i
+                data-lucide="moon" class="w-3 h-3"></i> Appearance</h3>
+
+        <div class="flex bg-slate-900 rounded-xl p-1 mb-6 border border-slate-800">
+            <button onclick="setDirectColorMode('dark')" id="btn-mode-dark"
+                class="flex-1 py-2 rounded-lg text-xs font-bold transition-all bg-slate-700 text-white flex items-center justify-center gap-2 shadow-md"><i
+                    data-lucide="moon" class="w-3 h-3"></i> Dark</button>
+            <button onclick="setDirectColorMode('light')" id="btn-mode-light"
+                class="flex-1 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white flex items-center justify-center gap-2"><i
+                    data-lucide="sun" class="w-3 h-3"></i> Light</button>
+        </div>
+
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i
+                data-lucide="swatch-book" class="w-3 h-3"></i> Color Theme</h3>
+
+        <div class="theme-wheel-shell" aria-label="Theme wheel selector">
+            <button type="button" class="theme-wheel-arrow theme-wheel-up" onclick="nudgeThemeWheel(-1)" aria-label="Previous theme">⌃</button>
+            <div id="theme-carousel" class="theme-carousel" aria-label="Theme carousel">
+                <button type="button" data-theme="tech" id="swatch-tech" class="theme-swatch theme-dot bg-blue-500 active" title="Tech & Startup"><span>Tech</span></button>
+                <button type="button" data-theme="educ" id="swatch-educ" class="theme-swatch theme-dot bg-emerald-500" title="Education"><span>Education</span></button>
+                <button type="button" data-theme="gov" id="swatch-gov" class="theme-swatch theme-dot bg-amber-500" title="Government"><span>Gov</span></button>
+                <button type="button" data-theme="creative" id="swatch-creative" class="theme-swatch theme-dot bg-fuchsia-500" title="Creative"><span>Creative</span></button>
+                <button type="button" data-theme="minimal" id="swatch-minimal" class="theme-swatch theme-dot bg-white" title="Minimal"><span>Minimal</span></button>
+                <button type="button" data-theme="eco" id="swatch-eco" class="theme-swatch theme-dot bg-teal-500" title="Eco Nature"><span>Eco</span></button>
+                <button type="button" data-theme="bold" id="swatch-bold" class="theme-swatch theme-dot bg-rose-500" title="Bold Passion"><span>Bold</span></button>
+                <button type="button" data-theme="luxury" id="swatch-luxury" class="theme-swatch theme-dot bg-gradient-to-br from-amber-300 to-indigo-900" title="Luxury"><span>Luxury</span></button>
+                <button type="button" data-theme="health" id="swatch-health" class="theme-swatch theme-dot bg-gradient-to-br from-sky-300 to-emerald-400" title="Health & Wellness"><span>Health</span></button>
+                <button type="button" data-theme="esports" id="swatch-esports" class="theme-swatch theme-dot bg-gradient-to-br from-violet-500 to-cyan-400" title="Esports"><span>Esports</span></button>
+            </div>
+            <button type="button" class="theme-wheel-arrow theme-wheel-down" onclick="nudgeThemeWheel(1)" aria-label="Next theme">⌄</button>
+            <div id="theme-wheel-label" class="theme-wheel-label">TECH</div>
+            <div class="theme-mode-branch" aria-label="Color mode">
+                <button type="button" onclick="setDirectColorMode('dark')" id="wheel-mode-dark"><i data-lucide="moon" class="w-3 h-3"></i><span>Dark</span></button>
+                <button type="button" onclick="setDirectColorMode('light')" id="wheel-mode-light"><i data-lucide="sun" class="w-3 h-3"></i><span>Light</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="container mx-auto py-20 px-6"></div>
+
+    <div id="edit-modal"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div
+            class="bg-[#0f172a] text-white w-full max-w-5xl rounded-3xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+
+            <div class="px-8 py-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                <h2 class="text-2xl font-bold flex items-center gap-3"><i data-lucide="user-cog"
+                        class="w-7 h-7 text-blue-400"></i> Manage Profile</h2>
+                <button onclick="toggleModal()" class="text-slate-400 hover:text-white transition-colors"><i
+                        data-lucide="x" class="w-7 h-7"></i></button>
+            </div>
+
+            <div class="flex px-8 pt-4 gap-8 border-b border-slate-800 bg-[#0f172a]">
+                <button onclick="switchTab('basic')" id="tab-basic"
+                    class="tab-active pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="user" class="w-4 h-4"></i> Basic Info</button>
+                <button onclick="switchTab('contact')" id="tab-contact"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="mail" class="w-4 h-4"></i> Contact & Skills</button>
+                <button onclick="switchTab('experience')" id="tab-experience"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="briefcase" class="w-4 h-4"></i> Experience</button>
+                <button onclick="switchTab('sections')" id="tab-sections"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="layout-template" class="w-4 h-4"></i> Extra Sections</button>
+                <button onclick="switchTab('resume')" id="tab-resume"
+                    class="tab-inactive pb-3 border-b-2 font-medium flex items-center gap-2 transition-all"><i
+                        data-lucide="file-user" class="w-4 h-4"></i> Resume Settings</button>
+            </div>
+
+            <div id="edit-modal-body" class="p-8 overflow-y-auto flex-1 custom-scrollbar">
+
+                <div id="content-basic" class="block space-y-6">
+                    <div
+                        class="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl flex items-center justify-between gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm text-slate-400 mb-3 flex items-center gap-2"><i
+                                    data-lucide="image" class="w-4 h-4"></i> Profile Picture</label>
+                            <input type="file" id="in-avatar" accept="image/*" onchange="handleImageUpload(event)"
+                                class="text-sm w-full text-slate-400 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer transition-all">
+                        </div>
+                        <img id="avatar-preview"
+                            class="hidden w-20 h-20 rounded-full object-cover border-2 border-slate-600 shadow-lg">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4 bg-slate-900/40 p-6 rounded-2xl border border-blue-500/20">
+                            <h3
+                                class="text-blue-400 font-bold border-b border-blue-900/50 pb-2 flex items-center gap-2">
+                                🇹🇭 ข้อมูลภาษาไทย</h3>
+                            <div><label
+                                    class="block text-xs font-semibold text-slate-400 uppercase mb-2">ชื่อ-นามสกุล</label><input
+                                    type="text" id="in-name-th"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-blue-500">
+                            </div>
+                            <div><label
+                                    class="block text-xs font-semibold text-slate-400 uppercase mb-2">ตำแหน่งงาน</label><input
+                                    type="text" id="in-role-th"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-blue-500">
+                            </div>
+                            <div><label
+                                    class="block text-xs font-semibold text-slate-400 uppercase mb-2">ประวัติโดยย่อ</label><textarea
+                                    id="in-bio-th"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl h-28 resize-none outline-none focus:border-blue-500"></textarea>
+                            </div>
+                        </div>
+                        <div class="space-y-4 bg-slate-900/40 p-6 rounded-2xl border border-amber-500/20">
+                            <h3
+                                class="text-amber-400 font-bold border-b border-amber-900/50 pb-2 flex items-center gap-2">
+                                🇬🇧 English Data</h3>
+                            <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Full
+                                    Name</label><input type="text" id="in-name-en"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-amber-500">
+                            </div>
+                            <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Job
+                                    Position</label><input type="text" id="in-role-en"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-amber-500">
+                            </div>
+                            <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Professional
+                                    Summary</label><textarea id="in-bio-en"
+                                    class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl h-28 resize-none outline-none focus:border-amber-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-contact" class="hidden space-y-6">
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 gap-5 bg-slate-900/40 p-6 rounded-2xl border border-slate-700">
+                        <div class="relative"><label
+                                class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email</label><input
+                                type="text" id="in-email"
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none">
+                        </div>
+                        <div class="relative"><label
+                                class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Phone</label><input
+                                type="text" id="in-phone"
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none">
+                        </div>
+                        <div class="relative md:col-span-2"><label
+                                class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">LinkedIn
+                                URL</label><input type="text" id="in-linkedin"
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-900/40 p-6 rounded-2xl border border-blue-500/20">
+                            <label class="block text-xs font-semibold text-blue-400 uppercase mb-2">Skills
+                                (ภาษาไทย)</label>
+                            <input type="text" id="in-skills-th" placeholder="เช่น การวางแผน, การจัดการ..."
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-blue-500">
+                        </div>
+                        <div class="bg-slate-900/40 p-6 rounded-2xl border border-amber-500/20">
+                            <label class="block text-xs font-semibold text-amber-400 uppercase mb-2">Skills
+                                (English)</label>
+                            <input type="text" id="in-skills-en" placeholder="e.g. Planning, Management..."
+                                class="text-slate-200 w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="content-sections" class="hidden space-y-6">
+                    <div class="bg-slate-900/50 border border-slate-700 rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="layers" class="w-5 h-5 text-violet-400"></i> Optional Portfolio / Resume Sections</h3>
+                        <p class="text-sm text-slate-400 mb-6">กรอกเฉพาะหัวข้อที่ต้องการแสดง ระบบจะไม่ render หัวข้อที่ว่างไว้ / Fill only the sections you want to show. Empty sections are hidden automatically.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-blue-400 border-b border-blue-500/30 pb-2">TH ข้อมูลภาษาไทย</h4>
+                                <label class="extra-label">การศึกษา <span>รูปแบบ: วุฒิ | สถาบัน | ปี | รายละเอียด</span></label>
+                                <textarea id="in-education-th" class="extra-textarea" placeholder="ปริญญาตรี วิทยาการคอมพิวเตอร์ | มหาวิทยาลัยตัวอย่าง | 2565 | เกียรตินิยม"></textarea>
+                                <label class="extra-label">ประกาศนียบัตร <span>ชื่อ | ผู้ออกใบรับรอง | ปี</span></label>
+                                <textarea id="in-certifications-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">รางวัลและความสำเร็จ <span>ชื่อ | หน่วยงาน | ปี | รายละเอียด</span></label>
+                                <textarea id="in-awards-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">กรณีศึกษา / ผลลัพธ์ <span>โปรเจกต์ | โจทย์ | วิธีทำ | ผลลัพธ์</span></label>
+                                <textarea id="in-caseStudies-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">บริการ <span>ชื่อบริการ | รายละเอียด</span></label>
+                                <textarea id="in-services-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">คำรับรอง <span>คำพูด | ชื่อ | ตำแหน่ง</span></label>
+                                <textarea id="in-testimonials-th" class="extra-textarea"></textarea>
+                                <label class="extra-label">ลูกค้า / หน่วยงาน <span>คั่นด้วย comma หรือขึ้นบรรทัดใหม่</span></label>
+                                <textarea id="in-clients-th" class="extra-textarea small"></textarea>
+                                <label class="extra-label">CTA <span>หัวข้อ | รายละเอียด | ข้อความปุ่ม | URL</span></label>
+                                <textarea id="in-cta-th" class="extra-textarea small"></textarea>
+                                <label class="extra-label">บทความ / สื่อเผยแพร่ <span>ชื่อ | รายละเอียด | URL</span></label>
+                                <textarea id="in-articles-th" class="extra-textarea"></textarea>
+                            </div>
+                            <div class="space-y-4">
+                                <h4 class="font-bold text-amber-400 border-b border-amber-500/30 pb-2">EN English Data</h4>
+                                <label class="extra-label">Education <span>Format: Degree | School | Year | Detail</span></label>
+                                <textarea id="in-education-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Certifications <span>Name | Issuer | Year</span></label>
+                                <textarea id="in-certifications-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Awards <span>Name | Organization | Year | Detail</span></label>
+                                <textarea id="in-awards-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Case Studies <span>Project | Problem | Action | Result</span></label>
+                                <textarea id="in-caseStudies-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Services <span>Service | Description</span></label>
+                                <textarea id="in-services-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Testimonials <span>Quote | Name | Role</span></label>
+                                <textarea id="in-testimonials-en" class="extra-textarea"></textarea>
+                                <label class="extra-label">Clients / Partners <span>Comma or newline separated</span></label>
+                                <textarea id="in-clients-en" class="extra-textarea small"></textarea>
+                                <label class="extra-label">CTA <span>Headline | Description | Button | URL</span></label>
+                                <textarea id="in-cta-en" class="extra-textarea small"></textarea>
+                                <label class="extra-label">Articles / Publications <span>Title | Description | URL</span></label>
+                                <textarea id="in-articles-en" class="extra-textarea"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-resume" class="hidden space-y-6">
+                    <div class="bg-slate-900/50 border border-slate-700 rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="file-user" class="w-5 h-5 text-cyan-400"></i> Resume Component Visibility</h3>
+                        <p class="text-sm text-slate-400 mb-5">เลือกหัวข้อที่จะแสดงใน Resume Mode ได้ แต่ตำแหน่งของแต่ละหัวข้อจะถูกล็อกไว้ เพื่อให้ Resume ยังดูสวยและพิมพ์ A4 ได้เสถียร</p>
+                        <div class="resume-toggle-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <label><input type="checkbox" id="rv-profile" checked> Profile / รูป + ชื่อ</label>
+                            <label><input type="checkbox" id="rv-contact" checked> Contact / ติดต่อ</label>
+                            <label><input type="checkbox" id="rv-skills" checked> Skills / ทักษะ</label>
+                            <label><input type="checkbox" id="rv-summary" checked> Summary / ประวัติย่อ</label>
+                            <label><input type="checkbox" id="rv-experience" checked> Experience / ประสบการณ์</label>
+                            <label><input type="checkbox" id="rv-education" checked> Education / การศึกษา</label>
+                            <label><input type="checkbox" id="rv-certifications" checked> Certifications / ใบรับรอง</label>
+                            <label><input type="checkbox" id="rv-awards" checked> Awards / รางวัล</label>
+                            <label><input type="checkbox" id="rv-services" checked> Services / บริการ</label>
+                            <label><input type="checkbox" id="rv-clients" checked> Clients / หน่วยงาน</label>
+                            <label><input type="checkbox" id="rv-articles" checked> Articles / สื่อเผยแพร่</label>
+                            <label><input type="checkbox" id="rv-caseStudies" checked> Case Studies / กรณีศึกษา</label>
+                            <label><input type="checkbox" id="rv-testimonials" checked> Testimonials / คำรับรอง</label>
+                        </div>
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            <button type="button" onclick="setResumeVisibilityPreset('full')" class="px-4 py-2 rounded-xl bg-cyan-600/20 border border-cyan-400/30 text-cyan-200 font-bold text-sm">Show all</button>
+                            <button type="button" onclick="setResumeVisibilityPreset('official')" class="px-4 py-2 rounded-xl bg-emerald-600/20 border border-emerald-400/30 text-emerald-200 font-bold text-sm">Thai official concise</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="content-experience" class="hidden">
+                    <div class="p-6 bg-slate-900/50 rounded-3xl border border-slate-700 mb-8">
+                        <label class="block text-sm font-bold text-slate-200 mb-4 flex items-center gap-2"><i
+                                data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i> <span id="exp-form-title">Add
+                                / Edit Experience</span></label>
+
+                        <div
+                            class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <select id="new-exp-start-month"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                                <option value="">Start Month</option>
+                                <option value="Jan">Jan</option>
+                                <option value="Feb">Feb</option>
+                                <option value="Mar">Mar</option>
+                                <option value="Apr">Apr</option>
+                                <option value="May">May</option>
+                                <option value="Jun">Jun</option>
+                                <option value="Jul">Jul</option>
+                                <option value="Aug">Aug</option>
+                                <option value="Sep">Sep</option>
+                                <option value="Oct">Oct</option>
+                                <option value="Nov">Nov</option>
+                                <option value="Dec">Dec</option>
+                            </select>
+                            <input type="number" id="new-exp-start-year" placeholder="Start Year" min="1900"
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                            <select id="new-exp-end-month"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                                <option value="">End Month</option>
+                                <option value="Jan">Jan</option>
+                                <option value="Feb">Feb</option>
+                                <option value="Mar">Mar</option>
+                                <option value="Apr">Apr</option>
+                                <option value="May">May</option>
+                                <option value="Jun">Jun</option>
+                                <option value="Jul">Jul</option>
+                                <option value="Aug">Aug</option>
+                                <option value="Sep">Sep</option>
+                                <option value="Oct">Oct</option>
+                                <option value="Nov">Nov</option>
+                                <option value="Dec">Dec</option>
+                            </select>
+                            <input type="number" id="new-exp-end-year" placeholder="End Year" min="1900"
+                                onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                                class="bg-slate-800 border border-slate-600 text-slate-200 p-3 rounded-lg outline-none">
+                            <div class="col-span-2 md:col-span-4 flex items-center gap-2 mt-1">
+                                <input type="checkbox" id="new-exp-current" onchange="toggleEndDate()"
+                                    class="w-4 h-4 accent-emerald-500">
+                                <label for="new-exp-current" class="text-sm text-emerald-400 font-medium">I currently
+                                    work here (ทำงานที่นี่ในปัจจุบัน)</label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="space-y-3 bg-[#0f172a] p-5 rounded-2xl border border-blue-500/20 shadow-inner">
+                                <h3
+                                    class="text-blue-400 font-bold border-b border-slate-700 pb-2 text-sm flex items-center gap-2">
+                                    🇹🇭 ข้อมูลภาษาไทย</h3>
+                                <input type="text" id="new-exp-company-th"
+                                    placeholder="ชื่อบริษัท / ลูกค้า (Company/Client)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
+                                <input type="text" id="new-exp-title-th"
+                                    placeholder="ตำแหน่ง / ชื่อโปรเจกต์ (Role/Project)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
+                                <input type="text" id="new-exp-desc-th" placeholder="รายละเอียดแบบย่อ"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500">
+                                <textarea id="new-exp-highlights-th"
+                                    placeholder="จุดเด่น/หน้าที่ (กด Enter เพื่อขึ้นข้อใหม่)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-blue-500 h-24 resize-none text-sm"></textarea>
+                            </div>
+                            <div class="space-y-3 bg-[#0f172a] p-5 rounded-2xl border border-amber-500/20 shadow-inner">
+                                <h3
+                                    class="text-amber-400 font-bold border-b border-slate-700 pb-2 text-sm flex items-center gap-2">
+                                    🇬🇧 English Data</h3>
+                                <input type="text" id="new-exp-company-en" placeholder="Company / Client"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
+                                <input type="text" id="new-exp-title-en" placeholder="Role / Project Name"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
+                                <input type="text" id="new-exp-desc-en" placeholder="Short description"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500">
+                                <textarea id="new-exp-highlights-en"
+                                    placeholder="Highlights/Duties (Press Enter for new line)"
+                                    class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl outline-none focus:border-amber-500 h-24 resize-none text-sm"></textarea>
+                            </div>
+                        </div>
+
+                        <div id="exp-image-box" class="mb-6 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                            <label class="block text-xs font-semibold text-slate-400 mb-2"><i data-lucide="image"
+                                    class="w-3 h-3 inline"></i> Project Images / รูปภาพโปรเจกต์</label>
+                            <p class="text-xs text-slate-500 mb-3">เพิ่ม/ลบรูปได้จากตรงนี้ แล้วกด <b class="text-emerald-400">Save & Close</b> เพื่อบันทึกทันที</p>
+                            <input type="file" id="new-exp-img" accept="image/*" multiple
+                                onchange="handleExpImageUpload(event)"
+                                class="text-sm w-full text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-700 file:text-white hover:file:bg-slate-600 cursor-pointer">
+                            <div id="exp-img-preview"
+                                class="flex gap-2 py-2 overflow-x-auto mt-2 hidden scrollbar-hide"></div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="cancelEditExp()" id="btn-cancel-exp"
+                                class="hidden px-6 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-all font-semibold">Cancel</button>
+                            <button onclick="addExperience(true)" id="btn-add-more-exp"
+                                class="px-6 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded-xl font-bold transition-all flex items-center gap-2"
+                                title="บันทึกโปรเจกต์นี้ และเคลียร์ช่องเพื่อเพิ่มโปรเจกต์ถัดไป">
+                                <i data-lucide="copy-plus" class="w-5 h-5"></i> <span class="hidden md:inline">Save &
+                                    Add Another</span>
+                            </button>
+                            <button onclick="addExperience(false)" id="btn-add-exp"
+                                class="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="check" class="w-5 h-5"></i> Save & Close
+                            </button>
+                        </div>
+                    </div>
+
+                    <label class="block text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Timeline
+                        (เรียงลำดับใหม่-เก่าอัตโนมัติ)</label>
+                    <div id="exp-list-preview" class="space-y-3"></div>
+                </div>
+
+            </div>
+
+            <div id="export-panel"
+                class="p-6 border-t border-slate-800 bg-slate-900/80 flex flex-wrap justify-end gap-3 rounded-b-3xl">
+                <button onclick="handleExportWeb()"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-600/20 transition-all flex items-center justify-center gap-2 border border-cyan-500">
+                    <i data-lucide="download" class="w-4 h-4"></i> <span class="text-sm">Download WEB</span>
+                </button>
+                <button id="btn-export-pptx" onclick="handleExportPPTX()"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-orange-600 hover:bg-orange-500 shadow-lg shadow-orange-600/20 transition-all flex items-center justify-center gap-2 border border-orange-500">
+                    <i data-lucide="file-presentation" class="w-4 h-4"></i> <span class="text-sm">Download PPTX</span>
+                </button>
+                <button id="btn-export-pdf-portrait" onclick="handlePrint('portrait')"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 border border-emerald-500">
+                    <i data-lucide="printer" class="w-4 h-4"></i> <span class="text-sm">PDF Portrait</span>
+                </button>
+                <button id="btn-export-pdf-landscape" onclick="handlePrint('landscape')"
+                    class="flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-teal-600 hover:bg-teal-500 shadow-lg shadow-teal-600/30 transition-all flex items-center justify-center gap-2 border border-teal-500">
+                    <i data-lucide="panel-top" class="w-4 h-4"></i> <span class="text-sm">PDF Landscape</span>
+                </button>
+                <button id="btn-export-docx" onclick="handleExportDOCX()" aria-hidden="true" tabindex="-1" disabled
+                    class="hidden !hidden flex-1 min-w-[120px] py-3 rounded-xl font-bold text-white bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-600/20 transition-all flex items-center justify-center gap-2 border border-violet-500">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> <span class="text-sm">Download DOCX</span>
+                </button>
+                <button onclick="updatePreview()"
+                    class="w-full md:w-auto px-10 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="save" class="w-5 h-5"></i> Save Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="quick-edit-popover" class="quick-edit-popover hidden" role="dialog" aria-modal="true">
+        <div class="quick-edit-card">
+            <div class="quick-edit-head">
+                <div><span class="quick-edit-kicker">Quick Edit</span><h3 id="quick-edit-title">Edit section</h3></div>
+                <button type="button" onclick="closeQuickEdit()" class="quick-edit-close"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="quick-edit-experience-manager" class="quick-edit-experience-manager hidden"></div>
+            <div class="quick-edit-grid" id="quick-edit-grid">
+                <label><span id="quick-edit-label-th">TH</span><textarea id="quick-edit-th"></textarea></label>
+                <label><span id="quick-edit-label-en">EN</span><textarea id="quick-edit-en"></textarea></label>
+            </div>
+            <div class="quick-edit-actions">
+                <button type="button" onclick="closeQuickEdit()">Cancel</button>
+                <button type="button" id="quick-edit-save-btn" onclick="saveQuickEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="in-theme" value="portfolio">
+
+    <script src="/js/components/Header.js"></script>
+    <script src="/js/components/Bio.js"></script>
+    <script src="/js/components/Experience.js"></script>
+    <script src="/js/components/Skill.js"></script>
+    <script src="/js/components/Contact.js"></script>
+    <script src="/js/components/EducationComponent.js"></script>
+    <script src="/js/components/CertificationComponent.js"></script>
+    <script src="/js/components/AwardsComponent.js"></script>
+    <script src="/js/components/CaseStudyComponent.js"></script>
+    <script src="/js/components/ServicesComponent.js"></script>
+    <script src="/js/components/TestimonialsComponent.js"></script>
+    <script src="/js/components/ClientsComponent.js"></script>
+    <script src="/js/components/CTAComponent.js"></script>
+    <script src="/js/components/ArticlesComponent.js"></script>
+    <script src="/js/storage.js"></script>
+    <script src="/js/exporter.js"></script>
+
+
+
+
+    <script src="/legacy/v49-app.js"></script>
+</body>
+
+</html>
