@@ -38,7 +38,6 @@ const ExperienceComponent = {
             luxury: { border: 'border-amber-400/50 shadow-[0_0_15px_rgba(251,191,36,0.3)]', glow: 'bg-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.8)]', year: 'text-amber-300 drop-shadow-sm', company: isDark ? 'text-amber-200' : 'text-indigo-800', cardDark: 'bg-[#1e1b4b]/80 border-amber-400/40 rounded-sm shadow-2xl', cardLight: 'bg-gradient-to-br from-indigo-50 to-amber-50/30 border-amber-400/60 rounded-sm shadow-xl' }
         };
 
-        // 🌟 ฟังก์ชันแปลงปีอัตโนมัติ: ถ้า lang=th แปลงเป็น พ.ศ. (>=2500) ถ้า lang=en แปลงเป็น ค.ศ. (<2500)
         const formatYear = (yStr, targetLang) => {
             if (!yStr) return '';
             const y = parseInt(yStr);
@@ -50,11 +49,8 @@ const ExperienceComponent = {
 
         const rows = items.map((item, itemIndex) => {
             const sm = item.startMonth ? item.startMonth + ' ' : '';
-
-            // ใช้ฟังก์ชัน formatYear เพื่อแปลงปี
             const sy = formatYear(item.startYear || item.year, lang);
             const ey = formatYear(item.endYear, lang);
-
             const startDate = `${sm}${sy}`.trim();
             let endDate = item.isCurrent ? presentText : (ey ? `${item.endMonth ? item.endMonth + ' ' : ''}${ey}`.trim() : '');
             const dateDisplay = endDate ? `${startDate} - ${endDate}` : startDate;
@@ -64,8 +60,6 @@ const ExperienceComponent = {
             const imageCount = item.images ? item.images.length : 0;
             const isFirstPrintExp = layout === 'portfolio' && itemIndex === 0;
             const getPrintFitVars = (count) => {
-                // Print-only fit variables: compress the first/current project image grid
-                // enough to keep the Experience heading and the first project together.
                 if (!count) return '';
                 if (count <= 2) return '--print-fit-cols:2;--print-fit-img-h:42mm;--print-fit-gap:3mm;';
                 if (count <= 4) return '--print-fit-cols:2;--print-fit-img-h:33mm;--print-fit-gap:2.6mm;';
@@ -107,9 +101,11 @@ const ExperienceComponent = {
                 const companyColor = t.company;
 
                 if (hasImages) {
-                    const scrollyHeight = (item.images.length * 85) + 250;
+                    const scrollyHeight = Math.min(420, Math.max(190, 135 + (imageCount * 52)));
+                    const startSpacerVW = imageCount <= 1 ? 4 : 6;
+                    const endSpacerVW = imageCount <= 1 ? 10 : imageCount === 2 ? 16 : imageCount === 3 ? 22 : imageCount === 4 ? 28 : 34;
                     return `
-                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-32 scroll-reveal print-exp-item${firstPrintClass}" style="--scrolly-images: ${item.images.length}; height: ${scrollyHeight}vh; ${printFitVars}">
+                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-32 scroll-reveal print-exp-item${firstPrintClass}" style="--scrolly-images: ${imageCount}; height: ${scrollyHeight}vh; ${printFitVars}">
                         <div class="sticky top-[10vh] w-full z-10 px-4 md:px-0">
                             <div class="${cardCls}">
                                 <div class="p-10 md:p-14 text-center flex flex-col items-center">
@@ -123,11 +119,11 @@ const ExperienceComponent = {
                                 <div class="cinematic-image-wrapper cinematic-collapsed w-full">
                                     <div class="cinematic-image-inner w-full ${innerDividerCls}">
                                         <div class="scrollytelling-track flex gap-6 items-center will-change-transform py-10 px-4">
-                                            <div class="scrolly-spacer shrink-0 flex-none w-[5vw] lg:w-[10vw]"></div>
+                                            <div class="scrolly-spacer shrink-0 flex-none" style="width:${startSpacerVW}vw"></div>
                                             ${item.images.map(imgSrc => `
                                                 <img src="${imgSrc}" class="h-[26vh] lg:h-[36vh] max-h-[380px] w-auto max-w-[85vw] lg:max-w-[58vw] object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'} shrink-0 scrolly-full-image" loading="lazy">
                                             `).join('')}
-                                            <div class="scrolly-spacer shrink-0 flex-none w-[150vw] lg:w-[200vw]"></div>
+                                            <div class="scrolly-spacer shrink-0 flex-none" style="width:${endSpacerVW}vw"></div>
                                         </div>
                                     </div>
                                 </div>
