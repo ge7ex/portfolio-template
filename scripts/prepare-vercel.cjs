@@ -54,6 +54,16 @@ if (!fs.existsSync(htmlPath)) {
 
 let html = fs.readFileSync(htmlPath, 'utf8');
 html = html.replace(/\s*<script src="\/js\/adaptive-scrollytelling\.js\?v=[^"]+"><\/script>/g, '');
-fs.writeFileSync(htmlPath, html, 'utf8');
 
-console.log('Patched the active v49 scrollytelling engine in public and dist.');
+const coverflowCss = '<link rel="stylesheet" href="/css/coverflow-scrollytelling.css?v=1">';
+const coverflowJs = '<script src="/js/coverflow-scrollytelling.js?v=1"></script>';
+
+if (!html.includes('/css/coverflow-scrollytelling.css')) {
+  html = html.replace('</head>', `    ${coverflowCss}\n</head>`);
+}
+if (!html.includes('/js/coverflow-scrollytelling.js')) {
+  html = html.replace('</body>', `    ${coverflowJs}\n</body>`);
+}
+
+fs.writeFileSync(htmlPath, html, 'utf8');
+console.log('Prepared active v49 timing and coverflow image rail prototype.');
