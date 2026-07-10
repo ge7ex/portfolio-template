@@ -35,7 +35,7 @@
     opacity: var(--coverflow-opacity, .25) !important;
     filter: blur(var(--coverflow-blur, 0px)) brightness(var(--coverflow-brightness, .7)) saturate(.92);
     transform:
-      translate3d(calc(-50% + (var(--coverflow-offset, 0) * var(--coverflow-step))), -50%, calc(-70px * abs(var(--coverflow-offset, 0))))
+      translate3d(calc(-50% + (var(--coverflow-offset, 0) * var(--coverflow-step))), -50%, 0)
       rotateY(calc(var(--coverflow-offset, 0) * -7deg))
       scale(var(--coverflow-scale, .7)) !important;
     transform-origin: center center;
