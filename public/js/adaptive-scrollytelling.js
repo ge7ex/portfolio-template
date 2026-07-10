@@ -1,5 +1,6 @@
 (() => {
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const smoothstep = t => t * t * (3 - (2 * t));
 
   function ensureStyle() {
     if (document.getElementById('adaptive-scrollytelling-style')) return;
@@ -82,23 +83,26 @@
       );
       const maxX = Math.max(0, Math.ceil(track.scrollWidth - parentWidth));
       const stickyH = Math.max(1, sticky.offsetHeight || sticky.getBoundingClientRect().height || 1);
-      const lead = clamp(vh * 0.045, 28, 48);
-      const move = Math.max(maxX, vh * 0.12);
-      const release = 12;
-      const total = Math.ceil(stickyH + lead + move + release);
+
+      // Balanced pacing: short lead-in, readable movement, then a visible hold on the final image.
+      // The hold adds time without adding a blank horizontal spacer.
+      const lead = clamp(vh * 0.055, 40, 64);
+      const move = Math.max(maxX * 1.08, vh * 0.20);
+      const hold = clamp(vh * 0.10, 84, 124);
+      const total = Math.ceil(stickyH + lead + move + hold);
 
       wrapper.style.setProperty('--adaptive-scrolly-height', `${total}px`);
       wrapper.dataset.maxX = String(maxX);
       wrapper.dataset.lead = String(lead);
       wrapper.dataset.move = String(move);
-      wrapper.dataset.release = String(release);
+      wrapper.dataset.hold = String(hold);
 
       if (collapsed) {
         imageBox.classList.add('cinematic-collapsed');
         imageBox.classList.remove('cinematic-expanded');
       }
 
-      return { track, imageBox, sticky, maxX, lead, move, release };
+      return { track, imageBox, sticky, maxX, lead, move, hold };
     }
 
     function metrics(wrapper) {
@@ -108,10 +112,10 @@
       const maxX = Number(wrapper.dataset.maxX);
       const lead = Number(wrapper.dataset.lead);
       const move = Number(wrapper.dataset.move);
-      const release = Number(wrapper.dataset.release);
+      const hold = Number(wrapper.dataset.hold);
 
-      return track && imageBox && sticky && [maxX, lead, move, release].every(Number.isFinite)
-        ? { track, imageBox, sticky, maxX, lead, move, release }
+      return track && imageBox && sticky && [maxX, lead, move, hold].every(Number.isFinite)
+        ? { track, imageBox, sticky, maxX, lead, move, hold }
         : measure(wrapper);
     }
 
@@ -134,11 +138,12 @@
         const rect = wrapper.getBoundingClientRect();
         const stickyTop = parseFloat(getComputedStyle(m.sticky).top) || Math.min(64, vh * 0.06);
         const travelled = stickyTop - rect.top;
-        const moveProgress = clamp((travelled - m.lead) / m.move, 0, 1);
+        const rawProgress = clamp((travelled - m.lead) / m.move, 0, 1);
+        const moveProgress = smoothstep(rawProgress);
         m.track.style.setProperty('--scrolly-x', `-${m.maxX * moveProgress}px`);
 
         const finish = m.lead + m.move;
-        const collapseAt = finish + m.release;
+        const collapseAt = finish + m.hold;
         const visible = rect.bottom > stickyTop && rect.top < vh;
         const active = visible && travelled > 6 && travelled < collapseAt;
 
@@ -157,7 +162,7 @@
         delete wrapper.dataset.maxX;
         delete wrapper.dataset.lead;
         delete wrapper.dataset.move;
-        delete wrapper.dataset.release;
+        delete wrapper.dataset.hold;
         measure(wrapper);
       });
       schedule();
