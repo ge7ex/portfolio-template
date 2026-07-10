@@ -6,7 +6,7 @@ const source = path.join(root, 'public', 'js', 'adaptive-scrollytelling.js');
 const targetDir = path.join(root, 'dist', 'js');
 const target = path.join(targetDir, 'adaptive-scrollytelling.js');
 const htmlPath = path.join(root, 'dist', 'index.html');
-const scriptSrc = '/js/adaptive-scrollytelling.js?v=20260710-4';
+const scriptSrc = '/js/adaptive-scrollytelling.js?v=20260710-6';
 const scriptTag = `<script src="${scriptSrc}"></script>`;
 
 if (!fs.existsSync(source)) {
@@ -30,4 +30,4 @@ if (!html.includes('</body>')) {
 html = html.replace('</body>', `    ${scriptTag}\n</body>`);
 fs.writeFileSync(htmlPath, html, 'utf8');
 
-console.log('Prepared adaptive scrollytelling runtime for Vercel.');
+console.log(`Prepared adaptive scrollytelling runtime for Vercel: ${scriptSrc}`);
