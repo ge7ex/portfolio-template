@@ -75,7 +75,7 @@ const ExperienceComponent = {
             if (item.highlights && item.highlights.length > 0) {
                 const textColor = isDark ? 'text-slate-100' : 'text-slate-700';
                 const liItems = item.highlights.map(h => `<li class="pl-1 leading-relaxed"><span class="ml-1">${h}</span></li>`).join('');
-                highlightsHtml = `<ul class="mt-4 space-y-3 list-disc pl-8 ${textColor} text-lg font-light">${liItems}</ul>`;
+                highlightsHtml = `<ul class="mt-3 space-y-2 list-disc pl-7 ${textColor} text-base md:text-lg font-light">${liItems}</ul>`;
             }
             const editProjectButton = layout === 'portfolio'
                 ? `<button type="button" class="inline-project-edit no-print" onclick="event.stopPropagation(); if (typeof openExperienceEditor === 'function') openExperienceEditor(${itemIndex});"><span>แก้ข้อมูล / รูปภาพ</span></button>`
@@ -94,8 +94,8 @@ const ExperienceComponent = {
             }
             else {
                 const t = themeConfig[pStyle] || themeConfig['tech'];
-                let yearCls = `font-mono font-extrabold tracking-widest text-base md:text-lg mb-2 ${t.year}`;
-                let cardCls = `unified-card w-full max-w-5xl mx-auto rounded-[2.5rem] border backdrop-blur-xl shadow-2xl overflow-hidden ${isDark ? t.cardDark : t.cardLight}`;
+                let yearCls = `font-mono font-extrabold tracking-widest text-sm md:text-base mb-1.5 ${t.year}`;
+                let cardCls = `unified-card w-full max-w-5xl mx-auto rounded-[2.25rem] border backdrop-blur-xl shadow-2xl overflow-hidden ${isDark ? t.cardDark : t.cardLight}`;
                 let innerDividerCls = `border-t ${isDark ? 'border-white/10 bg-black/10' : 'border-slate-200 bg-slate-50/50'}`;
                 const companyColor = t.company;
 
@@ -104,50 +104,50 @@ const ExperienceComponent = {
 
                     if (imageCount === 1) {
                         return `
-                        <div ${bgAttr}${firstPrintAttrs} class="mb-20 px-4 md:px-0 scroll-reveal story-section flex flex-col items-center print-exp-item${firstPrintClass}" style="${printFitVars}">
+                        <div ${bgAttr}${firstPrintAttrs} class="mb-16 px-4 md:px-0 scroll-reveal story-section flex flex-col items-center print-exp-item${firstPrintClass}" style="${printFitVars}">
                             <div class="${cardCls}">
-                                <div class="p-10 md:p-14 text-center flex flex-col items-center">
+                                <div class="p-7 md:p-9 text-center flex flex-col items-center">
                                     <span class="${yearCls}">${dateDisplay}</span>
-                                    <h4 class="font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-4xl md:text-5xl leading-tight mb-4">${item.title}</h4>
-                                    ${item.company ? `<h5 class="text-xl md:text-2xl font-semibold ${companyColor} mb-6">${item.company}</h5>` : ''}
-                                    ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-lg md:text-xl leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
-                                    ${highlightsHtml ? `<div class="mt-2 text-left inline-block">${highlightsHtml}</div>` : ''}
+                                    <h4 class="font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-3xl md:text-4xl leading-tight mb-3">${item.title}</h4>
+                                    ${item.company ? `<h5 class="text-lg md:text-xl font-semibold ${companyColor} mb-4">${item.company}</h5>` : ''}
+                                    ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-base md:text-lg leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
+                                    ${highlightsHtml ? `<div class="mt-1 text-left inline-block">${highlightsHtml}</div>` : ''}
                                     ${editProjectButton}
                                 </div>
-                                <div class="w-full ${innerDividerCls} p-6 md:p-8 flex justify-center">
-                                    <img src="${item.images[0]}" class="max-h-[420px] w-auto max-w-full object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'}" loading="lazy">
+                                <div class="w-full ${innerDividerCls} p-4 md:p-5 flex justify-center">
+                                    <img src="${item.images[0]}" class="max-h-[320px] w-auto max-w-full object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'}" loading="lazy">
                                 </div>
                             </div>
                         </div>`;
                     }
 
                     const scrollyHeight = imageCount === 2
-                        ? 150
+                        ? 125
                         : imageCount === 3
-                            ? 200
-                            : Math.min(390, 200 + ((imageCount - 3) * 46));
-                    const endSpacerVW = imageCount === 2 ? 10 : imageCount === 3 ? 14 : Math.min(26, 14 + ((imageCount - 3) * 3));
+                            ? 155
+                            : Math.min(300, 155 + ((imageCount - 3) * 34));
+                    const endSpacerVW = imageCount === 2 ? 4 : imageCount === 3 ? 6 : Math.min(14, 6 + ((imageCount - 3) * 2));
 
                     return `
-                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-20 scroll-reveal print-exp-item${firstPrintClass}" style="--scrolly-images:${imageCount};--scrolly-end-spacer:${endSpacerVW}vw;height:${scrollyHeight}vh;${printFitVars}">
-                        <div class="sticky top-[10vh] w-full z-10 px-4 md:px-0">
+                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-14 scroll-reveal print-exp-item${firstPrintClass}" style="--scrolly-images:${imageCount};--scrolly-end-spacer:${endSpacerVW}vw;height:${scrollyHeight}vh;${printFitVars}">
+                        <div class="sticky top-[4vh] lg:top-[5vh] w-full z-10 px-4 md:px-0">
                             <div class="${cardCls}">
-                                <div class="p-10 md:p-14 text-center flex flex-col items-center">
+                                <div class="p-7 md:p-9 text-center flex flex-col items-center">
                                     <span class="${yearCls}">${dateDisplay}</span>
-                                    <h4 class="font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-4xl md:text-5xl leading-tight mb-4">${item.title}</h4>
-                                    ${item.company ? `<h5 class="text-xl md:text-2xl font-semibold ${companyColor} mb-6">${item.company}</h5>` : ''}
-                                    ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-lg md:text-xl leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
-                                    ${highlightsHtml ? `<div class="mt-2 text-left inline-block">${highlightsHtml}</div>` : ''}
+                                    <h4 class="font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-3xl md:text-4xl leading-tight mb-3">${item.title}</h4>
+                                    ${item.company ? `<h5 class="text-lg md:text-xl font-semibold ${companyColor} mb-4">${item.company}</h5>` : ''}
+                                    ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-base md:text-lg leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
+                                    ${highlightsHtml ? `<div class="mt-1 text-left inline-block">${highlightsHtml}</div>` : ''}
                                     ${editProjectButton}
                                 </div>
                                 <div class="cinematic-image-wrapper cinematic-collapsed w-full">
                                     <div class="cinematic-image-inner w-full ${innerDividerCls}">
-                                        <div class="scrollytelling-track flex gap-6 items-center will-change-transform py-10 px-4">
-                                            <div class="scrolly-spacer shrink-0 flex-none w-[4vw] lg:w-[6vw]"></div>
+                                        <div class="scrollytelling-track flex gap-5 items-center will-change-transform py-5 px-3">
+                                            <div class="scrolly-spacer shrink-0 flex-none w-[2vw] lg:w-[3vw]"></div>
                                             ${item.images.map(imgSrc => `
-                                                <img src="${imgSrc}" class="h-[26vh] lg:h-[36vh] max-h-[380px] w-auto max-w-[85vw] lg:max-w-[58vw] object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'} shrink-0 scrolly-full-image" loading="lazy">
+                                                <img src="${imgSrc}" class="h-[21vh] lg:h-[27vh] max-h-[290px] w-auto max-w-[82vw] lg:max-w-[52vw] object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'} shrink-0 scrolly-full-image" loading="lazy">
                                             `).join('')}
-                                            <div class="scrolly-spacer shrink-0 flex-none" style="width:var(--scrolly-end-spacer,14vw)"></div>
+                                            <div class="scrolly-spacer shrink-0 flex-none" style="width:var(--scrolly-end-spacer,6vw)"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -157,14 +157,14 @@ const ExperienceComponent = {
                 }
                 else {
                     return `
-                    <div${firstPrintAttrs} class="mb-24 px-4 md:px-0 scroll-reveal story-section flex flex-col items-center print-exp-item${firstPrintClass}" style="${printFitVars}">
+                    <div${firstPrintAttrs} class="mb-20 px-4 md:px-0 scroll-reveal story-section flex flex-col items-center print-exp-item${firstPrintClass}" style="${printFitVars}">
                         <div class="${cardCls}">
-                            <div class="p-10 md:p-14 text-center flex flex-col items-center">
+                            <div class="p-7 md:p-9 text-center flex flex-col items-center">
                                 <span class="${yearCls}">${dateDisplay}</span>
-                                <h4 class="font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-4xl md:text-5xl leading-tight mb-4">${item.title}</h4>
-                                ${item.company ? `<h5 class="text-xl md:text-2xl font-semibold ${companyColor} mb-6">${item.company}</h5>` : ''}
-                                ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-lg md:text-xl leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
-                                ${highlightsHtml ? `<div class="mt-2 text-left inline-block">${highlightsHtml}</div>` : ''}
+                                <h4 class="font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-3xl md:text-4xl leading-tight mb-3">${item.title}</h4>
+                                ${item.company ? `<h5 class="text-lg md:text-xl font-semibold ${companyColor} mb-4">${item.company}</h5>` : ''}
+                                ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-base md:text-lg leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
+                                ${highlightsHtml ? `<div class="mt-1 text-left inline-block">${highlightsHtml}</div>` : ''}
                                 ${editProjectButton}
                             </div>
                         </div>
@@ -177,7 +177,7 @@ const ExperienceComponent = {
 
         if (layout === 'portfolio') {
             const titleColor = isDark ? 'text-white' : 'text-slate-800';
-            titleClass = `font-bold mb-10 uppercase tracking-widest text-2xl flex items-center ${titleColor}`;
+            titleClass = `font-bold mb-8 uppercase tracking-widest text-xl md:text-2xl flex items-center ${titleColor}`;
         }
 
         return `
@@ -187,7 +187,7 @@ const ExperienceComponent = {
                         ${layout === 'portfolio' ? '<span class="mr-3 opacity-80">🚀</span>' : ''} ${mainTitleText}
                     </h3>
                 </div>
-                <div class="mt-6 md:mt-10 experience-rows">${rows}</div>
+                <div class="mt-5 md:mt-8 experience-rows">${rows}</div>
             </section>
         `;
     }
