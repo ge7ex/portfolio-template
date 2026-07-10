@@ -94,18 +94,42 @@ const ExperienceComponent = {
             }
             else {
                 const t = themeConfig[pStyle] || themeConfig['tech'];
-                let borderCls = t.border; let glowCls = t.glow;
                 let yearCls = `font-mono font-extrabold tracking-widest text-base md:text-lg mb-2 ${t.year}`;
                 let cardCls = `unified-card w-full max-w-5xl mx-auto rounded-[2.5rem] border backdrop-blur-xl shadow-2xl overflow-hidden ${isDark ? t.cardDark : t.cardLight}`;
                 let innerDividerCls = `border-t ${isDark ? 'border-white/10 bg-black/10' : 'border-slate-200 bg-slate-50/50'}`;
                 const companyColor = t.company;
 
                 if (hasImages) {
-                    const scrollyHeight = Math.min(420, Math.max(190, 135 + (imageCount * 52)));
-                    const startSpacerVW = imageCount <= 1 ? 4 : 6;
-                    const endSpacerVW = imageCount <= 1 ? 10 : imageCount === 2 ? 16 : imageCount === 3 ? 22 : imageCount === 4 ? 28 : 34;
+                    const imageCount = item.images.length;
+
+                    if (imageCount === 1) {
+                        return `
+                        <div ${bgAttr}${firstPrintAttrs} class="mb-20 px-4 md:px-0 scroll-reveal story-section flex flex-col items-center print-exp-item${firstPrintClass}" style="${printFitVars}">
+                            <div class="${cardCls}">
+                                <div class="p-10 md:p-14 text-center flex flex-col items-center">
+                                    <span class="${yearCls}">${dateDisplay}</span>
+                                    <h4 class="font-bold ${isDark ? 'text-white' : 'text-slate-900'} text-4xl md:text-5xl leading-tight mb-4">${item.title}</h4>
+                                    ${item.company ? `<h5 class="text-xl md:text-2xl font-semibold ${companyColor} mb-6">${item.company}</h5>` : ''}
+                                    ${item.desc ? `<p class="${isDark ? 'text-slate-100' : 'text-slate-600'} text-lg md:text-xl leading-relaxed max-w-3xl font-light">${item.desc}</p>` : ''}
+                                    ${highlightsHtml ? `<div class="mt-2 text-left inline-block">${highlightsHtml}</div>` : ''}
+                                    ${editProjectButton}
+                                </div>
+                                <div class="w-full ${innerDividerCls} p-6 md:p-8 flex justify-center">
+                                    <img src="${item.images[0]}" class="max-h-[420px] w-auto max-w-full object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'}" loading="lazy">
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+
+                    const scrollyHeight = imageCount === 2
+                        ? 150
+                        : imageCount === 3
+                            ? 200
+                            : Math.min(390, 200 + ((imageCount - 3) * 46));
+                    const endSpacerVW = imageCount === 2 ? 10 : imageCount === 3 ? 14 : Math.min(26, 14 + ((imageCount - 3) * 3));
+
                     return `
-                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-32 scroll-reveal print-exp-item${firstPrintClass}" style="--scrolly-images: ${imageCount}; height: ${scrollyHeight}vh; ${printFitVars}">
+                    <div ${bgAttr}${firstPrintAttrs} class="scrollytelling-wrapper relative mb-20 scroll-reveal print-exp-item${firstPrintClass}" style="--scrolly-images:${imageCount};--scrolly-end-spacer:${endSpacerVW}vw;height:${scrollyHeight}vh;${printFitVars}">
                         <div class="sticky top-[10vh] w-full z-10 px-4 md:px-0">
                             <div class="${cardCls}">
                                 <div class="p-10 md:p-14 text-center flex flex-col items-center">
@@ -119,11 +143,11 @@ const ExperienceComponent = {
                                 <div class="cinematic-image-wrapper cinematic-collapsed w-full">
                                     <div class="cinematic-image-inner w-full ${innerDividerCls}">
                                         <div class="scrollytelling-track flex gap-6 items-center will-change-transform py-10 px-4">
-                                            <div class="scrolly-spacer shrink-0 flex-none" style="width:${startSpacerVW}vw"></div>
+                                            <div class="scrolly-spacer shrink-0 flex-none w-[4vw] lg:w-[6vw]"></div>
                                             ${item.images.map(imgSrc => `
                                                 <img src="${imgSrc}" class="h-[26vh] lg:h-[36vh] max-h-[380px] w-auto max-w-[85vw] lg:max-w-[58vw] object-contain rounded-2xl shadow-xl border ${isDark ? 'border-white/10' : 'border-slate-300'} shrink-0 scrolly-full-image" loading="lazy">
                                             `).join('')}
-                                            <div class="scrolly-spacer shrink-0 flex-none" style="width:${endSpacerVW}vw"></div>
+                                            <div class="scrolly-spacer shrink-0 flex-none" style="width:var(--scrolly-end-spacer,14vw)"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -152,7 +176,6 @@ const ExperienceComponent = {
         let titleWrapperCls = layout === 'portfolio' ? "w-full max-w-5xl mx-auto px-4 md:px-0" : "w-full";
 
         if (layout === 'portfolio') {
-            const tTheme = themeConfig[pStyle] || themeConfig['tech'];
             const titleColor = isDark ? 'text-white' : 'text-slate-800';
             titleClass = `font-bold mb-10 uppercase tracking-widest text-2xl flex items-center ${titleColor}`;
         }
