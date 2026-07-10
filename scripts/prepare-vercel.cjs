@@ -2,32 +2,58 @@ const fs = require('fs');
 const path = require('path');
 
 const root = process.cwd();
-const source = path.join(root, 'public', 'js', 'adaptive-scrollytelling.js');
-const targetDir = path.join(root, 'dist', 'js');
-const target = path.join(targetDir, 'adaptive-scrollytelling.js');
 const htmlPath = path.join(root, 'dist', 'index.html');
-const scriptSrc = '/js/adaptive-scrollytelling.js?v=20260710-7';
-const scriptTag = `<script src="${scriptSrc}"></script>`;
+const runtimePaths = [
+  path.join(root, 'public', 'legacy', 'v49-app.js'),
+  path.join(root, 'dist', 'legacy', 'v49-app.js')
+];
 
-if (!fs.existsSync(source)) {
-  throw new Error(`Missing source runtime: ${source}`);
+const oldThresholds = `                        const startMove = 0.045;
+                        const endMove = 0.86;
+                        const collapseAfter = 0.905;`;
+
+const newThresholds = `                        // Cinematic timeline: closed lead-in -> open -> pan -> final hold -> close -> closed exit.
+                        const openAfter = 0.06;
+                        const startMove = 0.12;
+                        const endMove = 0.76;
+                        const collapseAfter = 0.90;`;
+
+const oldActivity = `                        const isOpeningWindow = progress > 0.018;
+                        const isBeforeTerminalCollapse = progress < collapseAfter;
+                        const isActive = isInViewport && isOpeningWindow && isBeforeTerminalCollapse;`;
+
+const newActivity = `                        const isOpeningWindow = progress > openAfter;
+                        const isBeforeTerminalCollapse = progress < collapseAfter;
+                        const isActive = isInViewport && isOpeningWindow && isBeforeTerminalCollapse;`;
+
+for (const runtimePath of runtimePaths) {
+  if (!fs.existsSync(runtimePath)) {
+    throw new Error(`Missing active runtime: ${runtimePath}`);
+  }
+
+  let code = fs.readFileSync(runtimePath, 'utf8');
+
+  if (code.includes(oldThresholds)) {
+    code = code.replace(oldThresholds, newThresholds);
+  } else if (!code.includes('const openAfter = 0.06;')) {
+    throw new Error(`Could not find v49 scrollytelling threshold block in ${runtimePath}`);
+  }
+
+  if (code.includes(oldActivity)) {
+    code = code.replace(oldActivity, newActivity);
+  } else if (!code.includes('const isOpeningWindow = progress > openAfter;')) {
+    throw new Error(`Could not find v49 scrollytelling activity block in ${runtimePath}`);
+  }
+
+  fs.writeFileSync(runtimePath, code, 'utf8');
 }
 
 if (!fs.existsSync(htmlPath)) {
   throw new Error(`Missing prebuilt HTML: ${htmlPath}`);
 }
 
-fs.mkdirSync(targetDir, { recursive: true });
-fs.copyFileSync(source, target);
-
 let html = fs.readFileSync(htmlPath, 'utf8');
 html = html.replace(/\s*<script src="\/js\/adaptive-scrollytelling\.js\?v=[^"]+"><\/script>/g, '');
-
-if (!html.includes('</body>')) {
-  throw new Error('Could not find </body> in dist/index.html');
-}
-
-html = html.replace('</body>', `    ${scriptTag}\n</body>`);
 fs.writeFileSync(htmlPath, html, 'utf8');
 
-console.log(`Prepared adaptive scrollytelling runtime for Vercel: ${scriptSrc}`);
+console.log('Patched the active v49 scrollytelling engine in public and dist.');
