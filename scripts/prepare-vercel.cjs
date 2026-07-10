@@ -6,7 +6,7 @@ const source = path.join(root, 'public', 'js', 'adaptive-scrollytelling.js');
 const targetDir = path.join(root, 'dist', 'js');
 const target = path.join(targetDir, 'adaptive-scrollytelling.js');
 const htmlPath = path.join(root, 'dist', 'index.html');
-const scriptSrc = '/js/adaptive-scrollytelling.js?v=20260710-6';
+const scriptSrc = '/js/adaptive-scrollytelling.js?v=20260710-7';
 const scriptTag = `<script src="${scriptSrc}"></script>`;
 
 if (!fs.existsSync(source)) {
