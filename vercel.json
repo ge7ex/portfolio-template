@@ -1,6 +1,6 @@
 {
   "framework": "vite",
   "installCommand": "echo Skipping install - using committed dist",
-  "buildCommand": "node -e \"const fs=require('fs');fs.mkdirSync('dist/js',{recursive:true});fs.copyFileSync('public/js/adaptive-scrollytelling.js','dist/js/adaptive-scrollytelling.js');const p='dist/index.html';let s=fs.readFileSync(p,'utf8');const tag='<script src=\\\"/js/adaptive-scrollytelling.js?v=20260710-3\\\"></script>';if(!s.includes('/js/adaptive-scrollytelling.js'))s=s.replace('</body>',tag+'</body>');fs.writeFileSync(p,s);\"",
+  "buildCommand": "node scripts/prepare-vercel.cjs",
   "outputDirectory": "dist"
 }
