@@ -1,97 +1,134 @@
-/* Coverflow prototype: affects only desktop portfolio image rails with 2+ images. */
+/* Responsive coverflow: replaces the horizontal image rail for 2+ portfolio images. */
+body.layout-portfolio .coverflow-ready .cinematic-image-inner {
+  position: relative;
+  overflow: hidden;
+}
+
+body.layout-portfolio .coverflow-ready .coverflow-track {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  padding: 0 !important;
+  transform: none !important;
+  overflow: visible !important;
+  transform-style: preserve-3d;
+}
+
+body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-spacer {
+  display: none !important;
+}
+
+body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: auto !important;
+  max-height: none !important;
+  margin: 0 !important;
+  opacity: var(--coverflow-opacity, .25) !important;
+  filter: blur(var(--coverflow-blur, 0px)) brightness(var(--coverflow-brightness, .7)) saturate(.92);
+  transform:
+    translate3d(calc(-50% + (var(--coverflow-offset, 0) * var(--coverflow-step))), -50%, 0)
+    rotateY(calc(var(--coverflow-offset, 0) * var(--coverflow-angle)))
+    scale(var(--coverflow-scale, .7)) !important;
+  transform-origin: center center;
+  transition: box-shadow .28s ease, border-color .28s ease, filter .12s linear;
+  will-change: transform, opacity, filter;
+  pointer-events: none;
+  object-fit: contain !important;
+  background: rgba(2, 6, 23, .38);
+  box-shadow: 0 18px 54px rgba(0, 0, 0, .28);
+}
+
+body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image.is-coverflow-active {
+  pointer-events: auto;
+  filter: blur(0) brightness(1) saturate(1.04);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, .48), 0 0 0 1px rgba(255,255,255,.12);
+}
+
+body.layout-portfolio .coverflow-controls {
+  display: none !important;
+}
+
 @media (min-width: 1024px) {
   body.layout-portfolio .coverflow-ready .cinematic-image-inner {
-    position: relative;
-    overflow: hidden;
     min-height: clamp(260px, 31vh, 360px);
   }
 
   body.layout-portfolio .coverflow-ready .coverflow-track {
     --coverflow-step: clamp(180px, 18vw, 330px);
-    position: relative !important;
-    display: block !important;
-    width: 100% !important;
+    --coverflow-angle: -7deg;
     height: clamp(260px, 31vh, 360px) !important;
-    padding: 0 !important;
-    transform: none !important;
-    overflow: visible !important;
     perspective: 1500px;
-    transform-style: preserve-3d;
-  }
-
-  body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-spacer {
-    display: none !important;
   }
 
   body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    width: auto !important;
     height: clamp(205px, 26vh, 310px) !important;
     max-width: min(56vw, 680px) !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  body.layout-portfolio .experience-section .scrollytelling-wrapper.coverflow-ready {
+    height: var(--coverflow-scroll-height, 160svh) !important;
+    min-height: var(--coverflow-scroll-height, 160svh) !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  body.layout-portfolio .experience-section .scrollytelling-wrapper.coverflow-ready > .sticky {
+    position: sticky !important;
+    top: max(8px, env(safe-area-inset-top)) !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding-top: 0 !important;
+  }
+
+  body.layout-portfolio .coverflow-ready .cinematic-image-wrapper {
     max-height: none !important;
-    margin: 0 !important;
-    opacity: var(--coverflow-opacity, .25) !important;
-    filter: blur(var(--coverflow-blur, 0px)) brightness(var(--coverflow-brightness, .7)) saturate(.92);
-    transform:
-      translate3d(calc(-50% + (var(--coverflow-offset, 0) * var(--coverflow-step))), -50%, 0)
-      rotateY(calc(var(--coverflow-offset, 0) * -7deg))
-      scale(var(--coverflow-scale, .7)) !important;
-    transform-origin: center center;
-    transition:
-      box-shadow .28s ease,
-      border-color .28s ease,
-      filter .12s linear;
-    will-change: transform, opacity, filter;
-    pointer-events: none;
-    object-fit: contain !important;
-    background: rgba(2, 6, 23, .38);
-    box-shadow: 0 18px 54px rgba(0, 0, 0, .28);
+    overflow: hidden !important;
   }
 
-  body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image.is-coverflow-active {
-    pointer-events: auto;
-    filter: blur(0) brightness(1) saturate(1.04);
-    box-shadow: 0 30px 90px rgba(0, 0, 0, .48), 0 0 0 1px rgba(255,255,255,.12);
+  body.layout-portfolio .coverflow-ready .cinematic-image-inner {
+    min-height: clamp(220px, 31svh, 310px) !important;
+    opacity: 1 !important;
+    transform: none !important;
+    overflow: hidden !important;
   }
 
-  body.layout-portfolio .coverflow-ready .coverflow-controls {
-    position: absolute;
-    inset: 0;
-    z-index: 140;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 clamp(14px, 2.4vw, 38px);
-    pointer-events: none;
+  body.layout-portfolio .coverflow-ready .coverflow-track {
+    --coverflow-step: clamp(104px, 29vw, 156px);
+    --coverflow-angle: -5deg;
+    height: clamp(220px, 31svh, 310px) !important;
+    overflow-x: visible !important;
+    scroll-snap-type: none !important;
+    padding-bottom: 0 !important;
+    perspective: 1000px;
+    touch-action: pan-y;
   }
 
-  body.layout-portfolio .coverflow-ready .coverflow-control {
-    width: 46px;
-    height: 46px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.22);
-    background: rgba(2,6,23,.66);
-    color: #fff;
-    font: 300 32px/1 Arial, sans-serif;
-    display: grid;
-    place-items: center;
-    box-shadow: 0 12px 34px rgba(0,0,0,.34);
-    backdrop-filter: blur(16px);
-    pointer-events: auto;
-    cursor: pointer;
-    transition: transform .22s ease, opacity .22s ease, background-color .22s ease;
+  body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image {
+    height: clamp(170px, 25svh, 250px) !important;
+    width: auto !important;
+    max-width: min(76vw, 430px) !important;
+    border-radius: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body.layout-portfolio .coverflow-ready .coverflow-track {
+    --coverflow-step: clamp(88px, 27vw, 124px);
+    --coverflow-angle: -4deg;
   }
 
-  body.layout-portfolio .coverflow-ready .coverflow-control:hover:not(:disabled) {
-    transform: scale(1.08);
-    background: rgba(15,23,42,.92);
+  body.layout-portfolio .coverflow-ready .cinematic-image-inner,
+  body.layout-portfolio .coverflow-ready .coverflow-track {
+    min-height: clamp(205px, 29svh, 270px) !important;
+    height: clamp(205px, 29svh, 270px) !important;
   }
 
-  body.layout-portfolio .coverflow-ready .coverflow-control:disabled {
-    opacity: .2;
-    cursor: default;
+  body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image {
+    height: clamp(155px, 23svh, 220px) !important;
+    max-width: 78vw !important;
   }
 }
 
@@ -110,9 +147,5 @@
     filter: none !important;
     transform: none !important;
     pointer-events: auto !important;
-  }
-
-  body.layout-portfolio .coverflow-controls {
-    display: none !important;
   }
 }
