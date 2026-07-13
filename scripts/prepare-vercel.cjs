@@ -54,16 +54,23 @@ if (!fs.existsSync(htmlPath)) {
 
 let html = fs.readFileSync(htmlPath, 'utf8');
 html = html.replace(/\s*<script src="\/js\/adaptive-scrollytelling\.js\?v=[^"]+"><\/script>/g, '');
+html = html.replace(/\/css\/coverflow-scrollytelling\.css\?v=[^"]+/g, '/css/coverflow-scrollytelling.css?v=2');
+html = html.replace(/\/js\/coverflow-scrollytelling\.js\?v=[^"]+/g, '/js/coverflow-scrollytelling.js?v=2');
+html = html.replace(/\/css\/resume-theme-sync\.css\?v=[^"]+/g, '/css/resume-theme-sync.css?v=1');
 
-const coverflowCss = '<link rel="stylesheet" href="/css/coverflow-scrollytelling.css?v=1">';
-const coverflowJs = '<script src="/js/coverflow-scrollytelling.js?v=1"></script>';
+const coverflowCss = '<link rel="stylesheet" href="/css/coverflow-scrollytelling.css?v=2">';
+const resumeThemeCss = '<link rel="stylesheet" href="/css/resume-theme-sync.css?v=1">';
+const coverflowJs = '<script src="/js/coverflow-scrollytelling.js?v=2"></script>';
 
 if (!html.includes('/css/coverflow-scrollytelling.css')) {
   html = html.replace('</head>', `    ${coverflowCss}\n</head>`);
+}
+if (!html.includes('/css/resume-theme-sync.css')) {
+  html = html.replace('</head>', `    ${resumeThemeCss}\n</head>`);
 }
 if (!html.includes('/js/coverflow-scrollytelling.js')) {
   html = html.replace('</body>', `    ${coverflowJs}\n</body>`);
 }
 
 fs.writeFileSync(htmlPath, html, 'utf8');
-console.log('Prepared active v49 timing and coverflow image rail prototype.');
+console.log('Prepared active v49 timing, responsive coverflow phases, and resume theme synchronization.');
