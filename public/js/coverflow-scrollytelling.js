@@ -3,6 +3,10 @@
 (function () {
     'use strict';
 
+    const OPEN_AFTER = 0.06;
+    const START_MOVE = 0.12;
+    const END_MOVE = 0.76;
+    const COLLAPSE_AFTER = 0.90;
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const smoothstep = (value) => {
         const t = clamp(value, 0, 1);
@@ -27,6 +31,23 @@
         return { progress };
     }
 
+    function setPhase(wrapper, progress) {
+        const imageWrapper = wrapper.querySelector('.cinematic-image-wrapper');
+        if (!imageWrapper) return;
+
+        const isOpen = progress > OPEN_AFTER && progress < COLLAPSE_AFTER;
+        imageWrapper.classList.toggle('cinematic-expanded', isOpen);
+        imageWrapper.classList.toggle('cinematic-collapsed', !isOpen);
+        wrapper.classList.toggle('coverflow-open', isOpen);
+        wrapper.classList.toggle('coverflow-closed', !isOpen);
+
+        if (progress <= OPEN_AFTER) wrapper.dataset.coverflowPhase = 'opening';
+        else if (progress < START_MOVE) wrapper.dataset.coverflowPhase = 'hold-start';
+        else if (progress <= END_MOVE) wrapper.dataset.coverflowPhase = 'moving';
+        else if (progress < COLLAPSE_AFTER) wrapper.dataset.coverflowPhase = 'hold-end';
+        else wrapper.dataset.coverflowPhase = 'closing';
+    }
+
     function renderTrack(wrapper) {
         const track = wrapper.querySelector('.scrollytelling-track');
         if (!track || !track.classList.contains('coverflow-track')) return;
@@ -35,10 +56,9 @@
 
         const timeline = getTimeline(wrapper);
         if (!timeline) return;
+        setPhase(wrapper, timeline.progress);
 
-        const startMove = 0.12;
-        const endMove = 0.76;
-        const raw = clamp((timeline.progress - startMove) / (endMove - startMove), 0, 1);
+        const raw = clamp((timeline.progress - START_MOVE) / (END_MOVE - START_MOVE), 0, 1);
         const activeFloat = smoothstep(raw) * (images.length - 1);
         const nearest = Math.round(activeFloat);
         const mobile = isMobileViewport();
