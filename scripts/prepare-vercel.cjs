@@ -57,11 +57,11 @@ html = html.replace(/\s*<script src="\/js\/adaptive-scrollytelling\.js\?v=[^"]+"
 html = html.replace(/\/css\/coverflow-scrollytelling\.css\?v=[^"]+/g, '/css/coverflow-scrollytelling.css?v=2');
 html = html.replace(/\/js\/coverflow-scrollytelling\.js\?v=[^"]+/g, '/js/coverflow-scrollytelling.js?v=2');
 html = html.replace(/\/css\/resume-theme-sync\.css\?v=[^"]+/g, '/css/resume-theme-sync.css?v=1');
-html = html.replace(/\/css\/mobile-nav\.css\?v=[^"]+/g, '/css/mobile-nav.css?v=1');
+html = html.replace(/\/css\/mobile-nav\.css\?v=[^"]+/g, '/css/mobile-nav.css?v=2');
 
 const coverflowCss = '<link rel="stylesheet" href="/css/coverflow-scrollytelling.css?v=2">';
 const resumeThemeCss = '<link rel="stylesheet" href="/css/resume-theme-sync.css?v=1">';
-const mobileNavCss = '<link rel="stylesheet" href="/css/mobile-nav.css?v=1">';
+const mobileNavCss = '<link rel="stylesheet" href="/css/mobile-nav.css?v=2">';
 const coverflowJs = '<script src="/js/coverflow-scrollytelling.js?v=2"></script>';
 
 if (!html.includes('/css/coverflow-scrollytelling.css')) {
