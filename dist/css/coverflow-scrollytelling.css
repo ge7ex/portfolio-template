@@ -84,8 +84,23 @@ body.layout-portfolio .coverflow-controls {
   }
 
   body.layout-portfolio .coverflow-ready .cinematic-image-wrapper {
-    max-height: none !important;
+    max-height: 0 !important;
     overflow: hidden !important;
+    opacity: 0;
+    transform: translateY(14px) scale(.985);
+    transition:
+      max-height .62s cubic-bezier(.22,.8,.22,1),
+      opacity .42s ease,
+      transform .62s cubic-bezier(.22,.8,.22,1) !important;
+    pointer-events: none;
+  }
+
+  body.layout-portfolio .coverflow-ready .cinematic-image-wrapper.cinematic-expanded,
+  body.layout-portfolio .coverflow-ready.coverflow-open .cinematic-image-wrapper {
+    max-height: 48svh !important;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
   }
 
   body.layout-portfolio .coverflow-ready .cinematic-image-inner {
@@ -126,6 +141,11 @@ body.layout-portfolio .coverflow-controls {
     height: clamp(205px, 29svh, 270px) !important;
   }
 
+  body.layout-portfolio .coverflow-ready .cinematic-image-wrapper.cinematic-expanded,
+  body.layout-portfolio .coverflow-ready.coverflow-open .cinematic-image-wrapper {
+    max-height: 42svh !important;
+  }
+
   body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image {
     height: clamp(155px, 23svh, 220px) !important;
     max-width: 78vw !important;
@@ -133,6 +153,12 @@ body.layout-portfolio .coverflow-controls {
 }
 
 @media print {
+  body.layout-portfolio .coverflow-ready .cinematic-image-wrapper {
+    max-height: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   body.layout-portfolio .coverflow-ready .cinematic-image-inner,
   body.layout-portfolio .coverflow-ready .coverflow-track {
     min-height: 0 !important;
