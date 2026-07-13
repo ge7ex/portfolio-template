@@ -1,0 +1,75 @@
+/* Resume theme synchronization: keep the A4 layout while deriving every accent from the active theme. */
+body.layout-resume {
+  --resume-accent: var(--theme-accent, #0f766e);
+  --resume-accent-2: var(--theme-accent-2, #14b8a6);
+  --resume-sidebar-1: color-mix(in srgb, var(--resume-accent) 72%, #0f172a);
+  --resume-sidebar-2: color-mix(in srgb, var(--resume-accent-2) 48%, #0f172a);
+  --resume-sidebar-3: color-mix(in srgb, var(--resume-accent) 16%, #07101f);
+}
+
+body.layout-resume.theme-minimal {
+  --resume-accent: #475569;
+  --resume-accent-2: #94a3b8;
+}
+
+body.layout-resume .resume-cv-sidebar {
+  background: linear-gradient(160deg,
+    var(--resume-sidebar-1) 0%,
+    var(--resume-sidebar-2) 46%,
+    var(--resume-sidebar-3) 100%) !important;
+}
+
+body.layout-resume .resume-cv-main h3,
+body.layout-resume .resume-cv-main h5,
+body.layout-resume .resume-cv-main .resume-card > span,
+body.layout-resume .resume-cv-main .print-exp-item > span,
+body.layout-resume .resume-cv-main .font-mono {
+  color: var(--resume-accent) !important;
+}
+
+body.layout-resume .resume-cv-main h3,
+body.layout-resume .resume-cv-main .resume-card,
+body.layout-resume .resume-cv-main .print-exp-item {
+  border-color: var(--resume-accent) !important;
+}
+
+body.layout-resume .resume-cv-main .glow-point,
+body.layout-resume .resume-card:hover .glow-point {
+  background: var(--resume-accent-2) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--resume-accent-2) 18%, transparent) !important;
+}
+
+body.layout-resume .resume-card:hover {
+  border-left-color: var(--resume-accent) !important;
+  background: color-mix(in srgb, var(--resume-accent) 5%, #ffffff) !important;
+}
+
+/* Inline edit controls inside the resume sheet previously retained a fixed purple color. */
+body.layout-resume .resume-cv-shell button,
+body.layout-resume .resume-a4-sheet button,
+body.layout-resume .resume-a4-preview button {
+  --resume-button-bg: color-mix(in srgb, var(--resume-accent) 78%, #111827);
+  background: var(--resume-button-bg) !important;
+  border-color: color-mix(in srgb, var(--resume-accent-2) 58%, rgba(255,255,255,.28)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--resume-accent) 24%, transparent) !important;
+}
+
+body.layout-resume .resume-cv-shell button:hover,
+body.layout-resume .resume-a4-sheet button:hover,
+body.layout-resume .resume-a4-preview button:hover {
+  background: color-mix(in srgb, var(--resume-accent-2) 72%, #111827) !important;
+}
+
+body.layout-resume .resume-cv-sidebar .flex.flex-wrap span {
+  border-color: color-mix(in srgb, var(--resume-accent-2) 36%, rgba(255,255,255,.34)) !important;
+  background: color-mix(in srgb, var(--resume-accent) 16%, rgba(255,255,255,.08)) !important;
+}
+
+@media print {
+  body.layout-resume .resume-cv-shell button,
+  body.layout-resume .resume-a4-sheet button,
+  body.layout-resume .resume-a4-preview button {
+    display: none !important;
+  }
+}
