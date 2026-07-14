@@ -1,21 +1,28 @@
 # Portfolio Template — Documentation Index
 
-เอกสารใน repository นี้เป็นคู่มือภายในสำหรับทำความเข้าใจโครงสร้างระบบ และใช้สั่ง AI/Codex ให้แก้เว็บโดยไม่ทำให้ฟังก์ชันเดิมเสียหาย
+เอกสารใน repository นี้ใช้ทำความเข้าใจโครงสร้างระบบ และใช้สั่ง AI/Codex ให้แก้เว็บโดยไม่ทำให้ฟังก์ชันเดิมเสียหาย
 
 ## เริ่มอ่านจากไฟล์ใด
 
-| เป้าหมาย | เอกสาร |
-|---|---|
-| เข้าใจว่าเว็บนี้ประกอบด้วยอะไรและทำงานอย่างไร | [`docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.md`](docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.md) |
-| เขียน Prompt ให้ AI/Codex สร้างหรือแก้เว็บอย่างเป็นระบบ | [`docs/PROMPT_PLAYBOOK_TH.md`](docs/PROMPT_PLAYBOOK_TH.md) |
+| เป้าหมาย | เวอร์ชันอ่านง่าย | Source แบบข้อความ |
+|---|---|---|
+| เข้าใจว่าเว็บนี้ประกอบด้วยอะไรและทำงานอย่างไร | [`docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.html`](docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.html) | [`docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.md`](docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.md) |
+| เรียน Prompt Framework และนำไปสั่ง AI/Codex | [`docs/PROMPT_PLAYBOOK_TH.html`](docs/PROMPT_PLAYBOOK_TH.html) | [`docs/PROMPT_PLAYBOOK_TH.md`](docs/PROMPT_PLAYBOOK_TH.md) |
+
+แนะนำให้ผู้ใช้ทั่วไปเปิดไฟล์ `.html` เพราะมีแผนผัง การ์ดเปรียบเทียบ ตัวอย่างก่อน–หลัง และปุ่มคัดลอก Prompt ส่วน `.md` เก็บไว้เป็น source ที่อ่าน diff และแก้ไขผ่าน GitHub ได้ง่าย
 
 > คู่มือผู้ใช้งาน คู่มือสาธิต และ checklist สำหรับแจก ไม่เก็บไว้ใน repository หลัก ให้จัดทำเป็นไฟล์แจกแยกจาก source code
 
-## สถานะเอกสารเดิม
+## การรวมเอกสารเดิม
 
-เอกสาร framework และ prompt เคยอยู่ในโครงสร้างเก่า `AI-Portfolio-Toolkit/` และปรากฏในประวัติ Pull Request แต่โครงสร้างเว็บปัจจุบันย้าย source ที่ใช้งานจริงมาอยู่ระดับ root เช่น `public/`, `dist/` และ `scripts/` จึงทำให้ผู้ใช้หาเอกสารเดิมในหน้า `main` ไม่พบ
+HTML ทั้งสองไฟล์ปรับปรุงจากเอกสารเดิมที่เคยอยู่ในโครงสร้าง `AI-Portfolio-Toolkit/` และรวมสาระจาก:
 
-ชุดเอกสารนี้เขียนใหม่ให้ตรงกับระบบปัจจุบัน โดยรวมสาระจาก framework เดิม, PAR prompt เดิม และข้อกำหนดที่ยืนยันระหว่างพัฒนา
+- คู่มือสอน Prompt Framework
+- `framework.txt`
+- `prompt PAR.txt`
+- Framework และ Prompt Playbook ที่ปรับตาม architecture ปัจจุบัน
+
+เนื้อหาซ้ำถูกยุบรวม และตัวอย่างที่ล้าสมัยถูกปรับให้ตรงกับระบบปัจจุบัน เช่น Mobile ใช้ responsive Coverflow แทน horizontal image rail
 
 ## Source of truth ปัจจุบัน
 
