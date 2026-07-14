@@ -1,6 +1,6 @@
 # Portfolio Template — Documentation Index
 
-เอกสารชุดนี้เป็นคู่มืออ้างอิงของ `main` ปัจจุบัน สำหรับใช้อธิบายระบบ สาธิตงาน และสั่ง AI/Codex ให้แก้เว็บโดยไม่ทำให้ฟังก์ชันเดิมเสียหาย
+เอกสารใน repository นี้เป็นคู่มือภายในสำหรับทำความเข้าใจโครงสร้างระบบ และใช้สั่ง AI/Codex ให้แก้เว็บโดยไม่ทำให้ฟังก์ชันเดิมเสียหาย
 
 ## เริ่มอ่านจากไฟล์ใด
 
@@ -8,8 +8,8 @@
 |---|---|
 | เข้าใจว่าเว็บนี้ประกอบด้วยอะไรและทำงานอย่างไร | [`docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.md`](docs/PORTFOLIO_SYSTEM_FRAMEWORK_TH.md) |
 | เขียน Prompt ให้ AI/Codex สร้างหรือแก้เว็บอย่างเป็นระบบ | [`docs/PROMPT_PLAYBOOK_TH.md`](docs/PROMPT_PLAYBOOK_TH.md) |
-| ใช้งานและสาธิตเว็บให้ผู้ชมเข้าใจง่าย | [`docs/USER_AND_DEMO_GUIDE_TH.md`](docs/USER_AND_DEMO_GUIDE_TH.md) |
-| ตรวจงานก่อน deploy, print หรือขึ้นเวทีสาธิต | [`docs/MAINTENANCE_CHECKLIST_TH.md`](docs/MAINTENANCE_CHECKLIST_TH.md) |
+
+> คู่มือผู้ใช้งาน คู่มือสาธิต และ checklist สำหรับแจก ไม่เก็บไว้ใน repository หลัก ให้จัดทำเป็นไฟล์แจกแยกจาก source code
 
 ## สถานะเอกสารเดิม
 
