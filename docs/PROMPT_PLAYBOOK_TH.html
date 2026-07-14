@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prompt Framework Playbook</title>
+<style>
+:root{--bg:#07101d;--panel:#101d2e;--panel2:#16263b;--line:#2c4664;--text:#f2f7ff;--muted:#b7c7da;--cyan:#67e8f9;--purple:#c4b5fd;--green:#34d399;--yellow:#fbbf24;--red:#fb7185;--shadow:0 22px 70px rgba(0,0,0,.32)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Thai",sans-serif;line-height:1.75;color:var(--text);background:radial-gradient(circle at 10% 0,#13396d 0,transparent 30%),radial-gradient(circle at 92% 8%,#46236e 0,transparent 28%),var(--bg)}.wrap{width:min(1180px,calc(100% - 28px));margin:auto}.hero{padding:72px 0 36px}.badge{display:inline-block;padding:7px 12px;border-radius:999px;border:1px solid #3a5b7c;background:#0c192b;color:var(--cyan);font-weight:900}.hero h1{font-size:clamp(2rem,5vw,4.6rem);line-height:1.05;margin:18px 0 14px;background:linear-gradient(90deg,#fff,var(--cyan),#e9d5ff);-webkit-background-clip:text;color:transparent}.hero p{max-width:850px;color:var(--muted);font-size:1.08rem}.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}.nav a{color:white;text-decoration:none;background:#17283e;border:1px solid #375673;padding:9px 13px;border-radius:12px}.card{background:linear-gradient(180deg,#122239ef,#0c1728ef);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow)}.grid{display:grid;gap:18px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}h2,h3{line-height:1.3}.muted{color:var(--muted)}.selector{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.pill{padding:14px 8px;text-align:center;border-radius:14px;background:#16283e;border:1px solid #355472}.pill strong{display:block;color:var(--cyan);font-size:1.08rem}.framework{position:relative;overflow:hidden}.framework:after{content:attr(data-code);position:absolute;right:-6px;top:-24px;font-size:6.5rem;font-weight:1000;color:rgba(255,255,255,.035)}.formula{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}.token{padding:7px 10px;border-radius:10px;background:#1b3450;border:1px solid #365776;font-weight:800}.use{border-left:4px solid var(--green)}.avoid{border-left:4px solid var(--red)}.tip{border-left:4px solid var(--yellow)}pre{white-space:pre-wrap;background:#06101c;border:1px solid #263e5a;padding:16px;border-radius:15px;color:#dbeafe;overflow:auto}.promptbox{position:relative}.copy{position:absolute;right:12px;top:12px;border:1px solid #456785;background:#172b43;color:white;border-radius:10px;padding:7px 10px;cursor:pointer}.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}.bad{background:#2a1420;border-color:#683345}.good{background:#0d2925;border-color:#28645a}.flow{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.step{flex:1 1 150px;padding:14px;text-align:center;background:#17283e;border:1px solid #355472;border-radius:14px;font-weight:900}.arrow{color:var(--cyan);font-size:1.5rem}table{width:100%;border-collapse:collapse;background:#0d192a;border-radius:14px;overflow:hidden}th,td{padding:12px;border-bottom:1px solid #273f5b;text-align:left;vertical-align:top}th{background:#17283e;color:var(--cyan)}details{background:#0d192a;border:1px solid #2c4664;border-radius:14px;padding:13px 16px;margin:10px 0}summary{cursor:pointer;font-weight:900}.callout{padding:18px;border-radius:16px;background:linear-gradient(135deg,#13354c,#251c46);border:1px solid #42617f}.top{position:fixed;right:14px;bottom:14px;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:#17283e;border:1px solid #43627f;color:white;text-decoration:none}.footer{padding:40px 0 70px;color:#91a5bc}@media(max-width:920px){.g3,.g2,.selector,.compare{grid-template-columns:1fr}.arrow{width:100%;text-align:center;transform:rotate(90deg)}.hero{padding-top:42px}}@media print{body{background:white;color:#111}.card,.callout,details{background:white;color:#111;box-shadow:none;border-color:#bbb}.muted{color:#444}.nav,.copy,.top{display:none}pre{background:#f5f5f5;color:#111}}
+</style>
+</head>
+<body>
+<a href="#top" class="top" aria-label="กลับขึ้นด้านบน">↑</a>
+<header class="hero" id="top"><div class="wrap"><span class="badge">Prompt Framework Guide · Visual Edition</span><h1>เขียน Prompt ให้ AI เข้าใจงานตั้งแต่รอบแรก</h1><p>คู่มือนี้รวม RTF, RACE, CARE, CREATE, STAR และ PAR จากเอกสารสอนเดิม พร้อมตัวอย่างที่ใช้กับ Portfolio Template จริง โดยลดเนื้อหาซ้ำและอธิบายว่า “แต่ละช่องมีไว้ทำอะไร” มากกว่าการให้จำตัวย่ออย่างเดียว</p><div class="nav"><a href="#choose">เลือก Framework</a><a href="#frameworks">เรียนทีละสูตร</a><a href="#before-after">ก่อน–หลัง</a><a href="#four-prompts">4 Prompts สร้างโปรเจกต์</a><a href="#worksheet">แบบฝึกหัด</a></div></div></header>
+<main class="wrap">
+<section class="card"><h2>1. Prompt ที่ดีมีหน้าที่เหมือน “ใบสั่งงาน”</h2><div class="flow"><div class="step">บอกว่า AI เป็นใคร</div><div class="arrow">→</div><div class="step">บอกว่าต้องทำอะไร</div><div class="arrow">→</div><div class="step">ให้บริบทที่พอ</div><div class="arrow">→</div><div class="step">กำหนดผลลัพธ์</div><div class="arrow">→</div><div class="step">ใส่ข้อห้าม</div></div><div class="callout"><strong>หัวใจสำคัญ:</strong> Prompt ที่ดีไม่จำเป็นต้องยาว แต่ต้องลดพื้นที่ให้ AI เดาเอง โดยเฉพาะงานโค้ด งานเอกสาร และงานที่มีข้อจำกัด</div></section>
+<section id="choose" class="card" style="margin-top:22px"><h2>2. เลือก Framework จากประเภทงาน</h2><div class="selector"><div class="pill"><strong>RTF</strong>งานเร็ว</div><div class="pill"><strong>RACE</strong>มีบริบท</div><div class="pill"><strong>CARE</strong>มีตัวอย่าง</div><div class="pill"><strong>CREATE</strong>งานใหญ่</div><div class="pill"><strong>STAR</strong>วิเคราะห์ปัญหา</div><div class="pill"><strong>PAR</strong>แก้เป็นชั้น</div></div><table style="margin-top:18px"><tr><th>สถานการณ์</th><th>สูตรที่เหมาะ</th><th>เหตุผล</th></tr><tr><td>สรุปบทความเป็นตาราง</td><td>RTF</td><td>งานสั้นและรู้รูปแบบผลลัพธ์</td></tr><tr><td>ออกแบบเว็บราชการให้ทันสมัยแต่สุภาพ</td><td>RACE / CARE</td><td>ต้องคุมบริบท โทน และ reference</td></tr><tr><td>สร้างระบบ Portfolio ทั้งโปรเจกต์</td><td>CREATE</td><td>มีหลายส่วน หลายข้อห้าม และหลายไฟล์</td></tr><tr><td>Mobile Coverflow ไม่ยุบปิด</td><td>STAR / PAR</td><td>ต้องแยกอาการ สาเหตุ วิธีแก้ และผลลัพธ์</td></tr></table></section>
+<section id="frameworks" style="margin-top:26px"><h2>3. Framework แต่ละแบบ</h2><div class="grid g2">
+<article class="card framework" data-code="RTF"><h3>RTF — Role · Task · Format</h3><div class="formula"><span class="token">Role = ให้ AI เป็นใคร</span><span class="token">Task = ให้ทำอะไร</span><span class="token">Format = ตอบแบบไหน</span></div><p class="muted">เหมาะกับผู้เริ่มต้นและงานที่ scope ไม่ใหญ่</p><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Role:
+You are a senior frontend developer.
+
+Task:
+Explain CSS Grid and Flexbox for beginners.
+
+Format:
+Return a comparison table with short examples.</pre></div><div class="tip card"><strong>ถ้าขาด Format:</strong> AI อาจตอบยาวหรือจัดรูปแบบไม่เหมาะกับการใช้งาน</div></article>
+<article class="card framework" data-code="RACE"><h3>RACE — Role · Action · Context · Expectation</h3><div class="formula"><span class="token">Role</span><span class="token">Action</span><span class="token">Context</span><span class="token">Expectation</span></div><p class="muted">เหมาะกับงานองค์กร UX/UI และงานที่ต้องควบคุมคุณภาพ</p><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Role:
+You are an enterprise UX/UI designer.
+
+Action:
+Improve the Portfolio Mode hierarchy.
+
+Context:
+The product supports Portfolio, Resume, themes, TH/EN, print and mobile coverflow.
+
+Expectation:
+Keep it professional. Do not remove controls or break mobile.</pre></div></article>
+<article class="card framework" data-code="CARE"><h3>CARE — Context · Action · Result · Example</h3><div class="formula"><span class="token">Context</span><span class="token">Action</span><span class="token">Result</span><span class="token">Example</span></div><p class="muted">เหมาะกับงานที่มีภาพอ้างอิง งานออกแบบ งานเขียน และงาน Canva</p><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Context:
+This is a professional portfolio website.
+
+Action:
+Create the hero visual direction.
+
+Result:
+Premium, calm, trustworthy and modern.
+
+Example:
+Use the feeling of a high-end SaaS landing page, not a gaming poster.</pre></div><div class="tip card"><strong>อย่าเพียงส่งรูป:</strong> ควรบอกด้วยว่าชอบ “อะไร” ในตัวอย่าง เช่น spacing, mood, typography หรือ interaction</div></article>
+<article class="card framework" data-code="CREATE"><h3>CREATE — Context · Request · Explanation · Action · Task · Extras</h3><p class="muted">เหมาะกับ feature ใหญ่ refactor หรือการเริ่มโปรเจกต์ใหม่</p><div class="formula"><span class="token">ภาพรวม</span><span class="token">คำขอหลัก</span><span class="token">เหตุผล</span><span class="token">ขั้นตอน</span><span class="token">งานย่อย</span><span class="token">ข้อห้าม</span></div><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Context:
+[ระบบปัจจุบันและผู้ใช้]
+
+Request:
+[งานหลัก]
+
+Explanation:
+[เหตุผลและ behavior]
+
+Action:
+1. Inspect
+2. Plan
+3. Implement
+4. Verify
+
+Task:
+- [งานย่อย]
+
+Extras:
+- Preserve [ของเดิม]
+- Do not [ข้อห้าม]
+- Report risks and checks</pre></div></article>
+<article class="card framework" data-code="STAR"><h3>STAR — Situation · Task · Action · Result</h3><p class="muted">เหมาะกับ debug, root cause และ optimization</p><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Situation:
+On mobile, images move but the card does not close at the end.
+
+Task:
+Fix mobile collapse without breaking desktop.
+
+Action:
+Inspect progress logic, media queries and class timing.
+
+Result:
+Return root cause, minimal patch and regression checklist.</pre></div><div class="use card"><strong>ประโยชน์:</strong> ช่วยแยก “อาการที่เห็น” ออกจาก “สิ่งที่ต้องแก้” ทำให้ AI ไม่รีบแก้ผิดจุด</div></article>
+<article class="card framework" data-code="PAR"><h3>PAR — Problem · Action · Result</h3><p class="muted">เหมาะกับ bug เฉพาะจุด งานแบบแบ่งเลเยอร์ และ AI ที่มี context จำกัด</p><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Problem:
+Mobile coverflow stays open after the last image.
+
+Action:
+Add open–move–hold–close phases using the same progress model as desktop.
+
+Result:
+The image area closes and the next card follows without blank rail.</pre></div></article>
+</div></section>
+<section id="before-after" style="margin-top:28px"><h2>4. เปรียบเทียบ Prompt ก่อนและหลัง</h2><div class="compare"><article class="card bad"><h3>ก่อน: กว้างและเดาเยอะ</h3><pre>เมนูมือถือยังซ้ายอยู่ แก้ให้หน่อย</pre><p>AI ยังไม่รู้ viewport, selector, สิ่งที่ห้ามกระทบ หรือผลลัพธ์ที่ตรวจได้</p></article><article class="card good"><h3>หลัง: ตรวจได้และปลอดภัยกว่า</h3><pre>Problem:
+On mobile, the nav container is centered but the controls remain left aligned.
+
+Action:
+Inspect computed width, justify-content, overflow, stylesheet order and inline styles. Identify the winning rule before editing.
+
+Result:
+Controls are centered above 360px. Narrower screens may scroll without clipping.</pre></article></div></section>
+<section class="card" style="margin-top:28px"><h2>5. สูตรป้องกัน AI แก้งานเกิน Scope</h2><div class="grid g3"><div class="use card"><h3>Scope</h3><p>ระบุไฟล์หรือ section ที่อนุญาตให้แตะ</p></div><div class="use card"><h3>Preserve</h3><p>บอกว่าฟังก์ชันใดต้องไม่เสีย</p></div><div class="use card"><h3>Do not</h3><p>ห้าม rewrite, เปลี่ยน schema หรือเพิ่ม dependency โดยพลการ</p></div><div class="use card"><h3>Acceptance criteria</h3><p>กำหนดพฤติกรรมที่ตรวจได้</p></div><div class="use card"><h3>Test matrix</h3><p>Desktop, Mobile, Theme, Print และ Export</p></div><div class="use card"><h3>Report</h3><p>Changed, Preserved, Risk, Verified, Not verified</p></div></div></section>
+<section id="four-prompts" class="card" style="margin-top:28px"><h2>6. คัมภีร์ 4 Prompts สร้าง Portfolio แบบแบ่งเลเยอร์</h2><p class="muted">เนื้อหาเดิมถูกปรับให้ตรงกับระบบปัจจุบัน: ไม่ใช้ horizontal rail บน mobile และให้ Coverflow responsive เหมือน Desktop</p><details open><summary>Prompt 1 — Data Layer และ Shell</summary><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Problem:
+Create a static bilingual Portfolio/Resume generator without a database.
+
+Action:
+- Define schema for profile, contact, skills, projects, theme, layout and language.
+- Store data in localStorage with schemaVersion.
+- Add navigation, language, layout, theme and edit controls.
+- Escape user-provided text.
+
+Result:
+A safe bilingual shell that stores data in the browser and uses non-sensitive demo data.</pre></div></details><details><summary>Prompt 2 — Theme Engine และ Components</summary><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Problem:
+Portfolio and Resume must share the same visual identity across themes and dark/light modes.
+
+Action:
+- Create central theme tokens.
+- Make Header, Bio, Skills, Contact, Experience and Resume consume the same tokens.
+- Separate screen tokens and print tokens.
+- Avoid fixed colors that cause Resume mismatch.
+
+Result:
+All modes stay readable and visually consistent.</pre></div></details><details><summary>Prompt 3 — Responsive Coverflow Scrollytelling</summary><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Problem:
+Horizontal image rails create trailing blank space and poor mobile behavior.
+
+Action:
+- Use static layout for one image.
+- Use vertical-scroll coverflow for two or more images.
+- Use requestAnimationFrame.
+- Apply open 0.06, move 0.12–0.76, hold, close 0.90.
+- Use responsive step, angle and scale on mobile.
+- Flatten images for print.
+
+Result:
+Smooth coverflow on desktop and mobile with no blank rail.</pre></div></details><details><summary>Prompt 4 — Mobile, Print, Export และ Deploy</summary><div class="promptbox"><button class="copy" onclick="copyPrompt(this)">คัดลอก</button><pre>Problem:
+Mobile controls are difficult to tap and print/export may hide content due to animation state.
+
+Action:
+- Make navigation safe-area aware with practical touch targets.
+- Force print content visible and hide interactive controls.
+- Keep public and dist synchronized.
+- Load assets through prepare-vercel with cache versions.
+- Verify the deployed production path.
+
+Result:
+Mobile is usable, print content is complete and production loads the new assets.</pre></div></details></section>
+<section id="worksheet" class="grid g2" style="margin-top:28px"><article class="card"><h2>7. Worksheet: เติม Prompt</h2><pre>Role:
+You are ______________________.
+
+Action / Task:
+Please ______________________.
+
+Context:
+The situation is ______________________.
+
+Expectation / Result:
+The result must ______________________.
+
+Do not:
+______________________.</pre></article><article class="card"><h2>8. Checklist ก่อนส่ง Prompt</h2><table><tr><td>มีบทบาทหรือมุมมองที่เหมาะหรือไม่</td><td>□</td></tr><tr><td>งานหรือปัญหาชัดหรือไม่</td><td>□</td></tr><tr><td>บริบทพอให้ตัดสินใจหรือไม่</td><td>□</td></tr><tr><td>ผลลัพธ์ตรวจได้หรือไม่</td><td>□</td></tr><tr><td>มีข้อห้ามและสิ่งที่ต้อง preserve หรือไม่</td><td>□</td></tr><tr><td>งานโค้ดมี regression checklist หรือไม่</td><td>□</td></tr></table></article></section>
+<section class="callout" style="margin-top:28px"><h2>สรุปสูตรจำง่าย</h2><p><strong>RTF = เร็ว · RACE = มีบริบท · CARE = มีตัวอย่าง · CREATE = งานใหญ่ · STAR = วิเคราะห์ปัญหา · PAR = แก้เป็นชั้น</strong></p><p class="muted">ไม่ต้องใช้ทุกช่องทุกครั้ง เลือกเท่าที่จำเป็น แต่สำหรับงานโค้ดควรมี Scope, Preserve, Do not และ Acceptance criteria เสมอ</p></section>
+</main><footer class="footer"><div class="wrap">Prompt Framework Playbook · Visual edition · รวมและปรับปรุงจากคู่มือสอน Framework, framework.txt และ prompt PAR</div></footer>
+<script>
+function copyPrompt(btn){const pre=btn.parentElement.querySelector('pre');navigator.clipboard.writeText(pre.innerText).then(()=>{const old=btn.textContent;btn.textContent='คัดลอกแล้ว';setTimeout(()=>btn.textContent=old,1200)}).catch(()=>{btn.textContent='เลือกข้อความแทน'})}
+</script>
+</body></html>
