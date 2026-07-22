@@ -58,12 +58,14 @@ html = html.replace(/\/css\/coverflow-scrollytelling\.css\?v=[^"]+/g, '/css/cove
 html = html.replace(/\/js\/coverflow-scrollytelling\.js\?v=[^"]+/g, '/js/coverflow-scrollytelling.js?v=2');
 html = html.replace(/\/css\/resume-theme-sync\.css\?v=[^"]+/g, '/css/resume-theme-sync.css?v=1');
 html = html.replace(/\/css\/mobile-nav\.css\?v=[^"]+/g, '/css/mobile-nav.css?v=3');
+html = html.replace(/\/css\/runtime-hardening\.css\?v=[^"]+/g, '/css/runtime-hardening.css?v=1');
 html = html.replace(/\/css\/print\.css\?v=[^"]+/g, '/css/print.css?v=1');
 html = html.replace(/\/js\/mobile-nav-center\.js\?v=[^"]+/g, '/js/mobile-nav-center.js?v=1');
 
 const coverflowCss = '<link rel="stylesheet" href="/css/coverflow-scrollytelling.css?v=2">';
 const resumeThemeCss = '<link rel="stylesheet" href="/css/resume-theme-sync.css?v=1">';
 const mobileNavCss = '<link rel="stylesheet" href="/css/mobile-nav.css?v=3">';
+const runtimeHardeningCss = '<link rel="stylesheet" href="/css/runtime-hardening.css?v=1">';
 const printCss = '<link rel="stylesheet" href="/css/print.css?v=1" media="print">';
 const coverflowJs = '<script src="/js/coverflow-scrollytelling.js?v=2"></script>';
 const mobileNavJs = '<script src="/js/mobile-nav-center.js?v=1"></script>';
@@ -77,6 +79,9 @@ if (!html.includes('/css/resume-theme-sync.css')) {
 if (!html.includes('/css/mobile-nav.css')) {
   html = html.replace('</head>', `    ${mobileNavCss}\n</head>`);
 }
+if (!html.includes('/css/runtime-hardening.css')) {
+  html = html.replace('</head>', `    ${runtimeHardeningCss}\n</head>`);
+}
 if (!html.includes('/css/print.css')) {
   html = html.replace('</head>', `    ${printCss}\n</head>`);
 }
@@ -88,4 +93,4 @@ if (!html.includes('/js/mobile-nav-center.js')) {
 }
 
 fs.writeFileSync(htmlPath, html, 'utf8');
-console.log('Prepared active v49 timing, responsive coverflow phases, resume theme synchronization, centered mobile navigation, and canonical A4 print CSS.');
+console.log('Prepared active v49 timing, responsive coverflow phases, resume theme synchronization, centered mobile navigation, runtime hardening, and canonical A4 print CSS.');
