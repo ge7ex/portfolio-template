@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const root = process.cwd();
 const htmlPath = path.join(root, 'dist', 'index.html');
@@ -7,6 +8,20 @@ const runtimePaths = [
   path.join(root, 'public', 'legacy', 'v49-app.js'),
   path.join(root, 'dist', 'legacy', 'v49-app.js')
 ];
+
+const mirroredAssets = [
+  ['public/css/print.css', 'dist/css/print.css'],
+  ['public/css/runtime-hardening.css', 'dist/css/runtime-hardening.css'],
+  ['public/js/optimized-microinteractions.js', 'dist/js/optimized-microinteractions.js']
+];
+
+for (const [sourceRelative, targetRelative] of mirroredAssets) {
+  const source = path.join(root, sourceRelative);
+  const target = path.join(root, targetRelative);
+  if (!fs.existsSync(source)) throw new Error(`Missing canonical asset: ${source}`);
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.copyFileSync(source, target);
+}
 
 const oldThresholds = `                        const startMove = 0.045;
                         const endMove = 0.86;
@@ -26,6 +41,22 @@ const newActivity = `                        const isOpeningWindow = progress > 
                         const isBeforeTerminalCollapse = progress < collapseAfter;
                         const isActive = isInViewport && isOpeningWindow && isBeforeTerminalCollapse;`;
 
+const legacyCursorStart = '        /* v43: robust cursor-local seamless 3x3 tilt grid';
+const legacyCursorEnd = '        let hasBootedPortfolioApp = false;';
+const cursorCompatibilityStub = `        /* optimized-microinteractions.js owns the active cursor runtime. */
+        function ensureCursorLocalGrid() {
+            return document.getElementById('cursor-local-grid');
+        }
+
+        function initMicroInteractions() {
+            const activeRuntime = window.initMicroInteractions;
+            if (typeof activeRuntime === 'function' && activeRuntime !== initMicroInteractions) {
+                activeRuntime();
+            }
+        }
+
+        let hasBootedPortfolioApp = false;`;
+
 for (const runtimePath of runtimePaths) {
   if (!fs.existsSync(runtimePath)) {
     throw new Error(`Missing active runtime: ${runtimePath}`);
@@ -43,6 +74,15 @@ for (const runtimePath of runtimePaths) {
     code = code.replace(oldActivity, newActivity);
   } else if (!code.includes('const isOpeningWindow = progress > openAfter;')) {
     throw new Error(`Could not find v49 scrollytelling activity block in ${runtimePath}`);
+  }
+
+  if (!code.includes('optimized-microinteractions.js owns the active cursor runtime')) {
+    const startIndex = code.indexOf(legacyCursorStart);
+    const endIndex = code.indexOf(legacyCursorEnd, startIndex);
+    if (startIndex < 0 || endIndex < 0) {
+      throw new Error(`Could not isolate legacy cursor runtime in ${runtimePath}`);
+    }
+    code = `${code.slice(0, startIndex)}${cursorCompatibilityStub}${code.slice(endIndex + legacyCursorEnd.length)}`;
   }
 
   fs.writeFileSync(runtimePath, code, 'utf8');
@@ -98,4 +138,5 @@ if (!html.includes('/js/optimized-microinteractions.js')) {
 }
 
 fs.writeFileSync(htmlPath, html, 'utf8');
-console.log('Prepared active v49 timing, responsive coverflow phases, resume theme synchronization, centered mobile navigation, optimized microinteractions, runtime hardening, and canonical A4 print CSS.');
+execFileSync(process.execPath, [path.join(root, 'scripts', 'audit-runtime.cjs')], { stdio: 'inherit' });
+console.log('Prepared active v49 timing, stripped legacy cursor runtime, synchronized deploy assets, and verified optimized A4 output.');
