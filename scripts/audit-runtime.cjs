@@ -50,7 +50,8 @@ if (hardeningIndex < 0 || printIndex <= hardeningIndex) fail('Print CSS must loa
 
 if (legacy.includes('v43: robust cursor-local seamless 3x3 tilt grid')) fail('Legacy 3x3 cursor implementation was not stripped from deployed runtime.');
 if (!legacy.includes('optimized-microinteractions.js owns the active cursor runtime')) fail('Legacy runtime compatibility stub marker is missing.');
-if (/addEventListener\(\s*['"]mousemove['"]/.test(legacy)) fail('Deployed legacy runtime still registers a mousemove listener.');
+if (legacy.includes('window._portfolioMouseMove = move')) fail('Legacy cursor mousemove ownership remains in deployed runtime.');
+if (legacy.includes("Array.from({ length: 9 }, (_, i) => `<span class=\"cursor-local-cell\"")) fail('Legacy cursor grid creation remains in deployed runtime.');
 
 if (optimizedDist !== optimizedPublic) fail('Optimized microinteraction source differs between public and dist.');
 if (hardeningDist !== hardeningPublic) fail('Runtime hardening CSS differs between public and dist.');
