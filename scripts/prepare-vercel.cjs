@@ -61,6 +61,7 @@ html = html.replace(/\/css\/mobile-nav\.css\?v=[^"]+/g, '/css/mobile-nav.css?v=3
 html = html.replace(/\/css\/runtime-hardening\.css\?v=[^"]+/g, '/css/runtime-hardening.css?v=1');
 html = html.replace(/\/css\/print\.css\?v=[^"]+/g, '/css/print.css?v=1');
 html = html.replace(/\/js\/mobile-nav-center\.js\?v=[^"]+/g, '/js/mobile-nav-center.js?v=1');
+html = html.replace(/\/js\/optimized-microinteractions\.js\?v=[^"]+/g, '/js/optimized-microinteractions.js?v=1');
 
 const coverflowCss = '<link rel="stylesheet" href="/css/coverflow-scrollytelling.css?v=2">';
 const resumeThemeCss = '<link rel="stylesheet" href="/css/resume-theme-sync.css?v=1">';
@@ -69,6 +70,7 @@ const runtimeHardeningCss = '<link rel="stylesheet" href="/css/runtime-hardening
 const printCss = '<link rel="stylesheet" href="/css/print.css?v=1" media="print">';
 const coverflowJs = '<script src="/js/coverflow-scrollytelling.js?v=2"></script>';
 const mobileNavJs = '<script src="/js/mobile-nav-center.js?v=1"></script>';
+const optimizedMicroInteractionsJs = '<script src="/js/optimized-microinteractions.js?v=1"></script>';
 
 if (!html.includes('/css/coverflow-scrollytelling.css')) {
   html = html.replace('</head>', `    ${coverflowCss}\n</head>`);
@@ -91,6 +93,9 @@ if (!html.includes('/js/coverflow-scrollytelling.js')) {
 if (!html.includes('/js/mobile-nav-center.js')) {
   html = html.replace('</body>', `    ${mobileNavJs}\n</body>`);
 }
+if (!html.includes('/js/optimized-microinteractions.js')) {
+  html = html.replace('</body>', `    ${optimizedMicroInteractionsJs}\n</body>`);
+}
 
 fs.writeFileSync(htmlPath, html, 'utf8');
-console.log('Prepared active v49 timing, responsive coverflow phases, resume theme synchronization, centered mobile navigation, runtime hardening, and canonical A4 print CSS.');
+console.log('Prepared active v49 timing, responsive coverflow phases, resume theme synchronization, centered mobile navigation, optimized microinteractions, runtime hardening, and canonical A4 print CSS.');
