@@ -43,6 +43,7 @@ const newActivity = `                        const isOpeningWindow = progress > 
 
 const legacyCursorStart = '        /* v43: robust cursor-local seamless 3x3 tilt grid';
 const legacyCursorEnd = '        let hasBootedPortfolioApp = false;';
+const pressurePatchStart = '/* ==================================\n   V2 parity patch: cursor-pressure microinteraction + low-spec lazy behaviour';
 const cursorCompatibilityStub = `        /* optimized-microinteractions.js owns the active cursor runtime. */
         function ensureCursorLocalGrid() {
             return document.getElementById('cursor-local-grid');
@@ -83,6 +84,11 @@ for (const runtimePath of runtimePaths) {
       throw new Error(`Could not isolate legacy cursor runtime in ${runtimePath}`);
     }
     code = `${code.slice(0, startIndex)}${cursorCompatibilityStub}${code.slice(endIndex + legacyCursorEnd.length)}`;
+  }
+
+  const pressurePatchIndex = code.indexOf(pressurePatchStart);
+  if (pressurePatchIndex >= 0) {
+    code = `${code.slice(0, pressurePatchIndex).trimEnd()}\n`;
   }
 
   fs.writeFileSync(runtimePath, code, 'utf8');
@@ -139,4 +145,4 @@ if (!html.includes('/js/optimized-microinteractions.js')) {
 
 fs.writeFileSync(htmlPath, html, 'utf8');
 execFileSync(process.execPath, [path.join(root, 'scripts', 'audit-runtime.cjs')], { stdio: 'inherit' });
-console.log('Prepared active v49 timing, stripped legacy cursor runtime, synchronized deploy assets, and verified optimized A4 output.');
+console.log('Prepared active v49 timing, removed duplicate cursor runtimes, synchronized deploy assets, and verified optimized A4 output.');
