@@ -44,7 +44,6 @@ body.layout-resume .resume-card:hover {
   background: color-mix(in srgb, var(--resume-accent) 5%, #ffffff) !important;
 }
 
-/* Inline edit controls inside the resume sheet previously retained a fixed purple color. */
 body.layout-resume .resume-cv-shell button,
 body.layout-resume .resume-a4-sheet button,
 body.layout-resume .resume-a4-preview button {

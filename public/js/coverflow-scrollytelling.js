@@ -70,18 +70,10 @@
             const offset = index - activeFloat;
             const abs = Math.abs(offset);
             const limited = clamp(offset, mobile ? -2.35 : -3.25, mobile ? 2.35 : 3.25);
-            const scale = mobile
-                ? clamp(1 - (abs * 0.18), 0.52, 1)
-                : clamp(1 - (abs * 0.135), 0.58, 1);
-            const opacity = mobile
-                ? clamp(1 - (abs * 0.34), 0.10, 1)
-                : clamp(1 - (abs * 0.27), 0.16, 1);
-            const blur = mobile
-                ? clamp((abs - 0.55) * 0.9, 0, 2.4)
-                : clamp((abs - 0.7) * 0.75, 0, 2.2);
-            const brightness = mobile
-                ? clamp(1 - (abs * 0.20), 0.42, 1)
-                : clamp(1 - (abs * 0.16), 0.48, 1);
+            const scale = mobile ? clamp(1 - (abs * 0.18), 0.52, 1) : clamp(1 - (abs * 0.135), 0.58, 1);
+            const opacity = mobile ? clamp(1 - (abs * 0.34), 0.10, 1) : clamp(1 - (abs * 0.27), 0.16, 1);
+            const blur = mobile ? clamp((abs - 0.55) * 0.9, 0, 2.4) : clamp((abs - 0.7) * 0.75, 0, 2.2);
+            const brightness = mobile ? clamp(1 - (abs * 0.20), 0.42, 1) : clamp(1 - (abs * 0.16), 0.48, 1);
             const z = Math.max(1, 100 - Math.round(abs * 18));
 
             image.style.setProperty('--coverflow-offset', limited.toFixed(4));
@@ -98,8 +90,7 @@
     function updateAll() {
         rafId = 0;
         if (window.matchMedia('print').matches) return;
-        document.querySelectorAll('body.layout-portfolio .experience-section .scrollytelling-wrapper.coverflow-ready')
-            .forEach(renderTrack);
+        document.querySelectorAll('body.layout-portfolio .experience-section .scrollytelling-wrapper.coverflow-ready').forEach(renderTrack);
     }
 
     function requestUpdate() {
