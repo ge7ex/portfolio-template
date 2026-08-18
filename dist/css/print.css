@@ -1,0 +1,118 @@
+/*
+ * Canonical print stylesheet.
+ * Loaded after all screen/theme styles and owns A4 portrait/landscape output.
+ */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+@media print {
+  :root { --print-accent: var(--resume-accent, #0f766e); }
+  html, body {
+    width: auto !important; min-width: 0 !important; height: auto !important;
+    margin: 0 !important; padding: 0 !important; overflow: visible !important;
+    background: #fff !important; color: #0f172a !important;
+    font-family: "IBM Plex Sans Thai", "Noto Sans Thai", "Leelawadee UI", Arial, sans-serif !important;
+    font-size: 11pt !important; line-height: 1.45 !important;
+    -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+  }
+  *, *::before, *::after {
+    box-sizing: border-box !important; animation: none !important; transition: none !important;
+    text-shadow: none !important; filter: none !important;
+    -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+  }
+  nav, #edit-modal, #quick-edit-popover, #theme-panel, #export-panel,
+  #public-export-branch, #canva-export-branch, #dynamic-bg, #theme-decorations,
+  #scroll-progress, #watermark, #cursor-local-grid, #mouse-grid-field, #cursor-orb,
+  .mouse-flashlight, .pointer-flashlight, .no-print, .scrolly-spacer { display: none !important; }
+  #app, .container, .print-layout-wrapper {
+    width: 100% !important; max-width: 100% !important; min-height: 0 !important;
+    margin: 0 !important; padding: 0 !important; border: 0 !important;
+    border-radius: 0 !important; box-shadow: none !important; overflow: visible !important;
+  }
+  h1, h2, h3, h4, h5, h6 { break-after: avoid-page; page-break-after: avoid; orphans: 3; widows: 3; }
+  p, li { orphans: 3; widows: 3; }
+  a { color: inherit !important; text-decoration: none !important; }
+
+  body.layout-resume #app { width: 190mm !important; max-width: 190mm !important; }
+  body.layout-resume .resume-cv-shell,
+  body.layout-resume .resume-a4-preview {
+    width: 190mm !important; max-width: 190mm !important; min-height: 277mm !important;
+    display: grid !important; grid-template-columns: 64mm minmax(0, 126mm) !important;
+    margin: 0 !important; border: 0 !important; border-radius: 0 !important;
+    box-shadow: none !important; overflow: visible !important; background: #fff !important;
+  }
+  body.layout-resume .resume-cv-sidebar {
+    min-width: 0 !important; min-height: 277mm !important; padding: 8mm !important;
+    color: #fff !important;
+    background: linear-gradient(165deg, var(--resume-sidebar-1, #0f766e), var(--resume-sidebar-2, #134e4a), var(--resume-sidebar-3, #0f172a)) !important;
+  }
+  body.layout-resume .resume-cv-sidebar,
+  body.layout-resume .resume-cv-sidebar * { color: #fff !important; }
+  body.layout-resume .resume-cv-main {
+    min-width: 0 !important; padding: 8mm 9mm !important; background: #fff !important; color: #0f172a !important;
+  }
+  body.layout-resume .resume-cv-main h3,
+  body.layout-resume .section-title { color: var(--print-accent) !important; border-bottom-color: var(--print-accent) !important; }
+  body.layout-resume .resume-card,
+  body.layout-resume .extra-card { background: transparent !important; box-shadow: none !important; }
+  body.layout-resume .resume-card {
+    border-left: 1.5pt solid var(--print-accent) !important;
+    break-inside: avoid-page; page-break-inside: avoid;
+  }
+  body.layout-resume .resume-page-break { break-before: auto !important; page-break-before: auto !important; }
+  body.layout-resume .glow-point { display: none !important; }
+
+  body.layout-portfolio { background: #fff !important; }
+  body.layout-portfolio #app { width: 100% !important; padding: 0 !important; background: #fff !important; }
+  body.layout-portfolio .portfolio-hero,
+  body.layout-portfolio header,
+  body.layout-portfolio section,
+  body.layout-portfolio .story-section,
+  body.layout-portfolio .scrollytelling-wrapper,
+  body.layout-portfolio .sticky,
+  body.layout-portfolio .cinematic-image-wrapper,
+  body.layout-portfolio .cinematic-image-inner,
+  body.layout-portfolio .unified-card {
+    position: static !important; inset: auto !important; width: 100% !important; max-width: 100% !important;
+    height: auto !important; min-height: 0 !important; max-height: none !important;
+    margin-left: 0 !important; margin-right: 0 !important; transform: none !important;
+    opacity: 1 !important; overflow: visible !important;
+  }
+  body.layout-portfolio .portfolio-hero,
+  body.layout-portfolio .unified-card,
+  body.layout-portfolio .extra-card { background: #fff !important; color: #0f172a !important; box-shadow: none !important; }
+  body.layout-portfolio .unified-card {
+    padding: 7mm !important; border: 1px solid #dbe4ef !important;
+    border-left: 3pt solid var(--print-accent) !important; border-radius: 8px !important;
+  }
+  body.layout-portfolio .scrollytelling-track,
+  body.layout-portfolio .coverflow-track {
+    display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 5mm !important; width: 100% !important; padding: 5mm 0 0 !important;
+    margin: 0 !important; transform: none !important; overflow: visible !important;
+  }
+  body.layout-portfolio .scrollytelling-track img,
+  body.layout-portfolio .coverflow-track img,
+  body.layout-portfolio .coverflow-card img {
+    width: 100% !important; max-width: 100% !important; height: 52mm !important; max-height: 52mm !important;
+    object-fit: contain !important; object-position: center !important;
+    border: 1px solid #cbd5e1 !important; border-radius: 6px !important; background: #fff !important;
+    break-inside: avoid-page; page-break-inside: avoid;
+  }
+  body.layout-portfolio .print-exp-item,
+  body.layout-portfolio .portfolio-extra-section { break-inside: auto !important; page-break-inside: auto !important; }
+  body.layout-portfolio .extra-card,
+  body.layout-portfolio blockquote,
+  body.layout-portfolio .client-logo-grid span { break-inside: avoid-page; page-break-inside: avoid; }
+  body.print-landscape.layout-portfolio .scrollytelling-track,
+  body.print-landscape.layout-portfolio .coverflow-track { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  body.print-landscape.layout-portfolio .scrollytelling-track img,
+  body.print-landscape.layout-portfolio .coverflow-track img,
+  body.print-landscape.layout-portfolio .coverflow-card img { height: 42mm !important; max-height: 42mm !important; }
+}
+
+@media print and (orientation: landscape) {
+  @page { size: A4 landscape; margin: 10mm; }
+}

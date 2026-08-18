@@ -1,0 +1,89 @@
+/* Runtime hardening loaded after legacy style.css.
+ * This file owns compatibility, motion accessibility, and coarse-pointer fallbacks.
+ * It intentionally does not remove legacy selectors or DOM hooks.
+ */
+
+/* Correct the invalid legacy timing token: `active` is not a timing function. */
+button {
+  transition: transform .2s ease, background-color .3s ease;
+}
+
+/* Preserve readable surfaces when backdrop-filter is unsupported. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  body > nav,
+  #theme-panel,
+  #public-export-branch,
+  #public-canva-branch,
+  .quick-edit-card {
+    background-color: rgba(15, 23, 42, .96) !important;
+  }
+}
+
+/* Heavy cursor/GPU effects are desktop-pointer enhancements, not mobile requirements. */
+@media (hover: none), (pointer: coarse) {
+  #mouse-grid-field,
+  #cursor-local-grid,
+  #cursor-orb,
+  .cursor-orb,
+  .mouse-flashlight,
+  .pointer-flashlight {
+    display: none !important;
+  }
+
+  #theme-decorations,
+  .portfolio-hero,
+  .unified-card,
+  .coverflow-card,
+  .resume-card {
+    will-change: auto !important;
+  }
+}
+
+/* Respect the operating-system motion preference without flattening the desktop design. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  #mouse-grid-field,
+  #cursor-local-grid,
+  #cursor-orb,
+  .cursor-orb,
+  .mouse-flashlight,
+  .pointer-flashlight,
+  .hero-orb,
+  #theme-decorations {
+    display: none !important;
+  }
+
+  .scrollytelling-track,
+  .coverflow-track,
+  .cinematic-image-inner,
+  .unified-card,
+  .resume-card {
+    transform: none !important;
+  }
+}
+
+/* Avoid horizontal page overflow caused by fixed decorative layers. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
