@@ -55,19 +55,26 @@ if (!fs.existsSync(htmlPath)) {
 let html = fs.readFileSync(htmlPath, 'utf8');
 html = html.replace(/\s*<script src="\/js\/adaptive-scrollytelling\.js\?v=[^"]+"><\/script>/g, '');
 html = html.replace(/\/css\/coverflow-scrollytelling\.css\?v=[^"]+/g, '/css/coverflow-scrollytelling.css?v=2');
+html = html.replace(/\/css\/gallery-aspect-ratio\.css\?v=[^"]+/g, '/css/gallery-aspect-ratio.css?v=1');
 html = html.replace(/\/js\/coverflow-scrollytelling\.js\?v=[^"]+/g, '/js/coverflow-scrollytelling.js?v=2');
+html = html.replace(/\/js\/gallery-image-replacement\.js\?v=[^"]+/g, '/js/gallery-image-replacement.js?v=1');
 html = html.replace(/\/css\/resume-theme-sync\.css\?v=[^"]+/g, '/css/resume-theme-sync.css?v=1');
 html = html.replace(/\/css\/mobile-nav\.css\?v=[^"]+/g, '/css/mobile-nav.css?v=3');
 html = html.replace(/\/js\/mobile-nav-center\.js\?v=[^"]+/g, '/js/mobile-nav-center.js?v=1');
 
 const coverflowCss = '<link rel="stylesheet" href="/css/coverflow-scrollytelling.css?v=2">';
+const galleryAspectCss = '<link rel="stylesheet" href="/css/gallery-aspect-ratio.css?v=1">';
 const resumeThemeCss = '<link rel="stylesheet" href="/css/resume-theme-sync.css?v=1">';
 const mobileNavCss = '<link rel="stylesheet" href="/css/mobile-nav.css?v=3">';
 const coverflowJs = '<script src="/js/coverflow-scrollytelling.js?v=2"></script>';
+const galleryReplacementJs = '<script src="/js/gallery-image-replacement.js?v=1"></script>';
 const mobileNavJs = '<script src="/js/mobile-nav-center.js?v=1"></script>';
 
 if (!html.includes('/css/coverflow-scrollytelling.css')) {
   html = html.replace('</head>', `    ${coverflowCss}\n</head>`);
+}
+if (!html.includes('/css/gallery-aspect-ratio.css')) {
+  html = html.replace('</head>', `    ${galleryAspectCss}\n</head>`);
 }
 if (!html.includes('/css/resume-theme-sync.css')) {
   html = html.replace('</head>', `    ${resumeThemeCss}\n</head>`);
@@ -78,9 +85,12 @@ if (!html.includes('/css/mobile-nav.css')) {
 if (!html.includes('/js/coverflow-scrollytelling.js')) {
   html = html.replace('</body>', `    ${coverflowJs}\n</body>`);
 }
+if (!html.includes('/js/gallery-image-replacement.js')) {
+  html = html.replace('</body>', `    ${galleryReplacementJs}\n</body>`);
+}
 if (!html.includes('/js/mobile-nav-center.js')) {
   html = html.replace('</body>', `    ${mobileNavJs}\n</body>`);
 }
 
 fs.writeFileSync(htmlPath, html, 'utf8');
-console.log('Prepared active v49 timing, responsive coverflow phases, resume theme synchronization, and enforced centered mobile navigation.');
+console.log('Prepared active v49 timing, responsive coverflow phases, desktop gallery fill, approved jazz portrait replacement migration, resume theme synchronization, and enforced centered mobile navigation.');

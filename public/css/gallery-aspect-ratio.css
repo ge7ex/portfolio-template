@@ -1,0 +1,25 @@
+/* Portfolio gallery desktop fill fix.
+   Keep the source image untouched and preserve the already-correct mobile/tablet behavior.
+   On desktop, resize each gallery image to fill the existing coverflow frame. */
+
+@media (min-width: 1024px) {
+  body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+/* Mobile/tablet remains governed by the existing responsive gallery rules. */
+
+@media print {
+  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
+    width: 100% !important;
+    height: var(--print-fit-img-h, auto) !important;
+    max-width: 100% !important;
+    object-fit: cover !important;
+  }
+}
