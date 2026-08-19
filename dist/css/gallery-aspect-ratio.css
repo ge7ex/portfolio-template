@@ -1,35 +1,32 @@
 /* Portfolio gallery aspect-ratio normalization.
-   Keep source images untouched; standardize only their on-page gallery frame. */
+   Desktop-only fix: keep source images and the already-correct mobile layout untouched. */
 
-body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
-  aspect-ratio: 16 / 9 !important;
-  object-fit: cover !important;
-  object-position: center center !important;
-}
-
-/* Desktop/tablet: preserve the existing gallery height rhythm, but derive width
-   from the 16:9 frame instead of each image's intrinsic ratio. */
 @media (min-width: 1024px) {
   body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
-    width: auto !important;
-  }
-}
-
-/* Mobile: the legacy stylesheet sets both width and height, which can create
-   inconsistent boxes for mixed source ratios. Make width the controlling axis
-   and let the explicit 16:9 ratio determine height. */
-@media (max-width: 1023px) {
-  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
-    width: min(85vw, 430px) !important;
-    max-width: min(85vw, 430px) !important;
+    aspect-ratio: 16 / 9 !important;
+    width: clamp(364px, 46vh, 551px) !important;
     height: auto !important;
+    max-width: min(56vw, 680px) !important;
     max-height: none !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  /* Match the desktop coverflow stage to the normalized frame instead of
+     leaving an oversized dark media area beneath a landscape image. */
+  body.layout-portfolio .coverflow-ready .cinematic-image-inner,
+  body.layout-portfolio .coverflow-ready .coverflow-track {
+    min-height: clamp(229px, 29vh, 334px) !important;
+    height: clamp(229px, 29vh, 334px) !important;
   }
 }
 
-/* Print keeps the existing print-specific sizing/cropping rules. */
+/* Mobile/tablet remains governed by the existing responsive gallery rules. */
+
 @media print {
   body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
     aspect-ratio: auto !important;
+    width: 100% !important;
+    height: var(--print-fit-img-h, auto) !important;
   }
 }
