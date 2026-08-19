@@ -1,23 +1,15 @@
-/* Portfolio gallery aspect-ratio normalization.
-   Desktop-only fix: keep source images and the already-correct mobile layout untouched. */
+/* Portfolio gallery desktop fill fix.
+   Keep the source image untouched and preserve the already-correct mobile/tablet behavior.
+   On desktop, resize each gallery image to fill the existing coverflow frame. */
 
 @media (min-width: 1024px) {
-  body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
-    aspect-ratio: 16 / 9 !important;
-    width: clamp(364px, 46vh, 551px) !important;
-    height: auto !important;
-    max-width: min(56vw, 680px) !important;
+  body.layout-portfolio .coverflow-ready .coverflow-track .scrolly-full-image {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
     max-height: none !important;
     object-fit: cover !important;
     object-position: center center !important;
-  }
-
-  /* Match the desktop coverflow stage to the normalized frame instead of
-     leaving an oversized dark media area beneath a landscape image. */
-  body.layout-portfolio .coverflow-ready .cinematic-image-inner,
-  body.layout-portfolio .coverflow-ready .coverflow-track {
-    min-height: clamp(229px, 29vh, 334px) !important;
-    height: clamp(229px, 29vh, 334px) !important;
   }
 }
 
@@ -25,8 +17,9 @@
 
 @media print {
   body.layout-portfolio .experience-section .scrollytelling-track .scrolly-full-image {
-    aspect-ratio: auto !important;
     width: 100% !important;
     height: var(--print-fit-img-h, auto) !important;
+    max-width: 100% !important;
+    object-fit: cover !important;
   }
 }
